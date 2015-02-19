@@ -1,0 +1,23 @@
+{
+  "name": "blackbeardapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinsimper/blackbeardapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kevinsimper/blackbeardapp/issues"
+  },
+  "homepage": "https://github.com/kevinsimper/blackbeardapp",
+  "dependencies": {
+    "harp": "^0.15.2"
+  }
+}
