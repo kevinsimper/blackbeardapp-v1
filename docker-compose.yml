@@ -1,0 +1,25 @@
+frontend:
+  build: ./frontend/
+  ports: 
+   - "9000:9000"
+  volumes:
+   - ./frontend/:/app
+
+db:
+  image: mongo:latest
+  ports:
+   - "27017:27017"
+
+backend:
+  build: ./backend/
+  ports:
+   - "9001:9000"
+  volumes:
+   - ./backend/:/app
+
+router:
+  build: ./router/
+  ports:
+  - "9002:9000"
+  volumes:
+  - ./router/:/app
