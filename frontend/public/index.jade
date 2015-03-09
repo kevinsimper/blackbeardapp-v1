@@ -1,1 +1,62 @@
-h1 Blackbeard.io
+.cover
+  h1 Blackbeard.io
+  h2 Docker container hosting
+
+.steps
+  h2 How it works
+  ul
+    li You create the app you want and build a dockerfile to specify how to run it
+    li You push it to us via the docker cli
+    li We host it for you, with automatic scaling, load-balancing, etc.
+
+.works
+  h2 Behind the scenes
+  p We have a docker registry, where we store your docker image securely.
+  p We give you a CNAME that you point your domain to.
+  p We use powerful servers and because of the nature of containers, it allows us to run many of them together together in our custom cluster. We have multiple load balancers to tunnel the traffic to your containers. Redundancy layers are provided by ensuring at least two containers are running at any point in time.
+  p We choose not to build any loging mechanise, as we found there were several more dedicated for logging your applications output. We highly recommend loggly.com and papertrailapp.com.
+  p Security
+
+.features
+  h2 features
+
+  ul
+    li CLI for scaling containers
+    li Automatic load-balancing
+    li Free SSL on subdomain
+
+.pricing
+  h2 Pricing
+
+  .pricetable
+    .priceitem
+      ul
+        li $3 dollars per container
+        li 256 mb per container
+        li 100 GB traffic
+        li adequate cpu usage
+    .priceitem
+      ul
+        li $6 dollars per container
+        li 512 mb per container
+        li 200 GB traffic
+        li adequate cpu usage
+
+.about
+  h2 About us
+
+  .persons
+    .person
+      h3 James Brooking
+    .person
+      h3 Kevin Simper
+
+.contact
+  form
+    label Name
+    input(type="text")
+    label Email
+    input(type="text")
+    label Message
+    textarea
+    button Send message
