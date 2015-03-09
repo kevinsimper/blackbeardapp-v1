@@ -1,0 +1,9 @@
+.steps-container {
+  display: flex;
+  padding: 0;
+  justify-content: space-between;
+  .step {
+    width: 30%;
+    list-style-type: none;
+  }
+}

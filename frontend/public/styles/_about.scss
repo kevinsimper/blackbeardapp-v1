@@ -1,0 +1,13 @@
+.persons {
+  display: flex;
+  justify-content: space-around;
+  .person {
+    width: 40%;
+  }
+  .name {
+    text-align: center;
+  }
+  .headshot {
+    border-radius: 100%;
+  }
+}

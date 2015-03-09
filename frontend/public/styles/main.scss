@@ -1,3 +1,8 @@
+@import "modules/buttons";
+@import "cover";
+@import "steps";
+@import "pricing";
+@import "about";
 @import "contact";
 
 body {
@@ -5,4 +10,8 @@ body {
   max-width: 800px;
   margin: 0 auto;
   padding: 10px;
+}
+
+img {
+  max-width: 100%;
 }

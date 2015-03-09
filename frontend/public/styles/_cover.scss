@@ -1,0 +1,6 @@
+.cover {
+  min-height: 300px;
+  .btn-signup {
+    @extend %btn;
+  }
+}

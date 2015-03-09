@@ -1,13 +1,16 @@
 .cover
   h1 Blackbeard.io
   h2 Docker container hosting
+  .signup
+    input.email(type="email", placeholder="Email")
+    button.btn-signup Request invitation
 
 .steps
   h2 How it works
-  ul
-    li You create the app you want and build a dockerfile to specify how to run it
-    li You push it to us via the docker cli
-    li We host it for you, with automatic scaling, load-balancing, etc.
+  ul.steps-container
+    li.step You create the app you want and build a dockerfile to specify how to run it
+    li.step You push it to us via the docker cli
+    li.step We host it for you, with automatic scaling, load-balancing, etc.
 
 .works
   h2 Behind the scenes
@@ -47,16 +50,19 @@
 
   .persons
     .person
-      h3 James Brooking
+      h3.name James Brooking
+      img.headshot(src="https://avatars2.githubusercontent.com/u/458825?v=3&s=460")
     .person
-      h3 Kevin Simper
+      h3.name Kevin Simper
+      img.headshot(src="https://avatars0.githubusercontent.com/u/1126497?v=3&s=460")
 
 .contact
+  h2 Got any questions?
   form
     label Name
-    input(type="text")
+    input.name(type="text" placeholder="Email")
     label Email
-    input(type="text")
+    input.email(type="email")
     label Message
-    textarea
-    button Send message
+    textarea.message
+    button.btn-send Send message

@@ -1,0 +1,10 @@
+%btn {
+  background: dodgerblue;
+  border: 1px #CCC;
+  padding: 20px 30px;
+  color: white;
+  font-size: 1em;
+  &:hover {
+    background: darken(dodgerblue, 10%);
+  }
+}
