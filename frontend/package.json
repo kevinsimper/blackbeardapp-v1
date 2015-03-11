@@ -19,5 +19,8 @@
   "homepage": "https://github.com/kevinsimper/blackbeardapp",
   "dependencies": {
     "harp": "^0.15.2"
+  },
+  "devDependencies": {
+    "watchify": "^2.4.0"
   }
 }
