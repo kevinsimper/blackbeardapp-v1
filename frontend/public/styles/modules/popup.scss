@@ -1,0 +1,16 @@
+.popup {
+  position: absolute;
+  background: #FFF;
+  box-shadow: 0px 0px 20px #808080;
+  width: 90%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: 20px;
+  max-width: $layoutWidth;
+  display: none;
+}
+
+.popup--visible {
+  display: block;
+}

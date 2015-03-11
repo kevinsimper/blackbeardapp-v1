@@ -1,0 +1,1 @@
+watchify app/index.js -o public/build/bundle.js -dv
