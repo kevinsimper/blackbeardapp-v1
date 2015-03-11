@@ -5,6 +5,13 @@ frontend:
   volumes:
    - ./frontend/:/app
 
+backend:
+  build: ./backend/
+  ports:
+   - "8000:8000"
+  volumes:
+   - ./backend/:/app
+
 db:
   image: mongo:latest
   ports:
