@@ -12,4 +12,4 @@ RUN npm install
 
 EXPOSE 9000
 
-CMD node /app/server.js
+CMD npm start
