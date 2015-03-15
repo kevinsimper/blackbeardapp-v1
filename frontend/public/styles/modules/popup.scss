@@ -1,16 +1,24 @@
 .popup {
   position: absolute;
+  top: 10px;
   background: #FFF;
-  box-shadow: 0px 0px 20px #808080;
+  box-shadow: 0 0 0px 10px rgba(0, 0, 0, 0.3);
   width: 90%;
   left: 0;
   right: 0;
   margin: 0 auto;
   padding: 20px;
-  max-width: $layoutWidth;
+  max-width: 1100px;
   display: none;
+  color: #00658B;
+  z-index: 2;
+  border-radius: 5px;
 }
 
 .popup--visible {
   display: block;
+}
+
+.popup__btn-signup {
+  @extend %btn;
 }
