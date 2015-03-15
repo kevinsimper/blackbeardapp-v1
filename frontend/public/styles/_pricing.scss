@@ -1,5 +1,7 @@
 .pricing {
-  @extend %container;
+  background: $darkbg;
+  padding: 40px;
+  color: white;
 }
 .pricetable {
   display: flex;

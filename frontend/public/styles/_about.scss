@@ -1,5 +1,6 @@
 .about {
   @extend %container;
+  padding: 40px 0;
 }
 .persons {
   display: flex;

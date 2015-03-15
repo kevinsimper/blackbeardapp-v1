@@ -47,21 +47,22 @@
     li Free SSL on subdomain
 
 .pricing
-  h2 Pricing
+  .container
+    h2 Pricing
 
-  .pricetable
-    .priceitem
-      ul
-        li $3 dollars per container
-        li 256 mb per container
-        li 100 GB traffic
-        li adequate cpu usage
-    .priceitem
-      ul
-        li $6 dollars per container
-        li 512 mb per container
-        li 200 GB traffic
-        li adequate cpu usage
+    .pricetable
+      .priceitem
+        ul
+          li $3 dollars per container
+          li 256 mb per container
+          li 100 GB traffic
+          li adequate cpu usage
+      .priceitem
+        ul
+          li $6 dollars per container
+          li 512 mb per container
+          li 200 GB traffic
+          li adequate cpu usage
 
 .about
   h2 About us
@@ -75,12 +76,13 @@
       img.headshot(src="https://avatars0.githubusercontent.com/u/1126497?v=3&s=460")
 
 .contact
-  h2 Got any questions?
-  form
-    label Name
-    input.name(type="text" placeholder="Email")
-    label Email
-    input.email(type="email")
-    label Message
-    textarea.message
-    button.btn-send Send message
+  .container
+    h2 Got any questions?
+    form
+      label Name
+      input.name(type="text" placeholder="Email")
+      label Email
+      input.email(type="email")
+      label Message
+      textarea.message
+      button.btn-send Send message
