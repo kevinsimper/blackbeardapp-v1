@@ -1,5 +1,8 @@
 $layoutWidth: 1100px;
+$lightblue: #00a9e8;
 $darkblue: #00658b;
+
+$lightbg: #e9f9ff;
 
 @import "modules/buttons";
 @import "modules/forms";
@@ -7,6 +10,8 @@ $darkblue: #00658b;
 @import "header";
 @import "cover";
 @import "steps";
+@import "works";
+@import "features";
 @import "pricing";
 @import "about";
 @import "contact";
@@ -25,8 +30,11 @@ img {
   box-sizing: border-box;
 }
 
-.container {
+%container {
   max-width: $layoutWidth;
   margin: 0 auto;
   position: relative;
+}
+.container {
+  @extend %container;
 }

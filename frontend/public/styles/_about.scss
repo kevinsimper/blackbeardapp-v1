@@ -1,3 +1,6 @@
+.about {
+  @extend %container;
+}
 .persons {
   display: flex;
   justify-content: space-around;

@@ -1,3 +1,12 @@
+.steps {
+  padding: 40px 0;
+  .headline {
+    color: $lightblue;
+    text-align: center;
+    font-weight: 300;
+    font-size: 2em;
+  }
+}
 .steps-container {
   display: flex;
   padding: 0;
@@ -5,5 +14,22 @@
   .step {
     width: 30%;
     list-style-type: none;
+    text-align: center;
+    color: $darkblue;
+  }
+  .step__image {
+    padding: 40px 0;
+    border: 1px solid $lightblue;
+    border-radius: 80px;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+  }
+  .step__number {
+    background: $lightblue;
+    color: #FFF;
+    width: 24px;
+    margin: 0 auto;
+    border-radius: 20px;
   }
 }

@@ -1,3 +1,7 @@
+.contact {
+  @extend %container;
+}
+
 input, label, button {
   display: block;
 }

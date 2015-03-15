@@ -1,3 +1,6 @@
+.pricing {
+  @extend %container;
+}
 .pricetable {
   display: flex;
   .priceitem {
