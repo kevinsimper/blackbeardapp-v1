@@ -1,68 +1,72 @@
 .cover
-  h1 Blackbeard.io
-  h2 Docker container hosting
-  .signup
-    button.btn-signup Signup now
-  include ./popup.jade
+  .container.cover-container
 
-.steps
-  h2 How it works
-  ul.steps-container
-    li.step You create the app you want and build a dockerfile to specify how to run it
-    li.step You push it to us via the docker cli
-    li.step We host it for you, with automatic scaling, load-balancing, etc.
+    .headline 
+      h1 You only have to bring the container, we host it for you
+      .signup
+        button.btn-signup Signup now
+      include ./popup.jade
+    .ship
 
-.works
-  h2 Behind the scenes
-  p We have a docker registry, where we store your docker image securely.
-  p We give you a CNAME that you point your domain to.
-  p We use powerful servers and because of the nature of containers, it allows us to run many of them together together in our custom cluster. We have multiple load balancers to tunnel the traffic to your containers. Redundancy layers are provided by ensuring at least two containers are running at any point in time.
-  p We choose not to build any loging mechanise, as we found there were several more dedicated for logging your applications output. We highly recommend loggly.com and papertrailapp.com.
-  p Security
+.container 
+  .steps
+    h2 How it works
+    ul.steps-container
+      li.step You create the app you want and build a dockerfile to specify how to run it
+      li.step You push it to us via the docker cli
+      li.step We host it for you, with automatic scaling, load-balancing, etc.
 
-.features
-  h2 features
+  .works
+    h2 Behind the scenes
+    p We have a docker registry, where we store your docker image securely.
+    p We give you a CNAME that you point your domain to.
+    p We use powerful servers and because of the nature of containers, it allows us to run many of them together together in our custom cluster. We have multiple load balancers to tunnel the traffic to your containers. Redundancy layers are provided by ensuring at least two containers are running at any point in time.
+    p We choose not to build any loging mechanise, as we found there were several more dedicated for logging your applications output. We highly recommend loggly.com and papertrailapp.com.
+    p Security
 
-  ul
-    li CLI for scaling containers
-    li Automatic load-balancing
-    li Free SSL on subdomain
+  .features
+    h2 features
 
-.pricing
-  h2 Pricing
+    ul
+      li CLI for scaling containers
+      li Automatic load-balancing
+      li Free SSL on subdomain
 
-  .pricetable
-    .priceitem
-      ul
-        li $3 dollars per container
-        li 256 mb per container
-        li 100 GB traffic
-        li adequate cpu usage
-    .priceitem
-      ul
-        li $6 dollars per container
-        li 512 mb per container
-        li 200 GB traffic
-        li adequate cpu usage
+  .pricing
+    h2 Pricing
 
-.about
-  h2 About us
+    .pricetable
+      .priceitem
+        ul
+          li $3 dollars per container
+          li 256 mb per container
+          li 100 GB traffic
+          li adequate cpu usage
+      .priceitem
+        ul
+          li $6 dollars per container
+          li 512 mb per container
+          li 200 GB traffic
+          li adequate cpu usage
 
-  .persons
-    .person
-      h3.name James Brooking
-      img.headshot(src="https://avatars2.githubusercontent.com/u/458825?v=3&s=460")
-    .person
-      h3.name Kevin Simper
-      img.headshot(src="https://avatars0.githubusercontent.com/u/1126497?v=3&s=460")
+  .about
+    h2 About us
 
-.contact
-  h2 Got any questions?
-  form
-    label Name
-    input.name(type="text" placeholder="Email")
-    label Email
-    input.email(type="email")
-    label Message
-    textarea.message
-    button.btn-send Send message
+    .persons
+      .person
+        h3.name James Brooking
+        img.headshot(src="https://avatars2.githubusercontent.com/u/458825?v=3&s=460")
+      .person
+        h3.name Kevin Simper
+        img.headshot(src="https://avatars0.githubusercontent.com/u/1126497?v=3&s=460")
+
+  .contact
+    h2 Got any questions?
+    form
+      label Name
+      input.name(type="text" placeholder="Email")
+      label Email
+      input.email(type="email")
+      label Message
+      textarea.message
+      button.btn-send Send message

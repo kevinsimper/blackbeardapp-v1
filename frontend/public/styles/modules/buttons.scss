@@ -8,3 +8,15 @@
     background: darken(dodgerblue, 10%);
   }
 }
+
+%btn-white {
+  background: white;
+  border: 1px #CCC;
+  padding: 20px 30px;
+  color: $darkblue;
+  font-size: 1em;
+  text-transform: uppercase;
+  &:hover {
+    background: darken(white, 10%);
+  }
+}

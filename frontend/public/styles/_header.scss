@@ -1,0 +1,44 @@
+.header {
+  width: 100%;
+  color: white;
+  position: absolute;
+}
+.navigation {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 400px;
+}
+.navigation__link {
+  flex: 1;
+}
+
+.members {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 200px;
+
+}
+.members__link {
+  flex: 1;
+}
+
+.logo-container {
+  display: flex;
+  .logo {
+    width: 140px;
+  }
+  .text {
+    flex: 1;
+    padding: 50px 0 0 0;
+  }
+}

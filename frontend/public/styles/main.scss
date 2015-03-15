@@ -1,8 +1,10 @@
-$layoutWidth: 800px;
+$layoutWidth: 1100px;
+$darkblue: #00658b;
 
 @import "modules/buttons";
 @import "modules/forms";
 @import "modules/popup";
+@import "header";
 @import "cover";
 @import "steps";
 @import "pricing";
@@ -11,9 +13,8 @@ $layoutWidth: 800px;
 
 body {
   font-family: 'Open Sans', sans-serif;
-  max-width: $layoutWidth;
   margin: 0 auto;
-  padding: 10px;
+  padding: 0px;
 }
 
 img {
@@ -22,4 +23,10 @@ img {
 
 * {
   box-sizing: border-box;
+}
+
+.container {
+  max-width: $layoutWidth;
+  margin: 0 auto;
+  position: relative;
 }
