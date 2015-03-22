@@ -17,38 +17,45 @@
         .step__image
           img(src="/images/stepone.svg") 
         .step__number 3
-        div You create the app you want and build a dockerfile to specify how to run it
+        div.step__text You create the app you want and build a dockerfile to specify how to run it
       li.step 
         .step__image
           img(src="/images/steptwo.svg")
         .step__number 2
-        div You push it to us via the docker cli
+        div.step__text You push it to us via the docker cli
       li.step
         .step__image
           img(src="/images/stepthree.svg")
         .step__number 3
-        div We host it for you, with automatic scaling, load-balancing, etc.
+        div.step__text We host it for you, with automatic scaling, load-balancing, etc.
 
 .works
   .container
-    h2 Behind the scenes
-    p We have a docker registry, where we store your docker image securely.
+    h2.typo__headline.typo__headline--mediumblue How it works behind the scenes
+
+    .works__banner.
+      We have a docker registry,<br/>
+      where we store your docker image securely.
+
     p We give you a CNAME that you point your domain to.
     p We use powerful servers and because of the nature of containers, it allows us to run many of them together together in our custom cluster. We have multiple load balancers to tunnel the traffic to your containers. Redundancy layers are provided by ensuring at least two containers are running at any point in time.
     p We choose not to build any loging mechanise, as we found there were several more dedicated for logging your applications output. We highly recommend loggly.com and papertrailapp.com.
     p Security
 
 .features
-  h2 features
+  img.features__headerimage(src="/images/features.png")
+  h2.typo__headline.typo__headline--mediumblue Features
 
-  ul
-    li CLI for scaling containers
-    li Automatic load-balancing
-    li Free SSL on subdomain
+  .features__list
+    .features__item CLI for scaling containers
+    .features__spacer
+    .features__item Automatic load-balancing
+    .features__spacer
+    .features__item Free SSL on subdomain
 
 .pricing
   .container
-    h2 Pricing
+    h2.typo__headline.typo__headline--white Pricing
 
     .pricetable
       .priceitem
@@ -65,7 +72,7 @@
           li adequate cpu usage
 
 .about
-  h2 About us
+  h2.typo__headline About us
 
   .persons
     .person
@@ -77,7 +84,7 @@
 
 .contact
   .container
-    h2 Got any questions?
+    h2.typo__headline Got any questions?
     form
       label Name
       input.name(type="text" placeholder="Email")

@@ -2,3 +2,21 @@
   padding: 40px 0;
   @extend %container;
 }
+.features__headerimage {
+  display: block;
+  margin: 0 auto;
+}
+.features__list {
+  margin: 40px 0;
+  text-align: center;
+}
+.features__item {
+  font-size: 2em;
+  color: $lightblue;
+}
+.features__spacer {
+  background-image: url(/images/features-spacer.png);
+  width: 348px;
+  height: 39px;
+  margin: 30px auto;
+}
