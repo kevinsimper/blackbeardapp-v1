@@ -59,17 +59,32 @@
 
     .pricetable
       .priceitem
-        ul
-          li $3 dollars per container
-          li 256 mb per container
-          li 100 GB traffic
-          li adequate cpu usage
+        .priceitem__details
+          .priceitem__name Silver
+          ul.priceitem__specs
+            li 256 mb per container
+            li 100 GB traffic
+            li adequate cpu usage
+        .priceitem__price $3
+        .priceitem__deploy DEPLOY
       .priceitem
-        ul
-          li $6 dollars per container
-          li 512 mb per container
-          li 200 GB traffic
-          li adequate cpu usage
+        .priceitem__details
+          .priceitem__name Gold
+          ul.priceitem__specs
+            li 512 mb per container
+            li 200 GB traffic
+            li adequate cpu usage
+        .priceitem__price $6
+        .priceitem__deploy DEPLOY
+      .priceitem
+        .priceitem__details
+          .priceitem__name Diamond
+          ul.priceitem__specs
+            li 512 mb per container
+            li 200 GB traffic
+            li adequate cpu usage
+        .priceitem__price $11
+        .priceitem__deploy DEPLOY
 
 .about
   h2.typo__headline About us
