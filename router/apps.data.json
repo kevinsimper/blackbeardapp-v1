@@ -1,0 +1,9 @@
+[
+	{
+		"cname": "jambroo",
+		"ip": "8.8.8.8",
+		"port": 8003,
+		"active": true,
+		"user_id": "#HASH#"
+	}
+]

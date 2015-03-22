@@ -12,6 +12,13 @@ backend:
   volumes:
    - ./backend/:/app
 
+router:
+  build: ./router/
+  ports:
+   - "8500:8500"
+  volumes:
+   - ./router/:/app
+
 db:
   image: mongo:latest
   ports:

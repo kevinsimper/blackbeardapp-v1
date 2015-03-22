@@ -1,0 +1,16 @@
+{
+  "name": "router",
+  "version": "0.0.0",
+  "description": "1. Accept connection 2. Map CNAME using mongo to application 3. Proxy request to application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "hapi": "~8.4.0",
+    "mongodb": "~1.4.35",
+    "q": "~1.2.0"
+  }
+}
