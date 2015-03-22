@@ -1,11 +1,13 @@
 %btn {
-  background: dodgerblue;
+  background: $lightblue;
   border: 1px #CCC;
   padding: 20px 30px;
   color: white;
   font-size: 1em;
+  text-transform: uppercase;
+  border-radius: 40px;
   &:hover {
-    background: darken(dodgerblue, 10%);
+    background: darken($lightblue, 10%);
   }
 }
 
@@ -16,6 +18,7 @@
   color: $darkblue;
   font-size: 1em;
   text-transform: uppercase;
+  border-radius: 40px;
   &:hover {
     background: darken(white, 10%);
   }

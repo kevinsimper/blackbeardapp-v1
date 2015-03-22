@@ -8,15 +8,29 @@
       include ./popup.jade
     .ship
 
-.container 
-  .steps
-    h2 How it works
-    ul.steps-container
-      li.step You create the app you want and build a dockerfile to specify how to run it
-      li.step You push it to us via the docker cli
-      li.step We host it for you, with automatic scaling, load-balancing, etc.
 
-  .works
+.steps
+  .container 
+    h2.headline How it works
+    ul.steps-container
+      li.step
+        .step__image
+          img(src="/images/stepone.svg") 
+        .step__number 3
+        div You create the app you want and build a dockerfile to specify how to run it
+      li.step 
+        .step__image
+          img(src="/images/steptwo.svg")
+        .step__number 2
+        div You push it to us via the docker cli
+      li.step
+        .step__image
+          img(src="/images/stepthree.svg")
+        .step__number 3
+        div We host it for you, with automatic scaling, load-balancing, etc.
+
+.works
+  .container
     h2 Behind the scenes
     p We have a docker registry, where we store your docker image securely.
     p We give you a CNAME that you point your domain to.
@@ -24,15 +38,16 @@
     p We choose not to build any loging mechanise, as we found there were several more dedicated for logging your applications output. We highly recommend loggly.com and papertrailapp.com.
     p Security
 
-  .features
-    h2 features
+.features
+  h2 features
 
-    ul
-      li CLI for scaling containers
-      li Automatic load-balancing
-      li Free SSL on subdomain
+  ul
+    li CLI for scaling containers
+    li Automatic load-balancing
+    li Free SSL on subdomain
 
-  .pricing
+.pricing
+  .container
     h2 Pricing
 
     .pricetable
@@ -49,18 +64,19 @@
           li 200 GB traffic
           li adequate cpu usage
 
-  .about
-    h2 About us
+.about
+  h2 About us
 
-    .persons
-      .person
-        h3.name James Brooking
-        img.headshot(src="https://avatars2.githubusercontent.com/u/458825?v=3&s=460")
-      .person
-        h3.name Kevin Simper
-        img.headshot(src="https://avatars0.githubusercontent.com/u/1126497?v=3&s=460")
+  .persons
+    .person
+      h3.name James Brooking
+      img.headshot(src="https://avatars2.githubusercontent.com/u/458825?v=3&s=460")
+    .person
+      h3.name Kevin Simper
+      img.headshot(src="https://avatars0.githubusercontent.com/u/1126497?v=3&s=460")
 
-  .contact
+.contact
+  .container
     h2 Got any questions?
     form
       label Name
