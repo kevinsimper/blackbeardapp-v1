@@ -5,16 +5,22 @@
 
 input, label, button {
   display: block;
+  color: $lightblue;
+}
+
+.contact-form {
+  text-align: center;
 }
 
 .name, .email, .message {
   font-size: 1.1em;
   padding: 5px 10px;
-  margin: 10px 0;
+  margin: 10px auto 30px;
   width: 100%;
+  border: none;
 }
 .name, .email {
-  max-width: 300px;
+  max-width: 500px;
 }
 
 .message {
@@ -24,4 +30,5 @@ input, label, button {
 
 .btn-send {
   @extend %btn;
+  margin: 0 auto;
 }
