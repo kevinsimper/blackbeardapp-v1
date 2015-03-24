@@ -6,33 +6,30 @@ server.connection({
     port: '8500'
 });
 
-var handler = function (request, reply) {
-    // Request backend
+var mapper = function (request, callback) {
     var url = 'mongodb://localhost:27017/blackbeard';
-
-    var Q = require('q');
-    var deferred = Q.defer();
 
     // Use connect method to connect to the `
     MongoClient.connect(url, function(err, db) {
         var collection = db.collection('apps');
+
         var requestedCname = request.url.path.substr(1, request.url.path.length);
 
         collection.findOne({cname: requestedCname}, function(error, result) {
-            var uri = "http://"+result.ip+":"+result.port;
-
-            deferred.resolve(reply.proxy({ uri: uri, passThrough: true, xforward: true, timeout: 30000 }));
+            var uri = '';
+            if (result) {
+                uri = "http://"+result.ip+":"+result.port;
+            }
+            
+            callback(null, uri);
         })
-
     });
-
-    return deferred.promise;
-};
+}
 
 server.route({
     method: '*',
     path: '/{p*}',
-    handler: handler
+    handler: { proxy: { mapUri: mapper } }
 });
 
 server.start(function() {
