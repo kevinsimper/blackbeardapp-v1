@@ -1,17 +1,37 @@
 .cover {
   background: url(/images/bg.png);
   min-height: 512px;
-  padding: 20px;
+  padding: 20px 20px 60px;
   color: white;
   padding-top: 140px;
+  background-size: contain;
   .btn-signup {
     @extend %btn-white;
   }
   .ship {
-    width: 569px;
-    height: 278px;
-    float: right;
-    background: url(/images/ship.png)
+    flex: 1;
+    margin: auto;
+    padding: 50px 0 0px;
+    @include medium {
+      width: 569px;
+      float: right;
+    }
+  }
+  .headline {
+    flex: 1;
+    @include small {
+    }
+    h1 {
+      font-size: 2em;
+      font-weight: 300;
+      padding-right: 20px;
+      @include small {
+        font-size: 2.5em;
+      }
+      @include medium {
+        font-size: 3em;
+      }
+    }
   }
 }
 .cover::after {
@@ -19,23 +39,21 @@
   background-image: url(/images/cover-arrow.png);
   width: 57px;
   height: 25px;
-  display: block;
   position: absolute;
-  top: 512px;
+  top: 521px;
   margin: 0 auto;
   left: 0;
   right: 0;
+  display: none;
+  @media (min-width: 940px) {
+    display: block;
+  }
 }
 
 .cover-container {
   display: flex;
-}
-.headline {
-  flex: 1;
-  min-width: 450px;
-  h1 {
-    font-size: 3em;
-    font-weight: 300;
-    padding-right: 20px;
+  flex-direction: column;
+  @include medium {
+    flex-direction: row;
   }
 }

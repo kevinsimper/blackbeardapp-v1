@@ -21,6 +21,10 @@
   text-transform: uppercase;
   border-radius: 40px;
   cursor: pointer;
+  width: 100%;
+  @include small {
+    width: auto;
+  }
   &:hover {
     background: darken(white, 10%);
   }
