@@ -11,12 +11,20 @@
   @extend .container;
   display: flex;
   justify-content: space-around;
+  flex-direction: column;
+  @include medium {
+    flex-direction: row;
+  }
   .person {
-    width: 40%;
+    width: auto;
     color: white;
     margin: 50px 0;
+    @include medium {
+      width: 40%;
+    }
   }
   .person__text {
+    padding: 0 20px;
   }
   .person__name {
     text-align: center;
