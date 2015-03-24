@@ -1,4 +1,29 @@
 .works {
   padding: 40px 0;
   background: $lightbg;
+  color: $mediumblue;
+}
+.works__banner:before {
+  content: " ";
+  display: block;
+  background-color: $darkblue;
+  background-image: url(/images/works.svg);
+  background-position: center center;
+  background-size: 50px;
+  background-repeat: no-repeat;
+  width: 120px;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+.works__banner {
+  background-color: $darkbg;
+  color: white;
+  text-transform: uppercase;
+  padding: 15px 160px;
+  font-weight: 600;
+  font-size: 1.3em;
+  margin: 30px 0;
+  position: relative
 }
