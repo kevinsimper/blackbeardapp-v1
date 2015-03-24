@@ -1,6 +1,15 @@
+$micro-breakpoint: 390px;
 $small-breakpoint: 480px;
-$medium-breakpoint: 760px;
-$large-breakpoint: 1024px;
+$medium-breakpoint: 600px;
+$large-breakpoint: 790px;
+$huge-breakpoint: 1000px;
+$gigantic-breakpoint: 1200px;
+
+@mixin micro {
+  @media only screen and (min-width: $small-breakpoint) {
+    @content;
+  }
+}
 
 @mixin small {
   @media only screen and (min-width: $small-breakpoint) {
@@ -16,6 +25,18 @@ $large-breakpoint: 1024px;
 
 @mixin large {
   @media only screen and (min-width: $large-breakpoint) {
+    @content;
+  }
+}
+
+@mixin huge {
+  @media only screen and (min-width: $huge-breakpoint) {
+    @content;
+  }
+}
+
+@mixin gigantic {
+  @media only screen and (min-width: $gigantic-breakpoint) {
     @content;
   }
 }
