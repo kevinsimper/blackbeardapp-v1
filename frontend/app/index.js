@@ -1,6 +1,6 @@
+var React = require('react');
+var Signup = require('./signup.jsx');
 
-var signUpButton = document.querySelector('.btn-signup');
-signUpButton.addEventListener('click', function() {
-  var popup = document.querySelector('.popup');
-  popup.classList.add('popup--visible');
-})
+
+
+React.render(<Signup />, document.querySelector('.signup'));

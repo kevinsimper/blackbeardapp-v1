@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/kevinsimper/blackbeardapp",
   "dependencies": {
-    "harp": "^0.15.2"
+    "classnames": "^1.2.0",
+    "harp": "^0.15.2",
+    "react": "^0.13.1"
   },
   "devDependencies": {
     "browserify": "^9.0.3",
