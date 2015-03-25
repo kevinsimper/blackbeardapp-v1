@@ -1,9 +1,22 @@
-$priceitemWidth: 300px;
+$priceitemWidth: 280px;
 
+.pricing::before {
+  content: " ";
+  background: url(/images/pricing-arrow.png);
+  width: 116px;
+  height: 50px;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
 .pricing {
   background: $darkbg;
   padding: 40px;
   color: white;
+  position: relative;
 }
 .pricetable {
   overflow-x: auto;
@@ -20,13 +33,38 @@ $priceitemWidth: 300px;
   .priceitem__name {
     text-align: center;
     font-size: 2em;
-    line-height: 3em;
+    line-height: 4em;
     background: #d2ffd0;
   }
+  .priceitem__name--silver {
+    background: #ffefdc;
+  }
+  .priceitem__name--gold {
+    background: #d2ffd0;
+  }
+  .priceitem__name--diamond {
+    background: #b7fffe;
+  }
   .priceitem__details {
-    background: white;
+    background-image: url(/images/price-bg@2x.png);
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    background-size: cover;
     color: $lightblue;
     margin: 0 0 40px;
+    padding: 0 0 50px;
+    position: relative;
+    width: 250px;
+  }
+  .priceitem__anchor {
+    background-image: url(/images/price-anchor.png);
+    width: 51px;
+    height: 68px;
+    position: absolute;
+    left: -3px;
+    right: 0;
+    bottom: -32px;
+    margin: 0 auto;
   }
   .priceitem__specs {
     margin: 0;
