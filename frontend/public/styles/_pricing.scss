@@ -1,12 +1,21 @@
+$priceitemWidth: 300px;
+
 .pricing {
   background: $darkbg;
   padding: 40px;
   color: white;
 }
 .pricetable {
-  display: flex;
+  overflow-x: auto;
+  margin: 0 -40px;
+  .pricetable__scroll {
+    width: $priceitemWidth * 3;
+    margin: 0 auto;
+  }
   .priceitem {
-    flex: 1;
+    padding: 0 20px 40px;
+    display: inline-block;
+    width: $priceitemWidth;
   }
   .priceitem__name {
     text-align: center;
@@ -16,8 +25,8 @@
   }
   .priceitem__details {
     background: white;
-    margin: 0 20px 40px;
     color: $lightblue;
+    margin: 0 0 40px;
   }
   .priceitem__specs {
     margin: 0;
