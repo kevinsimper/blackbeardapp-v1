@@ -1,11 +1,20 @@
 .about {
   padding: 40px 0;
 }
+.about__headerimage {
+  text-align: center;
+}
+.about__headline {
+  background-image: url(/images/about-headline.png);
+  background-repeat: no-repeat;
+  background-position: center 22px;
+  margin: 0 0 10px;
+}
 .persons-container {
   background-image: url(/images/about-bg.jpg);
   background-size: cover;
   background-position: center center;
-  margin: 90px 0;
+  margin: 20px 0 90px;
 }
 .persons {
   @extend .container;
