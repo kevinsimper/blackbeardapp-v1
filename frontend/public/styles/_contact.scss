@@ -3,21 +3,25 @@
   padding: 40px 0;
 }
 
-input, label, button {
+.contact label {
   display: block;
   color: $lightblue;
+  font-size: 1em;
 }
+
 
 .contact-form {
   text-align: center;
 }
 
 .name, .email, .message {
+  display: block;
   font-size: 1.1em;
-  padding: 5px 10px;
+  padding: 9px 15px;
   margin: 10px auto 30px;
   width: 100%;
   border: none;
+  border-radius: 5px;
 }
 .name, .email {
   max-width: 500px;
