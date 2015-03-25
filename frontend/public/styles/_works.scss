@@ -3,6 +3,9 @@
   background: $lightbg;
   color: $mediumblue;
 }
+.works-container {
+  padding: 40px;
+}
 .works__banner:before {
   content: " ";
   display: block;
@@ -21,7 +24,7 @@
   background-color: $darkbg;
   color: white;
   text-transform: uppercase;
-  padding: 15px 160px;
+  padding: 15px 20px 15px 160px;
   font-weight: 600;
   font-size: 1.3em;
   margin: 30px 0;

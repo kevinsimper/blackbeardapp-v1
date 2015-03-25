@@ -4,29 +4,34 @@
   position: absolute;
 }
 .navigation {
-  display: flex;
   margin: 0;
   padding: 0;
   list-style-type: none;
   position: absolute;
   right: 0;
-  top: 40px;
+  top: 70px;
   width: 400px;
+  display: none;
+  @include large {
+    display: flex;
+  }
 }
 .navigation__link {
   flex: 1;
 }
 
 .members {
-  display: flex;
   margin: 0;
   padding: 0;
   list-style-type: none;
   position: absolute;
   right: 0px;
-  top: 0px;
+  top: 30px;
   width: 200px;
-
+  display: none;
+  @include large {
+    display: flex;
+  }
 }
 .members__link {
   flex: 1;
