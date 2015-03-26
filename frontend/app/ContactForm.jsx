@@ -1,11 +1,13 @@
 var React = require('react');
+var request = require('superagent');
 
 var ContactForm = React.createClass({
   getInitialState: function() {
     return {
       name: '',
       email: '',
-      message: ''
+      message: '',
+      status: ''
     };
   },
   handleNameChange: function(e) {
@@ -23,19 +25,46 @@ var ContactForm = React.createClass({
       message: e.target.value
     });
   },
+  handleSubmit: function(e) {
+    e.preventDefault();
+
+    var self = this
+
+    request
+      .post('/contact')
+      .send({
+        name: this.state.name,
+        email: this.state.email,
+        message: this.state.message,
+      })
+      .end(function(err, res) {
+        if(err) {
+          self.setState({
+            status: 'There was an error sending your message!'
+          })
+        } else {
+          self.setState({
+            status: 'Your message was send!'
+          })
+        }
+      })
+  },
   render: function() {
     return (
-      <h2 className="typo__headline">Got any questions?</h2>
+      <div>
+        <h2 className="typo__headline">Got any questions?</h2>
 
-      <form className="contact-form">
-          <label>Name</label>
-          <input className="name" type="text" onChange={this.handleNameChange}>
-          <label>Email</label>
-          <input className="email" type="email" onChange={this.handleEmailChange}>
-          <label>Message</label>
-          <textarea className="message" onChange={this.handleMessageChange}></textarea>
-          <button className="btn-send" >Send message</button>
-      </form>
+        <form className="contact-form" onSubmit={this.handleSubmit}>
+            <label>Name</label>
+            <input className="name" type="text" value={this.state.name} onChange={this.handleNameChange} required />
+            <label>Email</label>
+            <input className="email" type="email" value={this.state.email} onChange={this.handleEmailChange} required />
+            <label>Message</label>
+            <textarea className="message" value={this.state.message} onChange={this.handleMessageChange} required></textarea>
+            <button className="btn-send" type="submit">Send message</button>
+            <div>{this.state.status}</div>
+        </form>
+      </div>
     );
   }
 
