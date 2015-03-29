@@ -22,3 +22,7 @@
 .popup__btn-signup {
   @extend %btn;
 }
+
+.popup__btn-close {
+  @extend %btn-white;
+}

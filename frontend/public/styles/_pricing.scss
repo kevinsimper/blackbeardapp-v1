@@ -84,7 +84,7 @@ $priceitemWidth: 280px;
     font-weight: 600;
   }
   .priceitem__deploy {
-    @extend %btn-white;
+    @extend %btn-white-shadow;
     width: 80%;
     text-align: center;
     margin: 40px auto;

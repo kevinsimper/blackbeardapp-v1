@@ -45,6 +45,7 @@ var SignupPopup = React.createClass({
         <p>{'But you can sign up and you will get a special invitation when we are ready'}</p>
         <input type="email" placeholder="Email" className="input input__email" onChange={this.onEmailChange} />
         <button className="popup__btn-signup" onClick={this.onClickSignup}>Signup now</button>
+        <button className="popup__btn-close" onClick={this.props.closeHandler}>Close</button>
         <div>{this.state.status}</div>
       </div>
     );

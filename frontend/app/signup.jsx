@@ -12,11 +12,16 @@ var Signup = React.createClass({
       popupShow: true
     })
   },
+  onClickClose: function() {
+    this.setState({
+      popupShow: false
+    })
+  },
   render: function() {
     return (
       <div>
         <button className="btn-signup" onClick={this.onClickSignup} >Signup now</button>
-        <SignupPopup show={this.state.popupShow} />
+        <SignupPopup show={this.state.popupShow} closeHandler={this.onClickClose} />
       </div>
     );
   }
