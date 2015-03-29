@@ -39,11 +39,25 @@
 
 .logo-container {
   display: flex;
+  margin: 0 auto;
+  max-width: 400px;
+  @include large {
+    max-width: initial;
+  }
   .logo {
-    width: 140px;
+    margin: 15px;
+    width: 110px;
+    border: 3px solid #FFF;
+    border-radius: 120px;
+    height: 110px;
   }
   .text {
     flex: 1;
-    padding: 50px 0 0 0;
+    padding: 35px 0 0 20px;
+    .title {
+      font-size: 2em;
+    }
+    .tagline {
+    }
   }
 }
