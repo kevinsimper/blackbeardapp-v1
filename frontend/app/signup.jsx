@@ -7,6 +7,12 @@ var Signup = React.createClass({
       popupShow: false
     };
   },
+  componentDidMount: function() {
+    window.addEventListener('showSignup', this.onClickSignup);
+  },
+  componentWillUnmount: function() {
+    window.removeEventListener('showSignup', this.onClickSignup);
+  },
   onClickSignup: function() {
     this.setState({
       popupShow: true
