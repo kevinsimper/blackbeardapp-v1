@@ -6,6 +6,9 @@ server.connection({
     port: '8500'
 });
 
+// Had to add hosts file entry to test this as:
+// 88.80.187.61 jambroo.dev.jambroo.com imgur.dev.jambroo.com
+// TODO: Register domain and handle subdomains properly
 var mapper = function (request, callback) {
     var url = 'mongodb://localhost:27017/blackbeard';
 
