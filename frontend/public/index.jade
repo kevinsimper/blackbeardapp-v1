@@ -31,15 +31,26 @@
 .works
   .container.works-container
     h2.typo__headline.typo__headline--mediumblue How it works behind the scenes
+    .works__banner
+      | We have a docker registry,
+      br
+      | where we store your docker image securely.
+    p
+      span Once a Docker container is uploaded a 
+      span(title='A CNAME record is a DNS record that acts as an alias of another record') CNAME
+      span  will be provided that points to your running application.
+    p
+      | We use powerful servers and, due to the nature of containers, we run many of them together on custom server cluster. We employ multiple load balancers to tunnel traffic to your containers in an intelligent manner. Multiple redundancy layers are provided by ensuring that at least two containers are running at any point in time.
+    p
+      span
+        | Due to the large number of logging services available Blackbeard.io does not provide the facility to do this. Our recommendation is to use a more dedicated service, such as 
+      a(href='https://www.loggly.com/') loggly.com
+      span  and 
+      a(href='https://www.papertrailapp.com/') papertrailapp.com
+      | .
+    p
+      | Our servers will host your web application in a secure environment. Two-factor authentication can be enabled to ensure any changes to your hosting arrangement will be by a trusted person.
 
-    .works__banner.
-      We have a docker registry,<br/>
-      where we store your docker image securely.
-
-    p We give you a CNAME that you point your domain to.
-    p We use powerful servers and because of the nature of containers, it allows us to run many of them together together in our custom cluster. We have multiple load balancers to tunnel the traffic to your containers. Redundancy layers are provided by ensuring at least two containers are running at any point in time.
-    p We choose not to build any loging mechanise, as we found there were several more dedicated for logging your applications output. We highly recommend loggly.com and papertrailapp.com.
-    p Security
 
 .features
   img.features__headerimage(src="/images/features.png")
