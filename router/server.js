@@ -37,6 +37,19 @@ var mapper = function (request, callback) {
 }
 
 server.route({
+    method: 'GET',
+    path: '/testCross',
+    handler: function (request, reply) {
+        var request = require('request');
+        formData = {email: 'jambroo@gmail.com'}
+        // Need to change this hostname to another domain to test cross site scripting issue
+        request.post({url:'http://localhost:8000/signup', formData: formData}, function optionalCallback(err, httpResponse, body) {
+          console.log('From backend:', body);
+        });
+    }
+});
+
+server.route({
     method: '*',
     path: '/{p*}',
     handler: { proxy: { mapUri: mapper } }
