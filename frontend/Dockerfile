@@ -6,9 +6,9 @@ WORKDIR /app
 
 COPY . /app
 
-ENV NODE_ENV production
-
 RUN npm install
+
+ENV NODE_ENV production
 
 RUN npm run build
 
