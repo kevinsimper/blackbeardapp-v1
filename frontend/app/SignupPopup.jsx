@@ -17,7 +17,7 @@ var SignupPopup = React.createClass({
   onClickSignup: function(e) {
     var self = this
     request
-      .post('/signup')
+      .post(window.location.protocol+'//'+window.location.hostname+':8000/signup')
       .send({
         email: this.state.email
       })
