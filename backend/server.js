@@ -1,10 +1,8 @@
 var Hapi = require('hapi'),
     MongoClient = require('mongodb').MongoClient;
 
-var server = new Hapi.Server();
-server.connection({
-    port: '8000'
-});
+var server = new Hapi.Server({ connections: { routes: { cors: true } } });
+server.connection({ port: '8000' });
 
 server.route({
     method: 'GET',
