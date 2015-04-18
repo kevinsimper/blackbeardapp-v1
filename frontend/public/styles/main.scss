@@ -35,6 +35,13 @@ img {
   box-sizing: border-box;
 }
 
+a {
+  color: #111111; 
+}
+a:hover {
+  text-decoration: none;
+}
+
 %container {
   max-width: $layoutWidth;
   margin: 0 auto;
