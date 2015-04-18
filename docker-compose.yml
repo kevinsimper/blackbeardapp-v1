@@ -8,6 +8,9 @@ frontend:
    - ./frontend/:/app
 
 backend:
+  extends:
+    file: config/development.yml
+    service: backend
   build: ./backend/
   ports:
    - "8000:8000"
