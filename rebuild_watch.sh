@@ -1,1 +1,1 @@
-nodemon --exec "dockc restart backend"
+nodemon --exec "docker-compose restart backend"
