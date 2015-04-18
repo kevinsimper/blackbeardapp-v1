@@ -53,6 +53,7 @@
     border-radius: 20px;
     display: inline-block;
     margin: 0 20px;
+    display: none;
     @include medium {
       margin: 0 auto;
       display: block;
@@ -62,7 +63,9 @@
     margin: 20px 0 0 0;
     display: inline-block;
     width: 50%;
+    padding: 10px 5px;
     @include medium {
+      padding: 0;
       display: block;
       width: auto;
     }
