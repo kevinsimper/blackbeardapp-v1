@@ -8,6 +8,8 @@ frontend:
    - ./frontend/:/app
 
 backend:
+  environment:
+    NODE_ENV: development
   extends:
     file: config/development.yml
     service: backend
@@ -16,6 +18,8 @@ backend:
    - "8000:8000"
   volumes:
    - ./backend/:/app
+  links:
+   - db
 
 router:
   build: ./router/
