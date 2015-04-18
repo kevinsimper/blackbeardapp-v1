@@ -7,6 +7,17 @@
     font-size: 2em;
   }
 }
+.steps::before {
+  content: " ";
+  background-image: url(/images/cover-arrow.png);
+  background-repeat: no-repeat;
+  width: 57px;
+  height: 25px;
+  position: absolute;
+  margin: -40px auto 0;
+  left: 0;
+  right: 0;
+}
 .steps-container {
   display: flex;
   padding: 0;

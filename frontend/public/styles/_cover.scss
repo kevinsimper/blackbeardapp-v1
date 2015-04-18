@@ -46,13 +46,3 @@
     }
   }
 }
-.cover::after {
-  content: " ";
-  background-image: url(/images/cover-arrow.png);
-  width: 57px;
-  height: 25px;
-  position: absolute;
-  margin: 60px auto 0;
-  left: 0;
-  right: 0;
-}
