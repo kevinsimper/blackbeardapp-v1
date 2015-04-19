@@ -1,9 +1,12 @@
 frontend:
+  extends:
+    file: config/development.yml
+    service: common
   build: ./frontend/
-  ports:
-   - "9000:9000"
   environment:
     NODE_ENV: development
+  ports:
+   - "9000:9000"
   volumes:
    - ./frontend/:/app
 
@@ -12,7 +15,7 @@ backend:
     NODE_ENV: development
   extends:
     file: config/development.yml
-    service: backend
+    service: common
   build: ./backend/
   ports:
    - "8000:8000"

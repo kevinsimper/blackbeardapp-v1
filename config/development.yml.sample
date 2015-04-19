@@ -1,3 +1,4 @@
-backend:
+common:
   environment:
     - DB_HOST=127.0.0.1:27017
+    - BACKEND_HOST=127.0.0.1:27017
