@@ -21,11 +21,11 @@ server.route({
     method: 'POST',
     path: '/signup',
     handler: function(request, reply) {
-
         MongoClient.connect(DATABASE_URL, function(err, db) {
             if(err) return console.log(err);
 
             var collection = db.collection('users');
+            
             // Insert new user
             var email = request.payload.email;
             collection.insert({
@@ -50,7 +50,29 @@ server.route({
     method: 'POST',
     path: '/contact',
     handler: function(request, reply) {
-        console.log(request);
+        MongoClient.connect(DATABASE_URL, function(err, db) {
+            if(err) return console.log(err);
+
+            var collection = db.collection('enquiries');
+
+            var name = request.payload.name;
+            var email = request.payload.email;
+            var message = request.payload.message;
+            collection.insert({
+                name: name,
+                email: email,
+                message: message,
+                timestamp: Math.round(Date.now() / 1000)
+            }, function(err, result) {
+                if (err) {
+                    reply('error').code(500)
+                } else {
+                    reply('ok')
+                }
+
+                db.close();
+            });
+        });
     }
 });
 
