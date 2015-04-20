@@ -1,6 +1,6 @@
 var Hapi = require('hapi'),
     MongoClient = require('mongodb').MongoClient;
-
+ 
 var server = new Hapi.Server();
 server.connection({
     port: '8000'
