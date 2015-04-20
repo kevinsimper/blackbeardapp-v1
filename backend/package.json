@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "hapi": "8.3.1",
-    "mongodb": "1.4.34"
+    "mongodb": "1.4.34",
+    "password-hash": "1.2.2"
   }
 }

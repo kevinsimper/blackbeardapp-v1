@@ -1,5 +1,6 @@
 var Hapi = require('hapi'),
-    MongoClient = require('mongodb').MongoClient;
+    MongoClient = require('mongodb').MongoClient,
+    passwordHash = require('password-hash');
  
 var server = new Hapi.Server({ connections: { routes: { cors: true } } });
 server.connection({ port: '8000' });
@@ -72,6 +73,71 @@ server.route({
 
                 db.close();
             });
+        });
+    }
+});
+
+// Register
+server.route({
+    method: 'POST',
+    path: '/register',
+    handler: function(request, reply) {
+        MongoClient.connect(DATABASE_URL, function(err, db) {
+            if(err) return console.log(err);
+
+            var collection = db.collection('users_soon');
+
+            var email = request.payload.email;
+            var password = request.payload.password;
+            var hashedPassword = passwordHash.generate(password);
+
+            collection.insert({
+                email: email,
+                password_hashed: hashedPassword,
+                timestamp: Math.round(Date.now() / 1000)
+            }, function(err, result) {
+                if (err) {
+                    reply('error').code(500)
+                } else {
+                    reply('ok')
+                }
+
+                db.close();
+            });
+        });
+    }
+});
+
+// Login
+server.route({
+    method: 'POST',
+    path: '/login',
+    handler: function(request, reply) {
+        MongoClient.connect(DATABASE_URL, function(err, db) {
+            if(err) return console.log(err);
+
+            var collection = db.collection('users_soon');
+
+            var email = request.payload.email;
+            var password = request.payload.password;
+
+            collection.find({
+                email: email
+            }).toArray(function(err, docs) {
+                if (docs.length > 0) {
+                    var user = docs[0];
+
+                    if (passwordHash.verify(password, user.password_hashed)) {
+                        reply('ok')
+                    } else {
+                        reply('incorrect');
+                    }                    
+                } else {
+                    reply('incorrect');
+                }
+
+                db.close();
+              });
         });
     }
 });
