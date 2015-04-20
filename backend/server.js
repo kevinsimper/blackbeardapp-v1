@@ -1,15 +1,12 @@
 var Hapi = require('hapi'),
     MongoClient = require('mongodb').MongoClient;
  
-var server = new Hapi.Server();
-server.connection({
-    port: '8000'
-});
+var server = new Hapi.Server({ connections: { routes: { cors: true } } });
+server.connection({ port: '8000' });
 
 console.log('Mode:', process.env.NODE_ENV);
 
 var DATABASE_URL = 'mongodb://' + process.env.DB_PORT_27017_TCP_ADDR + ':' +process.env.DB_PORT_27017_TCP_PORT + '/blackbeard';
-
 
 server.route({
     method: 'GET',
@@ -19,6 +16,7 @@ server.route({
     }
 });
 
+// SignupForm
 server.route({
     method: 'POST',
     path: '/signup',
@@ -44,6 +42,15 @@ server.route({
                 db.close();
             });
         });
+    }
+});
+
+// Contact Form
+server.route({
+    method: 'POST',
+    path: '/contact',
+    handler: function(request, reply) {
+        console.log(request);
     }
 });
 
