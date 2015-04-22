@@ -1,8 +1,7 @@
 module.exports = function (server) {
 
 	var MongoClient = require('mongodb').MongoClient,
-	    ObjectID = require('mongodb').ObjectID,
-	    passwordHash = require('password-hash');
+	    ObjectID = require('mongodb').ObjectID;
 
 	var DATABASE_URL = 'mongodb://' + process.env.DB_PORT_27017_TCP_ADDR + ':' +process.env.DB_PORT_27017_TCP_PORT + '/blackbeard';
 
