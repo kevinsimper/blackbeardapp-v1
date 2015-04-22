@@ -21,11 +21,15 @@ module.exports.admin = function (server) {
 	            } else {
 	                var userHash = request.query.userHash;
 
-	                collection.find({
+	                collection.findOne({
 	                    _id: ObjectID(userHash)
-	                }).toArray(function(err, docs) {
-	                	reply(docs)
-	                });
+	                }, function(err, document) {
+	                	if (err) {
+	                		reply('user_not_found')
+	                	} else {
+	                		reply({email: document.email, timestamp: document.timestamp});
+	                	}
+					});
 	            }
 	        });
 	    }
@@ -48,11 +52,12 @@ module.exports.admin = function (server) {
 	                var email = request.payload.email;
 	                var password = request.payload.password;
 
-	                collection.find({
+					collection.findOne({
 	                    _id: ObjectID(userHash)
-	                }).toArray(function(err, docs) {
-	                    if (docs.length > 0) {
-	                        var user = docs[0];
+	                }, function(err, user) {
+	                	if (err) {
+	                		reply('user_not_found')
+	                	} else {
 	                        var hashedPassword = passwordHash.generate(password);
 
 	                        collection.update(
@@ -66,14 +71,10 @@ module.exports.admin = function (server) {
 	                                }
 
 	                    			db.close();
-
 	                            }
-	                        );
-	                    } else {
-	                        reply('user_not_found');
-	                    }
-
-	                });
+	                        )
+	                	}
+					});
 	            }
 
 	            
