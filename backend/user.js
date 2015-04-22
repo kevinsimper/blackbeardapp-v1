@@ -78,8 +78,39 @@ module.exports = function (server) {
 	                	}
 					});
 	            }
+	        });
+	    }
+	});
 
-	            
+	server.route({
+	    method: 'DELETE',
+	    path: '/admin/user',
+	    handler: function(request, reply) {
+	        MongoClient.connect(DATABASE_URL, function(err, db) {
+	            if(err) return console.log(err);
+
+	            var collection = db.collection('users_soon');
+
+	            var adminHash = request.payload.admin;
+	            if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
+	                reply('invalid_admin_hash')
+	            } else {
+	                var userHash = request.payload.userHash;
+
+					collection.remove({
+	                    _id: ObjectID(userHash)
+	                }, function(err, count) {
+	                	if (err) {
+	                		reply('error').code(500)
+	                	} else {
+	                     	if (count) {
+	                     		reply('ok')
+	                     	} else {
+	                			reply('user_not_found').code(500)
+	                     	}
+	                	}
+					});
+	            }
 	        });
 	    }
 	});
