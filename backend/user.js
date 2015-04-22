@@ -1,4 +1,4 @@
-module.exports.admin = function (server) {
+module.exports = function (server) {
 
 	var MongoClient = require('mongodb').MongoClient,
 	    ObjectID = require('mongodb').ObjectID,
@@ -29,6 +29,8 @@ module.exports.admin = function (server) {
 	                	} else {
 	                		reply({email: document.email, timestamp: document.timestamp});
 	                	}
+
+	                	db.close()
 					});
 	            }
 	        });
@@ -82,4 +84,78 @@ module.exports.admin = function (server) {
 	    }
 	});
 
+	server.route({
+	    method: 'POST',
+	    path: '/user',
+	    handler: function(request, reply) {
+	        MongoClient.connect(DATABASE_URL, function(err, db) {
+	            if(err) return console.log(err);
+
+	            var collection = db.collection('users_soon');
+
+                var email = request.payload.email;
+                var password = request.payload.password;
+	            var hashedPassword = passwordHash.generate(password);
+
+				collection.findOne({
+                    email: email
+                }, function(err, user) {
+                	if (err) {
+                		reply('error').code(500)
+                	} else {
+						if (user) {
+                        	reply('user_already_exists')
+                        } else {
+                        	collection.insert({
+				                email: email,
+				                password_hashed: hashedPassword,
+				                timestamp: Math.round(Date.now() / 1000)
+				            }, function(err, result) {
+				                if (err) {
+				                    reply('error').code(500)
+				                } else {
+				                    reply('ok')
+				                }
+
+				                db.close();
+				            });
+                        }
+                	}
+				});
+	        });
+	    }
+	});
+
+	server.route({
+	    method: 'POST',
+	    path: '/login',
+	    handler: function(request, reply) {
+	        MongoClient.connect(DATABASE_URL, function(err, db) {
+	            if(err) return console.log(err);
+
+	            var collection = db.collection('users_soon');
+
+	            var email = request.payload.email;
+	            var password = request.payload.password;
+
+	            collection.find({
+	                email: email
+	            }).toArray(function(err, docs) {
+	                if (docs.length > 0) {
+	                    var user = docs[0];
+
+	                    if (passwordHash.verify(password, user.password_hashed)) {
+	                        reply('ok')
+	                    } else {
+	                        reply('incorrect').code(500);
+	                    }                    
+	                } else {
+	                    reply('incorrect').code(500);
+	                }
+
+	                db.close();
+	              });
+	        });
+	    }
+	});
 }
