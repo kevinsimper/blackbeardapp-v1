@@ -4,8 +4,12 @@ module.exports = function (server) {
         ObjectID = require('mongodb').ObjectID,
         passwordHash = require('password-hash');
 
-    //var DATABASE_URL = 'mongodb://' + process.env.DB_PORT_27017_TCP_ADDR + ':' +process.env.DB_PORT_27017_TCP_PORT + '/blackbeard';
-    var DATABASE_URL = 'mongodb://localhost:27017/blackbeard'
+    var LOCAL_DEV = true;
+    if (LOCAL_DEV) {
+        var DATABASE_URL = 'mongodb://localhost:27017/blackbeard'
+    } else {
+        var DATABASE_URL = 'mongodb://' + process.env.DB_PORT_27017_TCP_ADDR + ':' + process.env.DB_PORT_27017_TCP_PORT + '/blackbeard';
+    }
 
     server.route({
         method: 'GET',
@@ -13,7 +17,7 @@ module.exports = function (server) {
         handler: function(request, reply) {
             MongoClient.connect(DATABASE_URL, function(err, db) {
                 if (err) {
-                    reply('error').code(500)
+                    reply('An internal server error has occurred.').code(500)
                 }
 
                 var collection = db.collection('users_soon');
@@ -51,7 +55,7 @@ module.exports = function (server) {
         handler: function(request, reply) {
             MongoClient.connect(DATABASE_URL, function(err, db) {
                 if (err) {
-                    reply('error').code(500)
+                    reply('An internal server error has occurred.').code(500)
                 }
 
                 var collection = db.collection('users_soon');
@@ -108,7 +112,7 @@ module.exports = function (server) {
         handler: function(request, reply) {
             MongoClient.connect(DATABASE_URL, function(err, db) {
                 if (err) {
-                    reply('error').code(500)
+                    reply('An internal server error has occurred.').code(500)
                 }
 
                 var collection = db.collection('users_soon');
@@ -124,7 +128,7 @@ module.exports = function (server) {
                         _id: ObjectID(userHash)
                     }, function(err, count) {
                         if (err) {
-                            reply('An error has ocurred while removing the user.').code(500)
+                            reply('An error has occurred while removing the user.').code(500)
                         } else {
                              if (count) {
                                  reply('User successfully updated.').code(200)
@@ -145,7 +149,7 @@ module.exports = function (server) {
         handler: function(request, reply) {
             MongoClient.connect(DATABASE_URL, function(err, db) {
                 if (err) {
-                    reply('error').code(500)
+                    reply('An internal server error has occurred.').code(500)
                 }
 
                 var collection = db.collection('users_soon');
@@ -154,33 +158,37 @@ module.exports = function (server) {
                 var password = request.payload.password;
                 var hashedPassword = passwordHash.generate(password);
 
-                collection.findOne({
-                    email: email
-                }, function(err, user) {
+                var insertCallback = function(err, result) {
                     if (err) {
-                        reply('An error has ocurred while removing the user.').code(500)
+                        reply('An internal server error has occurred').code(500)
+                    } else {
+                        reply('User successfully added.').code(200)
+                    }
+
+                    db.close() // Replace this with the user of a promise
+                };
+
+				var resultCallback = function(err, user) {
+                    if (err) {
+                        reply('An error has occurred while removing the user.').code(500)
                         db.close();
                     } else {
                         if (user) {
                             reply('A user account with this email address already exists.').code(187)
-                            db.close();
+                            db.close() // Replace this with the user of a promise
                         } else {
                             collection.insert({
                                 email: email,
                                 password_hashed: hashedPassword,
                                 timestamp: Math.round(Date.now() / 1000)
-                            }, function(err, result) {
-                                if (err) {
-                                    reply('An internal server error has ocurred').code(500)
-                                } else {
-                                    reply('User successfully added.').code(200)
-                                }
-
-                                db.close();
-                            });
+                            }, insertCallback);
                         }
                     }
-                });
+                }
+
+				collection.findOne({
+                    email: email
+                }, resultCallback);
             });
         }
     });
@@ -191,7 +199,7 @@ module.exports = function (server) {
         handler: function(request, reply) {
             MongoClient.connect(DATABASE_URL, function(err, db) {
                 if (err) {
-                    reply('error').code(500)
+                    reply('An internal server error has occurred.').code(500)
                 }
 
                 var collection = db.collection('users_soon');
