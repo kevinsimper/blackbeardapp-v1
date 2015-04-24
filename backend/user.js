@@ -17,7 +17,7 @@ module.exports = function (server) {
 
 	            var adminHash = request.query.admin;
 	            if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
-	                reply('invalid_admin_hash')
+	                reply('Invalid Admin Authorization Code.').code(401)
 	            } else {
 	                var userHash = request.query.userHash;
 
@@ -48,7 +48,8 @@ module.exports = function (server) {
 
 	            var adminHash = request.payload.admin;
 	            if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
-	                reply('invalid_admin_hash')
+	                reply('Invalid Admin Authorization Code.').code(401)
+
 	            } else {
 	                var userHash = request.payload.userHash;
 	                var email = request.payload.email;
@@ -93,7 +94,7 @@ module.exports = function (server) {
 
 	            var adminHash = request.payload.admin;
 	            if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
-	                reply('invalid_admin_hash')
+	                reply('Invalid admin authorization code.').code(401)
 	            } else {
 	                var userHash = request.payload.userHash;
 
@@ -101,12 +102,12 @@ module.exports = function (server) {
 	                    _id: ObjectID(userHash)
 	                }, function(err, count) {
 	                	if (err) {
-	                		reply('error').code(500)
+	                		reply('An error has ocurred while removing the user.').code(500)
 	                	} else {
 	                     	if (count) {
-	                     		reply('ok')
+	                     		reply('User successfully updated.').code(200)
 	                     	} else {
-	                			reply('user_not_found').code(500)
+	                			reply('User not found.').code(404)
 	                     	}
 	                	}
 					});
@@ -132,7 +133,7 @@ module.exports = function (server) {
                     email: email
                 }, function(err, user) {
                 	if (err) {
-                		reply('error').code(500)
+         		    reply('An error has ocurred while removing the user.').code(500)
                 	} else {
 						if (user) {
                         	reply('user_already_exists')
