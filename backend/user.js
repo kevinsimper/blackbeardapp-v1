@@ -1,15 +1,8 @@
-module.exports = function (server) {
+module.exports = function (server, DATABASE_URL) {
 
     var MongoClient = require('mongodb').MongoClient,
         ObjectID = require('mongodb').ObjectID,
         passwordHash = require('password-hash')
-
-    var LOCAL_DEV = true
-    if (LOCAL_DEV) {
-        var DATABASE_URL = 'mongodb://localhost:27017/blackbeard'
-    } else {
-        var DATABASE_URL = 'mongodb://' + process.env.DB_PORT_27017_TCP_ADDR + ':' + process.env.DB_PORT_27017_TCP_PORT + '/blackbeard'
-    }
 
     server.route({
         method: 'GET',
@@ -174,7 +167,7 @@ module.exports = function (server) {
                         db.close()
                     } else {
                         if (user) {
-                            reply('A user account with this email address already exists.').code(187)
+                            reply('A user account with this email address already exists.').code(500)
                             db.close() // Replace this with the user of a promise
                         } else {
                             collection.insert({

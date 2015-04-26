@@ -1,11 +1,9 @@
-module.exports = function (server) {
+module.exports = function (server, DATABASE_URL) {
 
 	var MongoClient = require('mongodb').MongoClient,
 	    ObjectID = require('mongodb').ObjectID;
 
-	var DATABASE_URL = 'mongodb://' + process.env.DB_PORT_27017_TCP_ADDR + ':' +process.env.DB_PORT_27017_TCP_PORT + '/blackbeard';
-
-	// SignupForm
+    // SignupForm
 	server.route({
 	    method: 'POST',
 	    path: '/signup',

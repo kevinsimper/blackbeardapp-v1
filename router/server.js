@@ -19,7 +19,8 @@ var mapper = function (request, callback) {
         throw 'No subdomain in request.';
     }
 
-    var url = 'mongodb://localhost:27017/blackbeard';
+    var url = 'mongodb://db.blackbeard.io:27017/blackbeard';
+
 
     // Use connect method to connect to the `
     MongoClient.connect(url, function(err, db) {
