@@ -5,9 +5,9 @@ var Header = React.createClass({
     return (
       <div>
         <ul>
-          <li><a href="#/dashboard">Home</a></li>
+          <li><a href="#/">Dashboard</a></li>
           <li><a href="#/profile">My Profile</a></li>
-        </ul>
+        </ul> 
       </div>
     );
   }
