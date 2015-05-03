@@ -1,6 +1,6 @@
 FROM node:wheezy
 
-RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get update -y --force-yes && apt-get upgrade -y --force-yes
 
 WORKDIR /app
 
