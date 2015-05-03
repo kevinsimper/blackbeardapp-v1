@@ -1,4 +1,5 @@
 var React = require('react')
+var AppActions = require('./Actions')
 
 var AppCreate = React.createClass({
   getInitialState: function() {
@@ -13,6 +14,9 @@ var AppCreate = React.createClass({
     })
   },
   onClickCreate: function() {
+    AppActions.createApp({
+      name: this.state.name
+    })
     this.setState({
       status: 'App created'
     })

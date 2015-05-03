@@ -30,6 +30,7 @@
     "react": "0.13.2",
     "react-router": "^0.13.3",
     "reactify": "1.1.0",
+    "reflux": "^0.2.7",
     "request": "2.55.0",
     "stream-browserify": "1.0.0",
     "superagent": "1.1.0",
