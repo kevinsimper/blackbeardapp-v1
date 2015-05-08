@@ -19,7 +19,11 @@ var AppsList = React.createClass({
         <h3>My Apps</h3>
         <div>
           {this.state.apps.map(function(item){
-            return <div>{item.name}</div>;
+            return (
+              <div>
+                <Link to='AppShow' params={item}>{item.name}</Link>
+              </div>
+            );
           })}
         </div>
       </div>

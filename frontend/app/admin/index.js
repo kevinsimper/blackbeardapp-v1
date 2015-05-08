@@ -7,14 +7,16 @@ var Dashboard = require('./Dashboard.jsx')
 var AppsList = require('./AppsList.jsx')
 var Profile = require('./Profile.jsx')
 var AppCreate = require('./App/Create.jsx')
+var AppShow = require('./App/Show.jsx')
 
 
 var routes = (
   <Route handler={AdminApp}>
-    <DefaultRoute handler={Dashboard} path='/'/>
+    <DefaultRoute handler={Dashboard}/>
     <Route name='dashboard' handler={Dashboard}/>
-    <Route name='app'>
-      <Route name='create' handler={AppCreate}/>
+    <Route name='app' path='/app'>
+      <Route path='create' handler={AppCreate}/>
+      <Route name="AppShow" path='show/:id' handler={AppShow}/>
     </Route>
     <Route path='profile' handler={Profile}/>
   </Route>

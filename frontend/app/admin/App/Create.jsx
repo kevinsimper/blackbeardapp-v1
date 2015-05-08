@@ -1,7 +1,9 @@
 var React = require('react')
 var AppActions = require('./Actions')
+var Navigation = require('react-router').Navigation;
 
 var AppCreate = React.createClass({
+  mixins: [Navigation],
   getInitialState: function() {
     return {
       name: '',
@@ -14,12 +16,16 @@ var AppCreate = React.createClass({
     })
   },
   onClickCreate: function() {
+    var self = this
     AppActions.createApp({
       name: this.state.name
     })
     this.setState({
       status: 'App created'
     })
+    setTimeout(function() {
+      self.transitionTo('/')
+    }, 1000)
   },
   render: function() {
     return (

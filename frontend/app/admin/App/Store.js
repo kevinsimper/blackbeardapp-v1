@@ -1,7 +1,13 @@
 var Reflux = require('reflux')
 var actions = require('./Actions')
 
-var apps = [{name: 'awesome-app'}, {name: 'docker-fun'}]
+var apps = [{
+    id: 1,
+    name: 'awesome-app'
+  }, {
+    id: 2,
+    name: 'docker-fun'
+  }]
 
 var AppStore = Reflux.createStore({
   listenables: actions,
