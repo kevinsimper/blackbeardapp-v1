@@ -2,6 +2,8 @@ var React = require('react');
 var classNames = require('classnames');
 var request = require('superagent');
 
+var BACKEND_HOST = process.env.BACKEND_HOST;
+
 var SignupPopup = React.createClass({
   getInitialState: function() {
     return {
@@ -17,7 +19,7 @@ var SignupPopup = React.createClass({
   onClickSignup: function(e) {
     var self = this
     request
-      .post(window.location.protocol+'//'+window.location.hostname+':8000/signup')
+      .post(BACKEND_HOST + '/signup')
       .send({
         email: this.state.email
       })

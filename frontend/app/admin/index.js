@@ -9,6 +9,7 @@ var Profile = require('./Profile.jsx')
 var AppCreate = require('./App/Create.jsx')
 var AppShow = require('./App/Show.jsx')
 
+console.log(process.env.BACKEND_HOST)
 
 var routes = (
   <Route handler={AdminApp}>

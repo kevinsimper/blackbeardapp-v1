@@ -5,13 +5,27 @@ var transform = require('vinyl-transform');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var gulpif = require('gulp-if');
+var envify = require('envify/custom')
 
 var production = (process.env.NODE_ENV) ? true : false;
 console.log(production)
 
+// This can be improved 
+// when we switch to something else than harp for templating
+// Then we can just put in the host in the main template
+if(!production) {
+  process.env.BACKEND_HOST = 'http://docker.dev:8000'
+} else {
+  process.env.BACKEND_HOST = 'http://api.blackbeard.io'
+}
+
 gulp.task('browserify', function() {
   var b = browserify()
-    .transform(reactify);
+    .transform(reactify)
+    .transform(envify({
+      NODE_ENV: 'development',
+      BACKEND_HOST: process.env.BACKEND_HOST
+    }));
 
   var browserified = transform(function(filename) {
     b.add(filename);
@@ -27,7 +41,12 @@ gulp.task('browserify', function() {
 
 gulp.task('browserify-admin', function() {
   var b = browserify()
-    .transform(reactify);
+    .transform(reactify)
+    .transform(envify({
+      NODE_ENV: 'development',
+      BACKEND_HOST: process.env.BACKEND_HOST
+    }));
+
 
   var browserified = transform(function(filename) {
     b.add(filename);

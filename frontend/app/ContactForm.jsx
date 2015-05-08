@@ -1,6 +1,8 @@
 var React = require('react');
 var request = require('superagent');
 
+var BACKEND_HOST = process.env.BACKEND_HOST;
+
 var ContactForm = React.createClass({
   getInitialState: function() {
     return {
@@ -31,7 +33,7 @@ var ContactForm = React.createClass({
     var self = this
 
     request
-      .post(window.location.protocol+'//'+window.location.hostname+':8000/contact')
+      .post(BACKEND_HOST + '/contact')
       .send({
         name: this.state.name,
         email: this.state.email,
