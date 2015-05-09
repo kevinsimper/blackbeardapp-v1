@@ -30,7 +30,8 @@ var SignupPopup = React.createClass({
           })
         } else {
           self.setState({
-            status: 'You successful signup to the waiting list'
+            status: res.body.status,
+            email: ''
           })
         }
       })

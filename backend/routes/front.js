@@ -2,27 +2,46 @@ var MongoClient = require('mongodb').MongoClient,
   ObjectID = require('mongodb').ObjectID;
 var config = require('../config')
 
+console.log(config)
+
 exports.postSignup = function(request, reply) {
   MongoClient.connect(config.DATABASE_URL, function(err, db) {
     if (err) return console.log(err);
-
-    var collection = db.collection('users');
-
     // Insert new user
     var email = request.payload.email;
-    collection.insert({
-      email: email,
-      active: false,
-      timestamp: Math.round(Date.now() / 1000)
-    }, function(err, result) {
-      if (err) {
-        reply('error').code(500)
-      } else {
-        reply('ok')
-      }
 
-      db.close();
-    });
+
+    var collection = db.collection('users');
+    collection.findOne({
+      email: email
+    }, function(err, result) {
+      if(result === null) {
+        insertEmail()
+      } else {
+        reply({
+          status: 'Already signed up'
+        })
+      }
+    })
+
+    function insertEmail() {
+      collection.insert({
+        email: email,
+        active: false,
+        timestamp: Math.round(Date.now() / 1000)
+      }, function(err, result) {
+        if (err) {
+          reply('error').code(500)
+        } else {
+          reply({
+            status: 'You successful signup to the waiting list'
+          })
+        }
+
+        db.close();
+      });
+    }
+      
   });
 };
 
