@@ -58,13 +58,17 @@ exports.postContact = function(request, reply) {
       name: name,
       email: email,
       message: message,
-      timestamp: Math.round(Date.now() / 1000)
+      timestamp: Math.round(Date.now() / 1000),
+      ip: request.info.remoteAddress
     }, function(err, result) {
       if (err) {
-        reply('error').code(500)
-      } else {
-        reply('ok')
+        reply({
+          status: 'Error'
+        }).code(500)
       }
+      reply({
+        status: 'OK'
+      })
 
       db.close();
     });
