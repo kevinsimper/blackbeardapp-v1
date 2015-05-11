@@ -27,6 +27,13 @@ var ContactForm = React.createClass({
       message: e.target.value
     });
   },
+  resetForm: function() {
+    this.setState({
+      name: '',
+      email: '',
+      message: ''
+    })
+  },
   handleSubmit: function(e) {
     e.preventDefault();
 
@@ -46,8 +53,9 @@ var ContactForm = React.createClass({
           })
         } else {
           self.setState({
-            status: 'Your message was send!'
+            status: 'Your message was send!',
           })
+          self.resetForm()
         }
       })
   },
