@@ -4,6 +4,8 @@ var Hapi = require('hapi'),
   passwordHash = require('password-hash');
 var frontRoutes = require('./routes/front')
 var userRoutes = require('./routes/user')
+var adminRoutes = require('./routes/admin')
+var preUsersRoutes = require('./routes/presignup')
 
 var server = new Hapi.Server({
   connections: {
@@ -25,8 +27,14 @@ server.route({
 });
 
 server.route({
+  method: 'GET',
+  path: '/preusers',
+  handler: preUsersRoutes.getPreUsers
+})
+
+server.route({
   method: 'POST',
-  path: '/signup',
+  path: '/presignup',
   handler: frontRoutes.postSignup
 })
 
@@ -45,19 +53,19 @@ server.route({
 server.route({
   method: 'GET',
   path: '/admin/user',
-  handler: userRoutes.getAdminUser
+  handler: adminRoutes.getAdminUser
 })
 
 server.route({
   method: 'PUT',
   path: '/admin/user',
-  handler: userRoutes.putAdminUser
+  handler: adminRoutes.putAdminUser
 })
 
 server.route({
   method: 'DELETE',
   path: '/admin/user',
-  handler: userRoutes.deleteAdminUser
+  handler: adminRoutes.deleteAdminUser
 })
 
 server.route({
