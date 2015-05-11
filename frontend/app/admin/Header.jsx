@@ -26,6 +26,9 @@ var Header = React.createClass({
           <div style={styles.item}>
             <a style={styles.link} href="#/profile">My Profile</a>
           </div>
+          <div style={styles.item}>
+            <a style={styles.link} href="#/preusers">PreUsers</a>
+          </div>
         </div> 
       </div>
     );

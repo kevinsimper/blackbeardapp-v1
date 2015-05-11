@@ -8,6 +8,7 @@ var AppsList = require('./AppsList.jsx')
 var Profile = require('./Profile.jsx')
 var AppCreate = require('./App/Create.jsx')
 var AppShow = require('./App/Show.jsx')
+var PreUsersList = require('./PreUsers/List.jsx')
 
 console.log(process.env.BACKEND_HOST)
 
@@ -19,6 +20,7 @@ var routes = (
       <Route path='create' handler={AppCreate}/>
       <Route name="AppShow" path='show/:id' handler={AppShow}/>
     </Route>
+    <Route path='/preusers' handler={PreUsersList}/>
     <Route path='profile' handler={Profile}/>
   </Route>
 )

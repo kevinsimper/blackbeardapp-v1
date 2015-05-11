@@ -16,10 +16,11 @@ var SignupPopup = React.createClass({
       email: e.target.value
     })
   },
-  onClickSignup: function(e) {
+  onSubmit: function(e) {
+    e.preventDefault()
     var self = this
     request
-      .post(BACKEND_HOST + '/signup')
+      .post(BACKEND_HOST + '/presignup')
       .send({
         email: this.state.email
       })
@@ -46,10 +47,12 @@ var SignupPopup = React.createClass({
       <div className={classes}>
         <h1>We are not quite ready yet</h1>
         <p>{'But you can sign up and you will get a special invitation when we are ready'}</p>
-        <input type="email" placeholder="Email" className="input input__email" onChange={this.onEmailChange} />
-        <button className="popup__btn-signup" onClick={this.onClickSignup}>Signup now</button>
-        <button className="popup__btn-close" onClick={this.props.closeHandler}>Close</button>
-        <div>{this.state.status}</div>
+        <form onSubmit={this.onSubmit}>
+          <input type="email" placeholder="Email" className="input input__email" onChange={this.onEmailChange} required/>
+          <button type="submit" className="popup__btn-signup">Signup now</button>
+          <button className="popup__btn-close" onClick={this.props.closeHandler}>Close</button>
+          <div>{this.state.status}</div>
+        </form>
       </div>
     );
   }
