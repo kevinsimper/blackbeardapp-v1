@@ -30,3 +30,5 @@ node_modules
 
 config/development.yml
 npm-debug.log
+
+backend/tests/server

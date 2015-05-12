@@ -2,10 +2,11 @@ var Hapi = require('hapi'),
   MongoClient = require('mongodb').MongoClient,
   ObjectID = require('mongodb').ObjectID,
   passwordHash = require('password-hash');
+
+var preUsersRoutes = require('./routes/preusers')
 var frontRoutes = require('./routes/front')
 var userRoutes = require('./routes/user')
 var adminRoutes = require('./routes/admin')
-var preUsersRoutes = require('./routes/presignup')
 
 var server = new Hapi.Server({
   connections: {
@@ -14,6 +15,7 @@ var server = new Hapi.Server({
     }
   }
 });
+
 server.connection({
   port: '8000'
 });
