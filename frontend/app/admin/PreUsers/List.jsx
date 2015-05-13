@@ -1,6 +1,6 @@
 var React = require('react')
-var PreUsersActions = require('./actions')
-var PreUsersStore = require('./store')
+var PreUsersActions = require('./Actions')
+var PreUsersStore = require('./Store')
 
 var getState = function() {
   return {

@@ -1,7 +1,7 @@
 var Reflux = require('reflux')
 var request = require('superagent')
 var config = require('../config')
-var actions = require('./actions')
+var actions = require('./Actions')
 
 var _preUsers = []
 
