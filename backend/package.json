@@ -11,6 +11,7 @@
   "dependencies": {
     "hapi": "8.3.1",
     "mongodb": "1.4.34",
+    "newrelic": "1.19.0",
     "password-hash": "1.2.2"
   }
 }

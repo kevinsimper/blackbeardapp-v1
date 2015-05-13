@@ -1,3 +1,5 @@
+require('newrelic')
+
 var Hapi = require('hapi'),
   MongoClient = require('mongodb').MongoClient,
   ObjectID = require('mongodb').ObjectID,
