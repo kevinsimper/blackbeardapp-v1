@@ -1,8 +1,9 @@
 var MongoClient = require('mongodb').MongoClient,
   ObjectID = require('mongodb').ObjectID,
-  passwordHash = require('password-hash')
-var config = require('../config')
+  passwordHash = require('password-hash'),
+  isint = require('isint')
 
+var config = require('../config')
 
 exports.getAdminUser = function(request, reply) {
   MongoClient.connect(config.DATABASE_URL, function(err, db) {
@@ -19,24 +20,61 @@ exports.getAdminUser = function(request, reply) {
     } else {
       var userHash = request.query.userHash
 
-      collection.findOne({
-        _id: ObjectID(userHash)
-      }, function(err, user) {
-        if (err) {
-          reply('Internal server error.').code(500)
-        } else {
-          if (user) {
-            reply({
-              email: user.email,
-              timestamp: user.timestamp
-            })
-          } else {
-            reply('User not found.').code(404)
-          }
+      if (!userHash) {
+        var limit = request.query.limit
+        var offset = request.query.offset
+
+        if (!isint.uint32(limit)) {
+          limit = 100
+        }
+        if (!isint.uint32(offset)) {
+          offset = 0
         }
 
-        db.close()
-      })
+        var getUsersResponse = function(err, users) {
+          if (err) {
+            reply('Internal server error.').code(500)
+          } else {
+            if (users) {
+              reply(users.toArray())
+            } else {
+              reply('No users found.').code(404)
+            }
+          }
+
+          db.close()
+        }
+
+        var options = {
+            "limit": limit,
+            "skip": offset,
+            "sort": "email"
+        }
+        collection.find({}, options).toArray(function(err, users) {
+          reply(users)
+        })
+      } else {
+        var getUserResponse = function(err, user) {
+          if (err) {
+            reply('Internal server error.').code(500)
+          } else {
+            if (user) {
+              reply({
+                email: user.email,
+                timestamp: user.timestamp
+              })
+            } else {
+              reply('User not found.').code(404)
+            }
+          }
+
+          db.close()
+        }
+
+        collection.findOne({
+          _id: ObjectID(userHash)
+        }, getUserResponse)
+      }
     }
   })
 }
