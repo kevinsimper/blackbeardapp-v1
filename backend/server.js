@@ -82,7 +82,7 @@ server.route({
     method: 'GET',
     path: '/test_env',
     handler: function(request, reply) {
-        reply(process.env.CIRCLECI)
+        reply(process.env)
     }
 })
 
