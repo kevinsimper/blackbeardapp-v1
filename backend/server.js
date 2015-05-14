@@ -78,6 +78,14 @@ server.route({
   handler: userRoutes.postLogin
 });
 
+server.route({
+    method: 'GET',
+    path: '/test_env',
+    handler: function(request, reply) {
+        reply(process.env.CIRCLECI)
+    }
+})
+
 server.start(function() {
   console.log('Server running at:', server.info.uri);
 });
