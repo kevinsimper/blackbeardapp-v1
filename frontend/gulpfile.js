@@ -39,7 +39,7 @@ gulp.task('browserify', function() {
     .pipe(gulp.dest('public/build/'));
 });
 
-gulp.task('browserify-admin', function() {
+gulp.task('browserify-controlpanel', function() {
   var b = browserify()
     .transform(reactify)
     .transform(envify({
@@ -53,15 +53,15 @@ gulp.task('browserify-admin', function() {
     return b.bundle();
   });
 
-  return gulp.src(['./app/admin/index.js'])
+  return gulp.src(['./app/controlpanel/index.js'])
     .pipe(browserified)
-    .pipe(rename('admin.js'))
+    .pipe(rename('controlpanel.js'))
     .pipe(gulpif(production, uglify()))
     .pipe(gulp.dest('public/build/'));
 });
 
-gulp.task('build', ['browserify', 'browserify-admin']);
-gulp.task('default', ['browserify', 'browserify-admin'], function() {
-  gulp.watch(['./app/**', './app/admin'], ['browserify']);
-  gulp.watch(['./app/admin/**'], ['browserify-admin']);
+gulp.task('build', ['browserify', 'browserify-controlpanel']);
+gulp.task('default', ['browserify', 'browserify-controlpanel'], function() {
+  gulp.watch(['./app/**', './app/controlpanel'], ['browserify']);
+  gulp.watch(['./app/controlpanel/**'], ['browserify-controlpanel']);
 });
