@@ -1,9 +1,16 @@
 require('newrelic')
 
-var Hapi = require('hapi'),
-  MongoClient = require('mongodb').MongoClient,
-  ObjectID = require('mongodb').ObjectID,
-  passwordHash = require('password-hash');
+var Hapi = require('hapi')
+var MongoClient = require('mongodb').MongoClient
+var ObjectID = require('mongodb').ObjectID
+var passwordHash = require('password-hash')
+var mongoose = require('mongoose')
+
+var config = require('./config')
+
+mongoose.connect(config.DATABASE_URL, function() {
+  console.log('mongoose connected to mongodb')
+})
 
 var preUsersRoutes = require('./routes/preusers')
 var frontRoutes = require('./routes/front')
