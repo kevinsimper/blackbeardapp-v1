@@ -1,6 +1,7 @@
 var React = require('react')
 var PreUsersActions = require('./Actions')
 var PreUsersStore = require('./Store')
+var Authentication = require('../mixins/authentication')
 
 var getState = function() {
   return {
@@ -9,6 +10,7 @@ var getState = function() {
 }
 
 var ListPreUsers = React.createClass({
+  mixins: [Authentication],
   getInitialState: function() {
     return getState()
   },
