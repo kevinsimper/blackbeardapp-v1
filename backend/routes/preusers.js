@@ -1,10 +1,9 @@
 var MongoClient = require('mongodb').MongoClient
 var config = require('../config')
+var PreUsers = require('../models/PreUsers')
 
 exports.getPreUsers = function(request, reply) {
-  MongoClient.connect(config.DATABASE_URL, function(err, db) {
-    db.collection('preusers').find({}).toArray(function(err, docs) {
-      reply(docs)
-    })
+  PreUsers.find(function(err, preUsers) {
+      reply(preUsers)
   })
 }
