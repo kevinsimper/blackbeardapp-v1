@@ -4,6 +4,7 @@ var passwordHash = require('password-hash')
 var Boom = require('boom')
 var config = require('../config')
 var User = require('../models/User')
+var jwt    = require('jsonwebtoken');
 
 exports.postUser = function(request, reply) {
   var email = request.payload.email
@@ -48,8 +49,13 @@ exports.postLogin = function(request, reply) {
   User.findOne({ email: email }, function(err, user) {
     if (user) {
       if (passwordHash.verify(password, user.password)) {
+        var token = jwt.sign(user, config.AUTH_SECRET, {
+          expiresInMinutes: 1440 // 24h
+        });
+
         reply({
-          status: 'Login successful'
+          status: 'Login successful',
+          token: token
         })
       } else {
         reply(Boom.unauthorized('Invalid email and password combination.'))
