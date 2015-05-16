@@ -41,30 +41,18 @@ exports.postUser = function(request, reply) {
 }
 
 exports.postLogin = function(request, reply) {
-  MongoClient.connect(config.DATABASE_URL, function(err, db) {
-    if (err) {
-      reply('An internal server error has occurred.').code(500)
-    }
+  var email = request.payload.email
+  var password = request.payload.password
 
-    var collection = db.collection('users_soon')
-
-    var email = request.payload.email
-    var password = request.payload.password
-
-    collection.findOne({
-      email: email
-    }).toArray(function(err, user) {
-      if (user) {
-        if (passwordHash.verify(password, user.password_hashed)) {
-          reply('Login successful.').code(200)
-        } else {
-          reply('Invalid email and password combination.').code(215)
-        }
+  User.findOne({ email: email }, function(err, user) {
+    if (user) {
+      if (passwordHash.verify(password, user.password)) {
+        reply('Login successful.').code(200)
       } else {
         reply('Invalid email and password combination.').code(215)
       }
-
-      db.close()
-    })
+    } else {
+      reply('Invalid email and password combination.').code(215)
+    }
   })
 }
