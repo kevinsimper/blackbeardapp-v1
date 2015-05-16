@@ -1,5 +1,5 @@
 var MongoClient = require('mongodb').MongoClient
-var Boom = require('Boom')
+var Boom = require('boom')
 var config = require('../config')
 var PreUsers = require('../models/PreUsers')
 
