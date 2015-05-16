@@ -20,9 +20,7 @@ exports.postContact = function(request, reply) {
 
   newSupport.save(function(err, result) {
     if (err) {
-      reply({
-        status: 'Error'
-      }).code(500)
+      return reply(Boom.badImplementation())
     }
     reply({
       status: 'OK'
@@ -40,9 +38,9 @@ exports.postSignup = function(request, reply) {
     if(result === null) {
       insertEmail()
     } else {
-      reply({
+      reply(Boom.badRequest({
         status: 'Already signed up'
-      })
+      }))
     }
   })
 
@@ -55,12 +53,11 @@ exports.postSignup = function(request, reply) {
     })
     newPreUser.save(function(err, result) {
       if (err) {
-        reply('error').code(500)
-      } else {
-        reply({
-          status: 'You successful signup to the waiting list'
-        })
+        return reply(Boom.badImplementation())
       }
+      reply({
+        status: 'You successful signup to the waiting list'
+      })
     })
   }
       

@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient
 var ObjectID = require('mongodb').ObjectID
 var passwordHash = require('password-hash')
+var Boom = require('boom')
 var config = require('../config')
 var User = require('../models/User')
 
@@ -12,18 +13,18 @@ exports.postUser = function(request, reply) {
   var insertCallback = function(err, result) {
     if (err) {
       console.log(err)
-      return reply('There was a problem with the database').code(500)
+      return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    reply('User successfully added.').code(200)
+    reply('User successfully added.')
   }
 
   var resultCallback = function(err, user) {
     if (err) {
       console.log(err)
-      return reply('There was a problem with the database').code(500)
+      return reply(Boom.badImplementation('There was a problem with the database'))
     }
     if (user) {
-      reply('A user account with this email address already exists.').code(500)
+      reply(Boom.badRequest('A user account with this email address already exists.'))
     } else {
       var newUser = new User({
         email: email,
@@ -47,12 +48,14 @@ exports.postLogin = function(request, reply) {
   User.findOne({ email: email }, function(err, user) {
     if (user) {
       if (passwordHash.verify(password, user.password)) {
-        reply('Login successful.').code(200)
+        reply({
+          status: 'Login successful'
+        })
       } else {
-        reply('Invalid email and password combination.').code(215)
+        reply(Boom.unauthorized('Invalid email and password combination.'))
       }
     } else {
-      reply('Invalid email and password combination.').code(215)
+      reply(Boom.unauthorized('Invalid email and password combination.'))
     }
   })
 }
