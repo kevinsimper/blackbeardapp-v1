@@ -1,6 +1,6 @@
-var MongoClient = require('mongodb').MongoClient,
-  ObjectID = require('mongodb').ObjectID,
-  passwordHash = require('password-hash')
+var MongoClient = require('mongodb').MongoClient
+var ObjectID = require('mongodb').ObjectID
+var passwordHash = require('password-hash')
 var config = require('../config')
 
 exports.postUser = function(request, reply) {
