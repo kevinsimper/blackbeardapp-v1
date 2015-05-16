@@ -9,10 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "boom": "2.7.1",
     "hapi": "8.3.1",
     "isint": "1.0.0",
     "mongodb": "1.4.34",
-    "mongoose": "^4.0.3",
+    "mongoose": "4.0.3",
     "newrelic": "1.19.0",
     "password-hash": "1.2.2"
   }
