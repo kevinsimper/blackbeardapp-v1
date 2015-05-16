@@ -49,7 +49,7 @@ exports.postLogin = function(request, reply) {
   User.findOne({ email: email }, function(err, user) {
     if (user) {
       if (passwordHash.verify(password, user.password)) {
-        var token = jwt.sign(user, config.AUTH_SECRET, {
+        var token = jwt.sign(user._id, config.AUTH_SECRET, {
           expiresInMinutes: 1440 // 24h
         });
 
