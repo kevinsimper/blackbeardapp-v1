@@ -50,7 +50,8 @@ exports.postSignup = function(request, reply) {
     var newPreUser = new PreUsers({
       email: email,
       active: false,
-      timestamp: Math.round(Date.now() / 1000)
+      timestamp: Math.round(Date.now() / 1000),
+      ip: request.info.remoteAddress
     })
     newPreUser.save(function(err, result) {
       if (err) {
