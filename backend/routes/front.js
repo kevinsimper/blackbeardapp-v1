@@ -4,6 +4,7 @@ var config = require('../config')
 var mongoose = require('mongoose')
 var PreUsers = require('../models/PreUsers')
 var Support = require('../models/Support')
+var Boom = require('boom')
 
 exports.postContact = function(request, reply) {
 
