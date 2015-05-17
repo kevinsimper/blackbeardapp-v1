@@ -1,7 +1,10 @@
 var mongoose = require('mongoose')
 
 var schema = new mongoose.Schema({
-  email: String,
+  email: {
+    type: String,
+    minlength: 6
+  },
   active: Boolean,
   timestamp: Date,
   ip: String,
