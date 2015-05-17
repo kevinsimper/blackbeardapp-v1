@@ -1,5 +1,5 @@
 var React = require('react')
-var PreUsersActions = require('./Actions')
+var Actions = require('./Actions')
 var PreUsersStore = require('./Store')
 var Authentication = require('../mixins/authentication')
 
@@ -16,7 +16,7 @@ var ListPreUsers = React.createClass({
   },
   componentDidMount: function() {
       this.unsubscribe = PreUsersStore.listen(this.onChange);
-      PreUsersActions.load()
+      Actions.load()
   },
   componentWillUnmount: function() {
       this.unsubscribe();
@@ -24,23 +24,33 @@ var ListPreUsers = React.createClass({
   onChange: function() {
     this.setState(getState())
   },
+  onClickDeletePreUser: function(i) {
+    Actions.del(this.state.preUsers[i]._id)
+  },
   render: function() {
+    var self = this
     return (
       <div>
         <h1>PreUsers</h1>
         <table>
-          <th>
-            <td>Email</td>
-            <td>IP</td>
-            <td>Active</td>
-          </th>
-          {this.state.preUsers.map(function(item) {
+          <tr>
+            <th>Email</th>
+            <th>IP</th>
+            <th>Active</th>
+            <th>Comment</th>
+            <th>Actions</th>
+          </tr>
+          {this.state.preUsers.map(function(preUser, i) {
 
             return (
               <tr>
-                <td>{item.email}</td>
-                <td>{item.ip}</td>
-                <td>{item.active}</td>
+                <td>{preUser.email}</td>
+                <td>{preUser.ip}</td>
+                <td>{preUser.active}</td>
+                <td>{preUser.comment}</td>
+                <td>
+                  <button onClick={self.onClickDeletePreUser.bind(this, i)}>Delete</button>
+                </td>
               </tr>
             );
           })}
