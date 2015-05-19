@@ -12,13 +12,14 @@
     "boom": "2.7.1",
     "code": "^1.4.0",
     "hapi": "8.3.1",
-    "isint": "1.0.0",
     "jsonwebtoken": "5.0.1",
+    "lab": "5.8.1",
+    "lodash": "3.8.0",
     "mongodb": "1.4.34",
     "mongoose": "4.0.3",
     "newrelic": "1.19.0",
     "password-hash": "1.2.2",
-    "lab": "5.8.1",
-    "request": "2.55.0"
+    "request": "2.55.0",
+    "q": "1.4.1"
   }
 }
