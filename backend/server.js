@@ -62,6 +62,12 @@ server.route({
 })
 
 server.route({
+  method: 'POST',
+  path: '/login',
+  handler: userRoutes.postLogin
+});
+
+server.route({
   method: 'GET',
   path: '/admin/user',
   handler: adminRoutes.getAdminUser
@@ -78,12 +84,6 @@ server.route({
   path: '/admin/user',
   handler: adminRoutes.deleteAdminUser
 })
-
-server.route({
-  method: 'POST',
-  path: '/login',
-  handler: userRoutes.postLogin
-});
 
 server.start(function() {
   console.log('Server running at:', server.info.uri);
