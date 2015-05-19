@@ -1,33 +1,34 @@
 var MongoClient = require('mongodb').MongoClient,
   ObjectID = require('mongodb').ObjectID,
   passwordHash = require('password-hash'),
-  isint = require('isint')
+  _ = require('lodash')
 
 var config = require('../config')
 
+// /admin/user
 exports.getAdminUser = function(request, reply) {
   MongoClient.connect(config.DATABASE_URL, function(err, db) {
     if (err) {
       reply('An internal server error has occurred.').code(500)
     }
 
-    var collection = db.collection('users_soon')
+    var collection = db.collection('users')
 
     var adminHash = request.query.admin
     if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
       reply('Invalid Admin Authorization Code.').code(401)
       db.close()
     } else {
-      var userHash = request.query.userHash
+      var userId = request.query.userId
 
-      if (!userHash) {
-        var limit = request.query.limit
-        var offset = request.query.offset
+      if (!userId) {
+        var limit = _.parseInt(request.query.limit)
+        var offset = _.parseInt(request.query.offset)
 
-        if (!isint.uint32(limit)) {
+        if (isNaN(limit)) {
           limit = 100
         }
-        if (!isint.uint32(offset)) {
+        if (isNaN(offset)) {
           offset = 0
         }
 
@@ -59,10 +60,7 @@ exports.getAdminUser = function(request, reply) {
             reply('Internal server error.').code(500)
           } else {
             if (user) {
-              reply({
-                email: user.email,
-                timestamp: user.timestamp
-              })
+              reply(user)
             } else {
               reply('User not found.').code(404)
             }
@@ -72,21 +70,21 @@ exports.getAdminUser = function(request, reply) {
         }
 
         collection.findOne({
-          _id: ObjectID(userHash)
+          _id: ObjectID(userId)
         }, getUserResponse)
       }
     }
   })
 }
 
-
+// /admin/user
 exports.putAdminUser = function(request, reply) {
   MongoClient.connect(config.DATABASE_URL, function(err, db) {
     if (err) {
       reply('An internal server error has occurred.').code(500)
     }
 
-    var collection = db.collection('users_soon')
+    var collection = db.collection('users')
 
     var adminHash = request.payload.admin
     if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
@@ -137,8 +135,7 @@ exports.putAdminUser = function(request, reply) {
   })
 }
 
-
-
+// /admin/user
 exports.deleteAdminUser = function(request, reply) {
   MongoClient.connect(config.DATABASE_URL, function(err, db) {
     if (err) {
