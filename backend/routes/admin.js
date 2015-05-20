@@ -92,12 +92,12 @@ exports.putAdminUser = function(request, reply) {
 
       db.close()
     } else {
-      var userHash = request.payload.userHash
+      var userId = request.payload.userId
       var email = request.payload.email
       var password = request.payload.password
 
       collection.findOne({
-        _id: ObjectID(userHash)
+        _id: ObjectID(userId)
       }, function(err, user) {
         if (err) {
           reply('Internal server error.').code(500)
@@ -108,7 +108,7 @@ exports.putAdminUser = function(request, reply) {
 
           if (user) {
             collection.update({
-                _id: ObjectID(userHash)
+                _id: ObjectID(userId)
               }, {
                 $set: {
                   email: email
@@ -142,23 +142,23 @@ exports.deleteAdminUser = function(request, reply) {
       reply('An internal server error has occurred.').code(500)
     }
 
-    var collection = db.collection('users_soon')
+    var collection = db.collection('users')
 
     var adminHash = request.payload.admin
     if (adminHash != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') {
       reply('Invalid admin authorization code.').code(401)
       db.close()
     } else {
-      var userHash = request.payload.userHash
+      var userId = request.payload.userId
 
       collection.remove({
-        _id: ObjectID(userHash)
+        _id: ObjectID(userId)
       }, function(err, count) {
         if (err) {
           reply('An error has occurred while removing the user.').code(500)
         } else {
           if (count) {
-            reply('User successfully updated.').code(200)
+            reply('User successfully removed.').code(200)
           } else {
             reply('User not found.').code(404)
           }
