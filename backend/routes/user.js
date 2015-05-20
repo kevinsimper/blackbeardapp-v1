@@ -59,7 +59,7 @@ exports.postLogin = function(request, reply) {
         });
 
         reply({
-          status: 'Login successful',
+          status: 'Login successful.',
           token: token
         })
       } else {
