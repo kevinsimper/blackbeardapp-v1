@@ -7,7 +7,6 @@ var Support = require('../models/Support')
 var Boom = require('boom')
 
 exports.postContact = function(request, reply) {
-
   var name = request.payload.name;
   var email = request.payload.email;
   var message = request.payload.message;
@@ -26,7 +25,6 @@ exports.postContact = function(request, reply) {
     reply({
       status: 'OK'
     })
-
   });
 }
 
@@ -36,6 +34,7 @@ exports.postSignup = function(request, reply) {
   PreUsers.findOne({
     email: email
   }, function(err, result) {
+
     if(result === null) {
       insertEmail()
     } else {
@@ -57,9 +56,8 @@ exports.postSignup = function(request, reply) {
         return reply(Boom.badImplementation())
       }
       reply({
-        status: 'You successful signup to the waiting list'
+        status: 'You have successfully signed up for the waiting list.'
       })
     })
   }
-      
 };

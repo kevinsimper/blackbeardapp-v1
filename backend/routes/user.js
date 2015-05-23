@@ -6,6 +6,7 @@ var config = require('../config')
 var User = require('../models/User')
 var jwt    = require('jsonwebtoken');
 
+// /user
 exports.postUser = function(request, reply) {
   var email = request.payload.email
   var password = request.payload.password
@@ -16,7 +17,10 @@ exports.postUser = function(request, reply) {
       console.log(err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    reply('User successfully added.')
+    reply({
+      status: 'User successfully added.',
+      userId: result._id
+    })
   }
 
   var resultCallback = function(err, user) {
@@ -42,6 +46,7 @@ exports.postUser = function(request, reply) {
   }, resultCallback)
 }
 
+// /login
 exports.postLogin = function(request, reply) {
   var email = request.payload.email
   var password = request.payload.password
@@ -54,7 +59,7 @@ exports.postLogin = function(request, reply) {
         });
 
         reply({
-          status: 'Login successful',
+          status: 'Login successful.',
           token: token
         })
       } else {
