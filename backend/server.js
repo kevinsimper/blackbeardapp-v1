@@ -16,6 +16,7 @@ var preUsersRoutes = require('./routes/preusers')
 var frontRoutes = require('./routes/front')
 var userRoutes = require('./routes/user')
 var adminRoutes = require('./routes/admin')
+var appRoutes = require('./routes/app')
 
 var server = new Hapi.Server({
   connections: {
@@ -83,6 +84,18 @@ server.route({
   method: 'DELETE',
   path: '/admin/user',
   handler: adminRoutes.deleteAdminUser
+})
+
+// Apps
+server.route({
+  method: 'GET',
+  path: '/app',
+  handler: appRoutes.getApps
+})
+server.route({
+  method: 'POST',
+  path: '/app',
+  handler: appRoutes.postApp
 })
 
 server.start(function() {

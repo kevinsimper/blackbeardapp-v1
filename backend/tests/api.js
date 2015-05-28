@@ -6,9 +6,9 @@ var request = require('request')
 var appUrl = 'http://localhost:8000'
 var hrTime = process.hrtime()
 var time = (hrTime[0] * 1000000 + hrTime[1] / 1000)
-var testUserEmail = 'user+'+time+'@jambroo.com'
-var testContactEmail = 'contact+'+time+'@jambroo.com'
-var testSignupEmail = 'signup+'+time+'@jambroo.com'
+var testUserEmail = 'user+' + time + '@jambroo.com'
+var testContactEmail = 'contact+' + time + '@jambroo.com'
+var testSignupEmail = 'signup+' + time + '@jambroo.com'
 
 //server.route({
 //  method: 'POST',
@@ -16,8 +16,9 @@ var testSignupEmail = 'signup+'+time+'@jambroo.com'
 //  handler: userRoutes.postUser
 //})
 var createdUserId = -1
-lab.experiment('/user', function () {
-  lab.test('POST', function (done) {
+var token = -1
+lab.experiment('/user', function() {
+  lab.test('POST', function(done) {
     var requestData = {
       email: testUserEmail,
       password: 'password'
@@ -25,15 +26,15 @@ lab.experiment('/user', function () {
 
     request({
         method: 'POST',
-        uri: appUrl+'/user',
+        uri: appUrl + '/user',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true,
         body: requestData
       },
-      function (error, response, body) {
-	      Code.expect(body.status).to.equal('User successfully added.')
+      function(error, response, body) {
+        Code.expect(body.status).to.equal('User successfully added.')
         createdUserId = body.userId
         done()
       })
@@ -45,8 +46,8 @@ lab.experiment('/user', function () {
 //  path: '/login',
 //  handler: userRoutes.postLogin
 //})
-lab.experiment('/login', function () {
-  lab.test('POST', function (done) {
+lab.experiment('/login', function() {
+  lab.test('POST', function(done) {
     var requestData = {
       email: testUserEmail,
       password: 'password'
@@ -54,16 +55,17 @@ lab.experiment('/login', function () {
 
     request({
         method: 'POST',
-        uri: appUrl+'/login',
+        uri: appUrl + '/login',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true,
         body: requestData
       },
-      function (error, response, body) {
+      function(error, response, body) {
         Code.expect(body.status).to.equal('Login successful.')
         Code.expect(body.token).to.be.a.string()
+        token = body.token
         done()
       })
   })
@@ -74,8 +76,8 @@ lab.experiment('/login', function () {
 //  path: '/contact',
 //  handler: frontRoutes.postContact
 //})
-lab.experiment('/contact', function () {
-  lab.test('POST', function (done) {
+lab.experiment('/contact', function() {
+  lab.test('POST', function(done) {
     var requestData = {
       email: testContactEmail,
       name: 'James',
@@ -84,14 +86,14 @@ lab.experiment('/contact', function () {
 
     request({
         method: 'POST',
-        uri: appUrl+'/contact',
+        uri: appUrl + '/contact',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true,
         body: requestData
       },
-      function (error, response, body) {
+      function(error, response, body) {
         Code.expect(body.status).to.equal("OK")
         done()
       })
@@ -103,8 +105,8 @@ lab.experiment('/contact', function () {
 //  path: '/admin/user',
 //  handler: adminRoutes.getAdminUser
 //})
-lab.experiment('/admin/user GET', function () {
-  lab.test('status', function (done) {
+lab.experiment('/admin/user GET', function() {
+  lab.test('status', function(done) {
     var getAdminUserResponse = null
     var getAdminUsersResponse = null
     var getAdminUsersInvalidAuthResponse = null
@@ -112,13 +114,13 @@ lab.experiment('/admin/user GET', function () {
     var getAdminUser = function() {
       request({
           method: 'GET',
-          uri: appUrl+'/admin/user?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&userId='+createdUserId,
+          uri: appUrl + '/admin/user?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&userId=' + createdUserId,
           headers: {
             'Content-Type': 'application/json'
           },
           json: true
         },
-        function (error, response, body) {
+        function(error, response, body) {
           Code.expect(getAdminUsersInvalidAuthResponse).to.equal("Invalid Admin Authorization Code.")
           Code.expect(getAdminUsersResponse).to.be.a.array()
           Code.expect(getAdminUsersResponse[0]).to.be.an.object()
@@ -129,16 +131,16 @@ lab.experiment('/admin/user GET', function () {
         })
     }
 
-    var getAdminUsers = function () {
+    var getAdminUsers = function() {
       request({
           method: 'GET',
-          uri: appUrl+'/admin/user?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+          uri: appUrl + '/admin/user?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
           headers: {
             'Content-Type': 'application/json'
           },
           json: true
         },
-        function (error, response, body) {
+        function(error, response, body) {
           getAdminUsersResponse = body
 
           getAdminUser()
@@ -147,13 +149,13 @@ lab.experiment('/admin/user GET', function () {
 
     request({
         method: 'GET',
-        uri: appUrl+'/admin/user',
+        uri: appUrl + '/admin/user',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true
       },
-      function (error, response, body) {
+      function(error, response, body) {
         getAdminUsersInvalidAuthResponse = body
 
         getAdminUsers()
@@ -166,8 +168,8 @@ lab.experiment('/admin/user GET', function () {
 //  path: '/admin/user',
 //  handler: adminRoutes.putAdminUser
 //})
-lab.experiment('/admin/user PUT', function () {
-  lab.test('status', function (done) {
+lab.experiment('/admin/user PUT', function() {
+  lab.test('status', function(done) {
     var requestData = {
       admin: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
       userId: createdUserId,
@@ -177,43 +179,15 @@ lab.experiment('/admin/user PUT', function () {
 
     request({
         method: 'PUT',
-        uri: appUrl+'/admin/user',
+        uri: appUrl + '/admin/user',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true,
         body: requestData
       },
-      function (error, response, body) {
+      function(error, response, body) {
         Code.expect(body).to.equal("User successfully updated.")
-        done()
-      })
-  })
-})
-
-//server.route({
-//  method: 'DELETE',
-//  path: '/admin/user',
-//  handler: adminRoutes.deleteAdminUser
-//})
-lab.experiment('/admin/user DELETE', function () {
-  lab.test('status', function (done) {
-    var requestData = {
-      admin: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-      userId: createdUserId
-    }
-
-    request({
-        method: 'DELETE',
-        uri: appUrl+'/admin/user',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        json: true,
-        body: requestData
-      },
-      function (error, response, body) {
-        Code.expect(body).to.equal("User successfully removed.")
         done()
       })
   })
@@ -224,10 +198,10 @@ lab.experiment('/admin/user DELETE', function () {
 //  path: '/presignup',
 //  handler: frontRoutes.postSignup
 //})
-lab.experiment('/presignup', function () {
+lab.experiment('/presignup', function() {
   var postPresignup = null
 
-  lab.test('status', function (done) {
+  lab.test('status', function(done) {
     var requestData = {
       email: testSignupEmail
     }
@@ -235,16 +209,16 @@ lab.experiment('/presignup', function () {
     var postSignupClash = function() {
       request({
           method: 'POST',
-          uri: appUrl+'/presignup',
+          uri: appUrl + '/presignup',
           headers: {
             'Content-Type': 'application/json'
           },
           json: true,
           body: requestData
         },
-        function (error, response, body) {
+        function(error, response, body) {
           Code.expect(postPresignup.status).to.equal("You have successfully signed up for the waiting list.")
-          //Code.expect(body).to.equal("Already signed up.")
+            //Code.expect(body).to.equal("Already signed up.")
 
           done()
         })
@@ -252,14 +226,14 @@ lab.experiment('/presignup', function () {
 
     request({
         method: 'POST',
-        uri: appUrl+'/presignup',
+        uri: appUrl + '/presignup',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true,
         body: requestData
       },
-      function (error, response, body) {
+      function(error, response, body) {
         postPresignup = body
 
         postSignupClash()
@@ -274,23 +248,98 @@ lab.experiment('/presignup', function () {
 //  handler: preUsersRoutes.getPreUsers
 //})
 //
-lab.experiment('/preusers', function () {
-  lab.test('status', function (done) {
+lab.experiment('/preusers', function() {
+  lab.test('status', function(done) {
     request({
         method: 'GET',
-        uri: appUrl+'/preusers',
+        uri: appUrl + '/preusers',
         headers: {
           'Content-Type': 'application/json'
         },
         json: true
       },
-      function (error, response, body) {
+      function(error, response, body) {
         Code.expect(body).to.be.a.array()
         Code.expect(body[0]).to.be.an.object()
         Code.expect(body[0]._id).to.be.a.string()
-        Code.expect(body[body.length-1].email).to.equal(testSignupEmail)
+        Code.expect(body[body.length - 1].email).to.equal(testSignupEmail)
 
         done()
       })
+  })
 })
-});
+
+lab.experiment('/app', function() {
+  lab.test('status', function(done) {
+    var postBody = null;
+    var getApps = function() {
+      request({
+          method: 'GET',
+          uri: appUrl + '/app?token=' + token,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          json: true
+        },
+        function(error, response, body) {
+          Code.expect(postBody).to.be.an.object()
+          Code.expect(postBody.status).to.be.a.string()
+          Code.expect(postBody.appId).to.be.a.string()
+
+          Code.expect(body).to.be.an.array();
+          Code.expect(body[0]._id).to.equal(postBody.appId)
+
+          done()
+        })
+    }
+
+    var requestData = {
+      token: token,
+      name: 'Test App'
+    }
+    request({
+        method: 'POST',
+        uri: appUrl + '/app',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: requestData,
+        json: true
+      },
+      function(error, response, body) {
+        postBody = body
+        getApps()
+      })
+
+  })
+})
+
+//server.route({
+//  method: 'DELETE',
+//  path: '/admin/user',
+//  handler: adminRoutes.deleteAdminUser
+//})
+lab.experiment('/admin/user DELETE', function() {
+  lab.test('status', function(done) {
+    var requestData = {
+      admin: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      userId: createdUserId
+    }
+
+    request({
+        method: 'DELETE',
+        uri: appUrl + '/admin/user',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        json: true,
+        body: requestData
+      },
+      function(error, response, body) {
+        Code.expect(body).to.equal("User successfully removed.")
+        done()
+      })
+  })
+})
+
+//TODO: Test if orphaned apps exist after user removed
