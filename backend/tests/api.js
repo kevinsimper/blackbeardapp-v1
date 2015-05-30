@@ -269,9 +269,12 @@ lab.experiment('/preusers', function() {
   })
 })
 
+var appId = null
 lab.experiment('/app', function() {
   lab.test('status', function(done) {
     var postBody = null;
+    var getBody = null;
+    var updateBody = null;
     var getApps = function() {
       request({
           method: 'GET',
@@ -282,16 +285,67 @@ lab.experiment('/app', function() {
           json: true
         },
         function(error, response, body) {
+          getBody = body;
+          updateApp()
+        })
+    }
+
+    var updateApp = function() {
+      var requestData = {
+        token: token,
+        appId: appId,
+        name: 'Test App Updated'
+      }
+      request({
+          method: 'PUT',
+          uri: appUrl + '/app',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          json: true,
+          body: requestData
+        },
+        function(error, response, body) {
+          updateBody = body
+          deleteApp()
+        })
+    }
+
+    var deleteApp = function() {
+      var requestData = {
+        token: token,
+        appId: appId
+      }
+      request({
+          method: 'DELETE',
+          uri: appUrl + '/app',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          json: true,
+          body: requestData
+        },
+        function(error, response, body) {
           Code.expect(postBody).to.be.an.object()
           Code.expect(postBody.status).to.be.a.string()
+          Code.expect(postBody.status).to.equal("App successfully added.")
           Code.expect(postBody.appId).to.be.a.string()
 
-          Code.expect(body).to.be.an.array();
-          Code.expect(body[0]._id).to.equal(postBody.appId)
+          Code.expect(getBody).to.be.an.array();
+          Code.expect(getBody[0]._id).to.equal(postBody.appId)
+          
+          Code.expect(updateBody).to.be.an.object()
+          Code.expect(updateBody.status).to.be.a.string()
+          Code.expect(updateBody.status).to.equal("App successfully updated.")
+
+          Code.expect(body).to.be.an.object()
+          Code.expect(body.status).to.be.a.string()
+          Code.expect(body.status).to.equal("App successfully removed.")
 
           done()
         })
     }
+
 
     var requestData = {
       token: token,
@@ -307,6 +361,7 @@ lab.experiment('/app', function() {
         json: true
       },
       function(error, response, body) {
+        appId = body.appId
         postBody = body
         getApps()
       })

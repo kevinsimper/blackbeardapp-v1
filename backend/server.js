@@ -97,6 +97,16 @@ server.route({
   path: '/app',
   handler: appRoutes.postApp
 })
+server.route({
+  method: 'DELETE',
+  path: '/app',
+  handler: appRoutes.deleteApp
+})
+server.route({
+  method: 'PUT',
+  path: '/app',
+  handler: appRoutes.putApp
+})
 
 server.start(function() {
   console.log('Server running at:', server.info.uri);

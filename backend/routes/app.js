@@ -14,9 +14,8 @@ exports.getApps = function(request, reply) {
 
   try {
     var decoded = jwt.verify(token, config.AUTH_SECRET)
-
   } catch (err) {
-    reply(Boom.unauthorized('Invalid authentication token supplied.'))
+    return reply(Boom.unauthorized('Invalid authentication token supplied.'))
   }
 
   App.find({
@@ -45,7 +44,6 @@ exports.postApp = function(request, reply) {
 
   var insertCallback = function(err, result) {
     if (err) {
-      console.log(err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
@@ -61,3 +59,85 @@ exports.postApp = function(request, reply) {
   })
   newApp.save(insertCallback)
 }
+// /app
+exports.putApp = function(request, reply) {
+  var token = request.payload.token
+  var name = request.payload.name
+  var appId = request.payload.appId
+
+  try {
+    var decoded = jwt.verify(token, config.AUTH_SECRET)
+
+  } catch (err) {
+    reply(Boom.unauthorized('Invalid authentication token supplied.'))
+  }
+
+  var updateCallback = function(err, result) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    reply({
+      status: 'App successfully updated.',
+      appId: result._id
+    })
+  }
+
+  // Verify user has ownership of app
+  App.find({
+    _id: ObjectID(appId),
+    user: ObjectID(decoded)
+  }, function(err, result) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    if (result.length > 0) {
+      var app = result[0]
+      app.name = name;
+      app.save(updateCallback)
+    } else {
+      return reply(Boom.notFound('Could not find App in system.'))  
+    }
+  })
+}
+
+exports.deleteApp = function(request, reply) {
+  var token = request.payload.token
+  var appId = request.payload.appId
+
+  try {
+    var decoded = jwt.verify(token, config.AUTH_SECRET)
+
+  } catch (err) {
+    reply(Boom.unauthorized('Invalid authentication token supplied.'))
+  }
+
+  var rmCallback = function(err, result) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    reply({
+      status: 'App successfully removed.',
+      appId: result._id
+    })
+  }
+
+  // Verify user has ownership of app
+  App.find({
+    _id: ObjectID(appId),
+    user: ObjectID(decoded)
+  }, function(err, result) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    if (result.length > 0) {
+      var app = result[0]
+      app.remove(rmCallback)
+    } else {
+      return reply(Boom.notFound('Could not find App in system.'))  
+    }
+  })
+
+}
+
+
