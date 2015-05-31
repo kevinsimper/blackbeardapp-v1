@@ -1,3 +1,6 @@
+var server = require('../server')
+server.start()
+
 var Code = require('code')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
@@ -111,10 +114,10 @@ lab.experiment('/admin/user GET', function() {
     var getAdminUsersResponse = null
     var getAdminUsersInvalidAuthResponse = null
 
-    var getAdminUser = function() {
+    var inviteUser = function() {
       request({
           method: 'GET',
-          uri: appUrl + '/admin/user?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&userId=' + createdUserId,
+          uri: appUrl + '/admin/invite?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&token=' + token + '&userId=' + createdUserId,
           headers: {
             'Content-Type': 'application/json'
           },
@@ -125,10 +128,28 @@ lab.experiment('/admin/user GET', function() {
           Code.expect(getAdminUsersResponse).to.be.a.array()
           Code.expect(getAdminUsersResponse[0]).to.be.an.object()
           Code.expect(getAdminUsersResponse[0]._id).to.be.a.string()
-          Code.expect(body.email).to.equal(testUserEmail)
-          Code.expect(body.credit).to.equal(0)
+          Code.expect(getAdminUserResponse.email).to.equal(testUserEmail)
+          Code.expect(getAdminUserResponse.credit).to.equal(0)
+
+          Code.expect(body.status).to.equal("Invitation successfully sent.")
+          Code.expect(body.mailgunResponse.message).to.equal("Queued. Thank you.")
 
           done()
+        })
+    }
+
+    var getAdminUser = function() {
+      request({
+          method: 'GET',
+          uri: appUrl + '/admin/user?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&userId=' + createdUserId,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          json: true
+        },
+        function(error, response, body) {
+          getAdminUserResponse = body
+          inviteUser()
         })
     }
 

@@ -1,7 +1,10 @@
-var MongoClient = require('mongodb').MongoClient,
-  ObjectID = require('mongodb').ObjectID,
-  passwordHash = require('password-hash'),
-  _ = require('lodash')
+var MongoClient = require('mongodb').MongoClient
+var ObjectID = require('mongodb').ObjectID
+var passwordHash = require('password-hash')
+var _ = require('lodash')
+var Boom = require('boom')
+var jwt = require('jsonwebtoken')
+var User = require('../models/User')
 
 var config = require('../config')
 
@@ -165,6 +168,39 @@ exports.deleteAdminUser = function(request, reply) {
         }
         db.close()
       })
+    }
+  })
+}
+
+exports.inviteUser = function(request, reply) {
+  var token = request.query.token
+  var userId = request.query.userId
+
+  try {
+    var decoded = jwt.verify(token, config.AUTH_SECRET)
+  } catch (err) {
+    return reply(Boom.unauthorized('Invalid authentication token supplied.'))
+  }
+
+  User.findOne({ _id: userId }, function(err, user) {
+    if (user) {
+      var mailgun = require('mailgun-js')({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
+
+      var data = {
+          from: 'Blackbeard <info@blackbeard.io>',
+          to: user.email,
+          subject: 'Welcome to Blackbeard',
+          text: '...'
+      }
+
+      mailgun.messages().send(data, function (error, body) {
+        reply({
+          status: 'Invitation successfully sent.',
+          mailgunResponse: body
+        })
+      })
+    } else {
+      reply(Boom.badRequest('Could not find user account.'))
     }
   })
 }

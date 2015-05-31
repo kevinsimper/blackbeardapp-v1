@@ -1,5 +1,3 @@
-require('newrelic')
-
 var Hapi = require('hapi')
 var MongoClient = require('mongodb').MongoClient
 var ObjectID = require('mongodb').ObjectID
@@ -103,6 +101,11 @@ server.route({
   path: '/admin/user',
   handler: adminRoutes.deleteAdminUser
 })
+server.route({
+  method: 'GET',
+  path: '/admin/invite',
+  handler: adminRoutes.inviteUser
+})
 
 // Apps
 server.route({
@@ -126,6 +129,4 @@ server.route({
   handler: appRoutes.putApp
 })
 
-server.start(function() {
-  console.log('Server running at:', server.info.uri);
-});
+module.exports = server

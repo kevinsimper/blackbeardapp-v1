@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "start.js",
   "scripts": {
     "test": "node_modules/lab/bin/lab tests/api.js"
   },
@@ -19,6 +19,7 @@
     "mongoose": "4.0.3",
     "newrelic": "1.19.0",
     "password-hash": "1.2.2",
-    "request": "2.55.0"
+    "request": "2.55.0",
+    "mailgun-js": "0.6.9"
   }
 }
