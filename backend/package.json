@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "start.js",
   "scripts": {
     "test": "node_modules/lab/bin/lab tests/api.js"
   },

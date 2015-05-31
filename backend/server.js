@@ -1,5 +1,3 @@
-require('newrelic')
-
 var Hapi = require('hapi')
 var MongoClient = require('mongodb').MongoClient
 var ObjectID = require('mongodb').ObjectID
@@ -146,6 +144,4 @@ server.route({
   }
 })
 
-server.start(function() {
-  console.log('Server running at:', server.info.uri);
-});
+module.exports = server
