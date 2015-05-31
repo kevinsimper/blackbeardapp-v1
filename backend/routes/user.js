@@ -34,6 +34,7 @@ exports.postUser = function(request, reply) {
       var newUser = new User({
         email: email,
         password: hashedPassword,
+        credit: 0,
         timestamp: Math.round(Date.now() / 1000),
         ip: request.info.remoteAddress
       })

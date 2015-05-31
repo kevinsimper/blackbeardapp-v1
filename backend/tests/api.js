@@ -126,6 +126,7 @@ lab.experiment('/admin/user GET', function() {
           Code.expect(getAdminUsersResponse[0]).to.be.an.object()
           Code.expect(getAdminUsersResponse[0]._id).to.be.a.string()
           Code.expect(body.email).to.equal(testUserEmail)
+          Code.expect(body.credit).to.equal(0)
 
           done()
         })

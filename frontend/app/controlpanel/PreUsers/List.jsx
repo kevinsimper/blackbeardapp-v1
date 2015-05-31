@@ -1,7 +1,8 @@
 var React = require('react')
-var PreUsersActions = require('./Actions')
+var Actions = require('./Actions')
 var PreUsersStore = require('./Store')
 var Authentication = require('../mixins/authentication')
+var PreUsersItem = require('./Item.jsx')
 
 var getState = function() {
   return {
@@ -16,7 +17,7 @@ var ListPreUsers = React.createClass({
   },
   componentDidMount: function() {
       this.unsubscribe = PreUsersStore.listen(this.onChange);
-      PreUsersActions.load()
+      Actions.load()
   },
   componentWillUnmount: function() {
       this.unsubscribe();
@@ -25,24 +26,20 @@ var ListPreUsers = React.createClass({
     this.setState(getState())
   },
   render: function() {
+    var self = this
     return (
       <div>
         <h1>PreUsers</h1>
         <table>
-          <th>
-            <td>Email</td>
-            <td>IP</td>
-            <td>Active</td>
-          </th>
-          {this.state.preUsers.map(function(item) {
-
-            return (
-              <tr>
-                <td>{item.email}</td>
-                <td>{item.ip}</td>
-                <td>{item.active}</td>
-              </tr>
-            );
+          <tr>
+            <th>Email</th>
+            <th>IP</th>
+            <th>Active</th>
+            <th>Comment</th>
+            <th>Actions</th>
+          </tr>
+          {this.state.preUsers.map(function(preUser, i) {
+            return <PreUsersItem preUser={preUser} key={i} />;
           })}
         </table>
       </div>

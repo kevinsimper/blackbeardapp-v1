@@ -46,6 +46,24 @@ server.route({
 
 server.route({
   method: 'POST',
+  path: '/preusers',
+  handler: preUsersRoutes.postPreUsers
+})
+
+server.route({
+  method: 'PUT',
+  path: '/preusers/{id}',
+  handler: preUsersRoutes.putPreUsers
+})
+
+server.route({
+  method: 'DELETE',
+  path: '/preusers/{id}',
+  handler: preUsersRoutes.delPreUsers
+})
+
+server.route({
+  method: 'POST',
   path: '/presignup',
   handler: frontRoutes.postSignup
 })
