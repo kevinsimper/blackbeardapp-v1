@@ -101,6 +101,11 @@ server.route({
   path: '/admin/user',
   handler: adminRoutes.deleteAdminUser
 })
+server.route({
+  method: 'GET',
+  path: '/admin/invite',
+  handler: adminRoutes.inviteUser
+})
 
 // Apps
 server.route({
@@ -122,26 +127,6 @@ server.route({
   method: 'PUT',
   path: '/app',
   handler: appRoutes.putApp
-})
-server.route({
-  method: 'GET',
-  path: '/mg',
-  handler: function (request, reply) {
-    var api_key = 'key-5859ef062599d1fd5412c49e413f2e26';
-    var domain = 'sandbox7790b5e2eec7461d9501b24fa25d8d54.mailgun.org';
-    var mailgun = require('mailgun-js')({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
-
-    var data = {
-        from: 'Jambroo <j@jambroo.com>',
-          to: 'jambroo@gmail.com',
-            subject: 'Hello, again',
-              text: 'Testing some Mailgun awesomness!'
-    };
-
-    mailgun.messages().send(data, function (error, body) {
-        reply(body);
-    });
-  }
 })
 
 module.exports = server
