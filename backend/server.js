@@ -206,3 +206,4 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 })
 
 module.exports = server
+module.exports.start()
