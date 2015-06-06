@@ -175,6 +175,11 @@ exports.deleteAdminUser = function(request, reply) {
 exports.inviteUser = function(request, reply) {
   var token = request.query.token
   var userId = request.query.userId
+  var credit = request.query.credit
+  if (!credit) {
+    // Default credit to 10
+    credit = 10;
+  }
 
   try {
     var decoded = jwt.verify(token, config.AUTH_SECRET)
@@ -182,23 +187,36 @@ exports.inviteUser = function(request, reply) {
     return reply(Boom.unauthorized('Invalid authentication token supplied.'))
   }
 
+  var updateCallback = function(err, user) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    user.email = "jambroo@gmail.com"
+
+    var mailgun = require('mailgun-js')({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
+
+    var data = {
+        from: 'Blackbeard <info@blackbeard.io>',
+        to: user.email,
+        subject: 'Blackbeard Credit Applied!',
+        text: "Your new account at Blackbeard has been credited for $"+credit+". To use this credit and take "+
+          "advantage of the hosting services provided by Blackbeard please login at http://blackbeard.io."+
+          "\n\nRegards,\nThe team at Blackbeard"
+    }
+
+    mailgun.messages().send(data, function (error, body) {
+      reply({
+        status: 'Invitation successfully sent.',
+        mailgunResponse: body
+      })
+    })
+  }
+
   User.findOne({ _id: userId }, function(err, user) {
     if (user) {
-      var mailgun = require('mailgun-js')({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
-
-      var data = {
-          from: 'Blackbeard <info@blackbeard.io>',
-          to: user.email,
-          subject: 'Welcome to Blackbeard',
-          text: '...'
-      }
-
-      mailgun.messages().send(data, function (error, body) {
-        reply({
-          status: 'Invitation successfully sent.',
-          mailgunResponse: body
-        })
-      })
+      var newCredit = user.credit + credit
+      user.credit = newCredit
+      user.save(updateCallback)
     } else {
       reply(Boom.badRequest('Could not find user account.'))
     }
