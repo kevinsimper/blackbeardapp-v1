@@ -10,16 +10,9 @@ var config = require('../config')
 
 // /app
 exports.getApps = function(request, reply) {
-  var token = request.query.token
-
-  try {
-    var decoded = jwt.verify(token, config.AUTH_SECRET)
-  } catch (err) {
-    return reply(Boom.unauthorized('Invalid authentication token supplied.'))
-  }
-
+  user = request.auth.credentials
   App.find({
-    user: ObjectID(decoded)
+    user: user._id
   }, function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
@@ -139,5 +132,3 @@ exports.deleteApp = function(request, reply) {
   })
 
 }
-
-

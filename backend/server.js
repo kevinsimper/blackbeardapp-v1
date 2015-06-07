@@ -177,7 +177,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'GET',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.getApps
     }
   })

@@ -116,9 +116,10 @@ lab.experiment('/admin/user GET', function() {
     var inviteUser = function() {
       request({
           method: 'GET',
-          uri: appUrl + '/admin/invite?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&token=' + token + '&userId=' + createdUserId,
+          uri: appUrl + '/admin/invite?admin=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&userId=' + createdUserId,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token
           },
           json: true
         },
@@ -299,9 +300,10 @@ lab.experiment('/app', function() {
     var getApps = function() {
       request({
           method: 'GET',
-          uri: appUrl + '/app?token=' + token,
+          uri: appUrl + '/app',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token
           },
           json: true
         },
