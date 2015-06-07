@@ -7,7 +7,8 @@ var mongoose = require('mongoose')
 var config = require('./config')
 
 mongoose.connect(config.DATABASE_URL, function() {
-  console.log('mongoose connected to mongodb')
+  console.log('Mongoose connected to MongoDB:')
+  console.log("\t"+config.DATABASE_URL)
 })
 
 var User = require('./models/User.js')
@@ -25,9 +26,7 @@ var server = new Hapi.Server({
   }
 });
 
-server.connection({
-  port: '8000'
-});
+server.connection({ port: 8000 })
 
 server.register(require('hapi-auth-jwt2'), function(err) {
   if(err) {
@@ -64,7 +63,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: 'jwt',
       handler: function(request, reply) {
-        console.log(request.auth)
         reply(request.auth)
       }
     }
@@ -174,7 +172,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'GET',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.getApps
     }
   })
@@ -206,4 +204,3 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 })
 
 module.exports = server
-module.exports.start()

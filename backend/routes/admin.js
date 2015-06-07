@@ -191,7 +191,6 @@ exports.inviteUser = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    user.email = "jambroo@gmail.com"
 
     var mailgun = require('mailgun-js')({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
 

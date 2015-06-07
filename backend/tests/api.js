@@ -1,5 +1,4 @@
 var server = require('../server')
-server.start()
 
 var Code = require('code')
 var Lab = require('lab')
