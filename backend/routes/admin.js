@@ -5,8 +5,10 @@ var _ = require('lodash')
 var Boom = require('boom')
 var jwt = require('jsonwebtoken')
 var User = require('../models/User')
+var MailgunJs = require('mailgun-js')
 
 var config = require('../config')
+
 
 // /admin/user
 exports.getAdminUser = function(request, reply) {
@@ -192,7 +194,7 @@ exports.inviteUser = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    var mailgun = require('mailgun-js')({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
+    var mailgun = MailgunJs({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
 
     var data = {
         from: 'Blackbeard <info@blackbeard.io>',

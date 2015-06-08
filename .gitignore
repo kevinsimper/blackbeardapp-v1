@@ -26,10 +26,7 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
-
 .idea
-backend/.idea
-
 
 config/development.yml
 npm-debug.log
