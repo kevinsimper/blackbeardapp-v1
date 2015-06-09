@@ -1,7 +1,6 @@
 var MongoClient = require('mongodb').MongoClient
 var ObjectID = require('mongodb').ObjectID
 var _ = require('lodash')
-var jwt = require('jsonwebtoken')
 var User = require('../models/User')
 var App = require('../models/App')
 var Boom = require('boom')
@@ -25,15 +24,7 @@ exports.getApps = function(request, reply) {
 
 // /app
 exports.postApp = function(request, reply) {
-  var token = request.payload.token
   var name = request.payload.name
-
-  try {
-    var decoded = jwt.verify(token, config.AUTH_SECRET)
-
-  } catch (err) {
-    reply(Boom.unauthorized('Invalid authentication token supplied.'))
-  }
 
   var insertCallback = function(err, result) {
     if (err) {
@@ -47,23 +38,15 @@ exports.postApp = function(request, reply) {
 
   var newApp = new App({
     name: name,
-    user: decoded,
+    user: request.auth.credentials,
     timestamp: Math.round(Date.now() / 1000)
   })
   newApp.save(insertCallback)
 }
 // /app
 exports.putApp = function(request, reply) {
-  var token = request.payload.token
   var name = request.payload.name
   var appId = request.payload.appId
-
-  try {
-    var decoded = jwt.verify(token, config.AUTH_SECRET)
-
-  } catch (err) {
-    reply(Boom.unauthorized('Invalid authentication token supplied.'))
-  }
 
   var updateCallback = function(err, result) {
     if (err) {
@@ -76,9 +59,10 @@ exports.putApp = function(request, reply) {
   }
 
   // Verify user has ownership of app
+  var user = request.auth.credentials
   App.find({
     _id: ObjectID(appId),
-    user: ObjectID(decoded)
+    user: user
   }, function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
@@ -94,15 +78,7 @@ exports.putApp = function(request, reply) {
 }
 
 exports.deleteApp = function(request, reply) {
-  var token = request.payload.token
   var appId = request.payload.appId
-
-  try {
-    var decoded = jwt.verify(token, config.AUTH_SECRET)
-
-  } catch (err) {
-    reply(Boom.unauthorized('Invalid authentication token supplied.'))
-  }
 
   var rmCallback = function(err, result) {
     if (err) {
@@ -115,9 +91,10 @@ exports.deleteApp = function(request, reply) {
   }
 
   // Verify user has ownership of app
+  var user = request.auth.credentials
   App.find({
     _id: ObjectID(appId),
-    user: ObjectID(decoded)
+    user: user
   }, function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
@@ -130,5 +107,4 @@ exports.deleteApp = function(request, reply) {
       return reply(Boom.notFound('Could not find App in system.'))  
     }
   })
-
 }

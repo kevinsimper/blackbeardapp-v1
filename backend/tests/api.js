@@ -315,7 +315,6 @@ lab.experiment('/app', function() {
 
     var updateApp = function() {
       var requestData = {
-        token: token,
         appId: appId,
         name: 'Test App Updated'
       }
@@ -323,7 +322,8 @@ lab.experiment('/app', function() {
           method: 'PUT',
           uri: appUrl + '/app',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token
           },
           json: true,
           body: requestData
@@ -336,14 +336,14 @@ lab.experiment('/app', function() {
 
     var deleteApp = function() {
       var requestData = {
-        token: token,
         appId: appId
       }
       request({
           method: 'DELETE',
           uri: appUrl + '/app',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token
           },
           json: true,
           body: requestData
@@ -371,14 +371,14 @@ lab.experiment('/app', function() {
 
 
     var requestData = {
-      token: token,
       name: 'Test App'
     }
     request({
         method: 'POST',
         uri: appUrl + '/app',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': token
         },
         body: requestData,
         json: true

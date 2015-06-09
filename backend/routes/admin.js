@@ -3,7 +3,6 @@ var ObjectID = require('mongodb').ObjectID
 var passwordHash = require('password-hash')
 var _ = require('lodash')
 var Boom = require('boom')
-var jwt = require('jsonwebtoken')
 var User = require('../models/User')
 var MailgunJs = require('mailgun-js')
 

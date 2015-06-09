@@ -195,7 +195,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'POST',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.postApp
     }
   })
@@ -203,7 +203,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'DELETE',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.deleteApp
     }
   })
@@ -211,7 +211,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'PUT',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.putApp
     }
   })
