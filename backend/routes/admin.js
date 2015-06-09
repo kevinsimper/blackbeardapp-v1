@@ -175,18 +175,11 @@ exports.deleteAdminUser = function(request, reply) {
 }
 
 exports.inviteUser = function(request, reply) {
-  var token = request.query.token
   var userId = request.query.userId
   var credit = request.query.credit
   if (!credit) {
     // Default credit to 10
     credit = 10;
-  }
-
-  try {
-    var decoded = jwt.verify(token, config.AUTH_SECRET)
-  } catch (err) {
-    return reply(Boom.unauthorized('Invalid authentication token supplied.'))
   }
 
   var updateCallback = function(err, user) {

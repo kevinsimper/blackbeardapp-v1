@@ -172,6 +172,16 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
 
+  server.route({
+    method: 'GET',
+    path: '/admin/invite',
+    config: {
+      auth: 'jwt',
+      handler: adminRoutes.inviteUser
+    }
+  })
+
+
   // Apps
   server.route({
     method: 'GET',
