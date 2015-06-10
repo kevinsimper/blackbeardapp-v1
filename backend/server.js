@@ -7,7 +7,8 @@ var mongoose = require('mongoose')
 var config = require('./config')
 
 mongoose.connect(config.DATABASE_URL, function() {
-  console.log('mongoose connected to mongodb')
+  console.log('Mongoose connected to MongoDB:')
+  console.log("\t"+config.DATABASE_URL)
 })
 
 var User = require('./models/User.js')
@@ -25,9 +26,12 @@ var server = new Hapi.Server({
   }
 });
 
-server.connection({
-  port: '8000'
-});
+var port = 8000;
+if ((process.argv.length > 2) && (process.argv[2] == 'tests/api.js')) {
+  port = 8001;
+}
+
+server.connection({ port: port })
 
 server.register(require('hapi-auth-jwt2'), function(err) {
   if(err) {
@@ -64,7 +68,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: 'jwt',
       handler: function(request, reply) {
-        console.log(request.auth)
         reply(request.auth)
       }
     }
@@ -169,12 +172,22 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
 
+  server.route({
+    method: 'GET',
+    path: '/admin/invite',
+    config: {
+      auth: 'jwt',
+      handler: adminRoutes.inviteUser
+    }
+  })
+
+
   // Apps
   server.route({
     method: 'GET',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.getApps
     }
   })
@@ -182,7 +195,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'POST',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.postApp
     }
   })
@@ -190,7 +203,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'DELETE',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.deleteApp
     }
   })
@@ -198,11 +211,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'PUT',
     path: '/app',
     config: {
-      auth: false,
+      auth: 'jwt',
       handler: appRoutes.putApp
     }
   })
   
 })
 
+server.start()
 module.exports = server
