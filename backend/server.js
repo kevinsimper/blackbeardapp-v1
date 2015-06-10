@@ -28,7 +28,7 @@ var server = new Hapi.Server({
 
 var port = 8000;
 if ((process.argv.length > 2) && (process.argv[2] == 'tests/api.js')) {
-  port = 80001;
+  port = 8001;
 }
 
 server.connection({ port: port })
