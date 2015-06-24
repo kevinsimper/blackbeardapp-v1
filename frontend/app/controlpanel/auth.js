@@ -1,3 +1,6 @@
+var request = require('superagent')
+var config = require('./config')
+
 var auth = {
   login: function(email, pass, cb) {
     cb = arguments[arguments.length - 1];
@@ -6,7 +9,7 @@ var auth = {
       auth.onChange(true);
       return;
     }
-    pretendRequest(email, pass, function(res){
+    makeAuthRequest(email, pass, function(res){
       if (res.authenticated) {
         localStorage.token = res.token;
         if (cb) cb(true);
@@ -33,20 +36,25 @@ var auth = {
   onChange: function () {}
 };
 
-function pretendRequest(email, pass, cb) {
-  setTimeout(function() {
-    if (email === 'joe@example.com' && pass === 'password1') {
+function makeAuthRequest(email, password, cb) {
+  request
+    .post(config.BACKEND_HOST + '/login')
+    .send({
+      email: email,
+      password: password
+    })
+    .end(function(err, res) {
+      if(err) {
+        cb({
+          authenticated: false
+        })
+        return false;
+      }
       cb({
         authenticated: true,
-        token: Math.random().toString(36).substring(7)
-      });
-    } else {
-      cb({
-        authenticated: true,
-        token: Math.random().toString(36).substring(7)
-      });
-    }
-  }, 1000);
+        token: res.body.token
+      })
+    })
 }
 
 module.exports = auth
