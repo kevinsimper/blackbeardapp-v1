@@ -16,7 +16,7 @@ exports.getApps = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-
+    
     // Should probably only return a subset of this information
     reply(result)
   })
@@ -26,14 +26,11 @@ exports.getApps = function(request, reply) {
 exports.postApp = function(request, reply) {
   var name = request.payload.name
 
-  var insertCallback = function(err, result) {
+  var insertCallback = function(err, app) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    reply({
-      status: 'App successfully added.',
-      appId: result._id
-    })
+    reply(app)
   }
 
   var newApp = new App({
@@ -48,14 +45,11 @@ exports.putApp = function(request, reply) {
   var name = request.payload.name
   var appId = request.payload.appId
 
-  var updateCallback = function(err, result) {
+  var updateCallback = function(err, app) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    reply({
-      status: 'App successfully updated.',
-      appId: result._id
-    })
+    reply(app)
   }
 
   // Verify user has ownership of app
@@ -72,7 +66,7 @@ exports.putApp = function(request, reply) {
       app.name = name;
       app.save(updateCallback)
     } else {
-      return reply(Boom.notFound('Could not find App in system.'))  
+      return reply(Boom.notFound('Could not find App'))  
     }
   })
 }
