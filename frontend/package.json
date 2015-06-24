@@ -7,7 +7,8 @@
     "start": "node server.js",
     "build": "gulp build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "browser-sync": "browser-sync start --files=\"public/**/*.js\" --proxy=\"docker.dev:9000\""
+    "browser-sync": "browser-sync start --files=\"public/**/*.js\" --proxy=\"docker.dev:9000\"",
+    "watch": "gulp & npm run browser-sync"
   },
   "repository": {
     "type": "git",
@@ -40,5 +41,10 @@
     "superagent": "1.1.0",
     "vinyl-transform": "1.0.0",
     "watchify": "2.4.0"
+  },
+  "standard": {
+    "ignore": [
+      "**/build/*"
+    ]
   }
 }
