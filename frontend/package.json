@@ -46,5 +46,8 @@
     "ignore": [
       "**/build/*"
     ]
+  },
+  "devDependencies": {
+    "gulp-sass": "^2.0.2"
   }
 }
