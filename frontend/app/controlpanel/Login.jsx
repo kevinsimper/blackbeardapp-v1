@@ -42,9 +42,9 @@ var Login = React.createClass({
         <h1>Login</h1>
         <form onSubmit={this.onSubmit}>
           <div>Email</div>
-          <Input type="text" value={this.state.username} onChange={this.onUsernameChange} required/>
+          <Input type="email" value={this.state.username} onChange={this.onUsernameChange} required/>
           <div>Password</div>
-          <Input type="text" value={this.state.password} onChange={this.onPasswordChange} required/>
+          <Input type="password" value={this.state.password} onChange={this.onPasswordChange} required/>
           <div>
             <Button type="submit">Log in</Button>
           </div>
