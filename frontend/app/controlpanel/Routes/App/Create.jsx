@@ -1,6 +1,8 @@
 var React = require('react')
 var AppActions = require('./Actions')
 var Navigation = require('react-router').Navigation;
+var Input = require('../../components/Input/')
+var Button = require('../../components/Button/')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
@@ -31,9 +33,9 @@ var AppCreate = React.createClass({
     return (
       <div>
         <h1>Create app</h1>
-        <input type="text" value={this.state.name} onChange={this.onChangeName} />
+        <Input type="text" value={this.state.name} onChange={this.onChangeName} />
         <div>
-          <button onClick={this.onClickCreate}>Create app</button>
+          <Button onClick={this.onClickCreate}>Create app</Button>
         </div>
         <div>{this.state.status}</div>
       </div>

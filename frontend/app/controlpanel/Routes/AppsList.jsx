@@ -1,6 +1,7 @@
 var React = require('react')
 var Link = require('react-router').Link
 var AppStore = require('./App/Store')
+var AppActions = require('./App/Actions')
 
 var getState = function() {
   return {
@@ -12,6 +13,16 @@ var AppsList = React.createClass({
   getInitialState: function() {
     return getState()
   },
+  componentDidMount: function() {
+    AppActions.load()
+    this.unsubscribe = AppStore.listen(this.onChange)
+  },
+  componentWillUnmount: function() {
+    this.unsubscribe()
+  },
+  onChange: function() {
+    this.setState(getState())
+  },
   render: function() {
     return (
       <div>
@@ -21,7 +32,7 @@ var AppsList = React.createClass({
           {this.state.apps.map(function(item){
             return (
               <div>
-                <Link to='AppShow' params={item}>{item.name}</Link>
+                <Link to='AppShow' params={{id: item._id}}>{item.name}</Link>
               </div>
             );
           })}
