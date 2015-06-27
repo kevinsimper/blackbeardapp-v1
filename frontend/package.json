@@ -7,7 +7,7 @@
     "start": "node server.js",
     "build": "gulp build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "browser-sync": "browser-sync start --files=\"public/**/*.js\" --proxy=\"docker.dev:9000\"",
+    "browser-sync": "browser-sync start --files=\"public/**/*.js, public/**/*.css\" --proxy=\"docker.dev:9000\"",
     "watch": "gulp & npm run browser-sync"
   },
   "repository": {
