@@ -5,17 +5,21 @@ var auth = {
   login: function(email, pass, cb) {
     cb = arguments[arguments.length - 1];
     if (localStorage.token) {
-      if (cb) cb(true);
+      if (cb) cb(null, true);
       auth.onChange(true);
       return;
     }
-    makeAuthRequest(email, pass, function(res){
+    makeAuthRequest(email, pass, function(err, res){
       if (res.authenticated) {
         localStorage.token = res.token;
-        if (cb) cb(true);
+        if (cb) cb(null, true);
         auth.onChange(true);
       } else {
-        if (cb) cb(false);
+        if (cb) {
+          cb({
+            message: err.message
+          }, false);
+        }
         auth.onChange(false);
       }
     });
@@ -46,11 +50,13 @@ function makeAuthRequest(email, password, cb) {
     .end(function(err, res) {
       if(err) {
         cb({
+          message: res.body.message
+        }, {
           authenticated: false
         })
         return false;
       }
-      cb({
+      cb(null, {
         authenticated: true,
         token: res.body.token
       })
