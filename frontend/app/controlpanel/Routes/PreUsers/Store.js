@@ -1,6 +1,6 @@
 var Reflux = require('reflux')
 var request = require('superagent')
-var config = require('../config')
+var config = require('../../config')
 var actions = require('./Actions')
 var _ = require('lodash')
 

@@ -1,5 +1,5 @@
 var React = require('react');
-var auth = require('./auth')
+var auth = require('../auth')
 
 var Header = React.createClass({
   render: function() {
@@ -14,7 +14,7 @@ var Header = React.createClass({
       },
       link: {
         color: 'white',
-        padding: 10,
+        padding: 10,  
         display: 'block'
       }
     } 
@@ -30,7 +30,7 @@ var Header = React.createClass({
           <div style={styles.item}>
             <a style={styles.link} href="#/preusers">PreUsers</a>
           </div>
-          <div style={styles.item}>
+          <div style={styles.item} style={{padding: 10}}>
             <button onClick={auth.logout}>Log ud</button>
           </div>
         </div> 

@@ -17,7 +17,7 @@ var AppCreate = React.createClass({
   },
   onClickCreate: function() {
     var self = this
-    AppActions.createApp({
+    AppActions.new({
       name: this.state.name
     })
     this.setState({
