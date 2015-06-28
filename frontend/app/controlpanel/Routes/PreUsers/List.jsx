@@ -1,7 +1,7 @@
 var React = require('react')
 var Actions = require('./Actions')
 var PreUsersStore = require('./Store')
-var Authentication = require('../mixins/authentication')
+var Authentication = require('../../mixins/authentication')
 var PreUsersItem = require('./Item.jsx')
 
 var getState = function() {

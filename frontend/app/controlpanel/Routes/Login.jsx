@@ -1,8 +1,8 @@
 var React = require('react')
 var Navigation = require('react-router').Navigation;
-var auth = require('./auth')
-var Button = require('./components/Button/')
-var Input = require('./components/Input/')
+var auth = require('../auth')
+var Button = require('../components/Button/')
+var Input = require('../components/Input/')
 
 var Login = React.createClass({
   mixins: [Navigation],

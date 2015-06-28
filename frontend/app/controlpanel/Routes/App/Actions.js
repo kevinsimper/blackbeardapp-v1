@@ -1,7 +1,12 @@
 var Reflux = require('reflux')
 
 var actions = Reflux.createActions({
-  "createApp": {}
+  'load': {
+    asyncResult: true
+  },
+  'new': {
+    asyncResult: true
+  }
 })
 
 module.exports = actions

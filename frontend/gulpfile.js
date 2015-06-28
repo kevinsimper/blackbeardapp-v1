@@ -7,6 +7,9 @@ var uglify = require('gulp-uglify');
 var gulpif = require('gulp-if');
 var envify = require('envify/custom')
 var sass = require('gulp-sass')
+var plumber = require('gulp-plumber')
+var through2 = require('through2')
+var vinyl = require('vinyl')
 
 var production = (process.env.NODE_ENV) ? true : false;
 console.log(production)
@@ -41,21 +44,25 @@ gulp.task('browserify', function() {
 });
 
 gulp.task('browserify-controlpanel', function() {
-  var b = browserify()
-    .transform(reactify)
-    .transform(envify({
-      NODE_ENV: 'development',
-      BACKEND_HOST: process.env.BACKEND_HOST
-    }));
-
-
-  var browserified = transform(function(filename) {
-    b.add(filename);
-    return b.bundle();
-  });
-
   return gulp.src(['./app/controlpanel/index.js'])
-    .pipe(browserified)
+    .pipe(through2.obj(function(file, enc, next) {
+      var self = this
+      var b = browserify();
+      b.add(file.path)
+      b.transform(reactify)
+      b.transform(envify({
+        NODE_ENV: 'development',
+        BACKEND_HOST: process.env.BACKEND_HOST
+      }))
+      b.bundle( function(err, src) {
+        if(err) console.log(err);
+        self.push( new vinyl({
+          path: file.path,
+          contents: src
+        }));
+        next();
+      })
+    }))
     .pipe(rename('controlpanel.js'))
     .pipe(gulpif(production, uglify()))
     .pipe(gulp.dest('./public/build/'));

@@ -1,5 +1,5 @@
 var React = require('react')
-var Header = require('./Header.jsx');
+var Header = require('./Layout/Header.jsx');
 var Router = require('react-router')
 var RouteHandler = Router.RouteHandler
 var Navigation = Router.Navigation

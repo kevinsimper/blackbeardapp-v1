@@ -3,14 +3,14 @@ var Router = require('react-router')
 var Route = Router.Route
 var DefaultRoute = Router.DefaultRoute
 var ControlpanelApp = require('./AdminApp.jsx')
-var Dashboard = require('./Dashboard.jsx')
-var AppsList = require('./AppsList.jsx')
-var Profile = require('./Profile.jsx')
-var AppCreate = require('./App/Create.jsx')
-var AppShow = require('./App/Show.jsx')
-var PreUsersList = require('./PreUsers/List.jsx')
-var PreUsersShow = require('./PreUsers/Show.jsx')
-var Login = require('./Login.jsx')
+var Dashboard = require('./Routes/Dashboard.jsx')
+var AppsList = require('./Routes/AppsList.jsx')
+var Profile = require('./Routes/Profile/show.js')
+var AppCreate = require('./Routes/App/Create.jsx')
+var AppShow = require('./Routes/App/Show.jsx')
+var PreUsersList = require('./Routes/PreUsers/List.jsx')
+var PreUsersShow = require('./Routes/PreUsers/Show.jsx')
+var Login = require('./Routes/Login.jsx')
 
 console.log(process.env.BACKEND_HOST)
 
