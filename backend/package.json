@@ -4,7 +4,7 @@
   "description": "",
   "main": "start.js",
   "scripts": {
-    "test": "node_modules/lab/bin/lab tests/api.js"
+    "test": "lab tests/api.js"
   },
   "author": "",
   "license": "ISC",
