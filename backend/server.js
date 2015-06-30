@@ -27,10 +27,6 @@ var server = new Hapi.Server({
 });
 
 var port = 8000;
-if ((process.argv.length > 2) && (process.argv[2] == 'tests/api.js')) {
-  port = 8001;
-}
-
 server.connection({ port: port })
 
 server.register(require('hapi-auth-jwt2'), function(err) {
@@ -218,5 +214,4 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   
 })
 
-server.start()
 module.exports = server

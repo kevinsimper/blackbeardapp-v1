@@ -12,6 +12,10 @@ var testUserEmail = 'user+' + time + '@jambroo.com'
 var testContactEmail = 'contact+' + time + '@jambroo.com'
 var testSignupEmail = 'signup+' + time + '@jambroo.com'
 
+server.start(function() {
+  console.log('Server running at:', server.info.uri)
+})
+
 //server.route({
 //  method: 'POST',
 //  path: '/user',
