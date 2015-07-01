@@ -1,2 +1,2 @@
 #!/bin/bash
-mongo blackbeard < fixtures.js
+mongo db/blackbeard < fixtures.js
