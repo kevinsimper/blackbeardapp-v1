@@ -1,4 +1,4 @@
-FROM node:wheezy
+FROM node:latest
 
 RUN apt-get update -y --force-yes && apt-get upgrade -y --force-yes
 
