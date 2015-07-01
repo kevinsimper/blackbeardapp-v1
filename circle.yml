@@ -1,3 +1,27 @@
 machine:
   services:
     - docker
+  environment:
+    NODE_ENV: development
+dependencies:
+  override:
+    - curl -L https://github.com/docker/compose/releases/download/1.2.0/docker-compose-`uname -s`-`uname -m` > ./docker-compose
+    - chmod +x ./docker-compose
+test:
+  override:
+    - docker build -t blackbeardapp_frontend frontend/
+    - docker build -t blackbeardapp_backend backend/
+deployment:
+  production:
+    branch: master
+    commands:
+      - docker login -e kevin.simper@gmail.com -p $TUTUM_PASSWORD -u kevinsimper tutum.co
+      - docker tag blackbeardapp_frontend tutum.co/kevinsimper/blackbeardapp_frontend
+      - docker push tutum.co/kevinsimper/blackbeardapp_frontend
+      - docker tag blackbeardapp_backend tutum.co/kevinsimper/blackbeardapp_backend
+      - docker push tutum.co/kevinsimper/blackbeardapp_backend
+experimental:
+  notify:
+    branches:
+      only:
+        - master
