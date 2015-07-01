@@ -1,6 +1,9 @@
 FROM node:0.12
 
-RUN apt-get update -y --force-yes && apt-get upgrade -y --force-yes
+RUN apt-get update -y --force-yes && \
+    apt-get upgrade -y --force-yes && \
+    apt-get install -y --force-yes \
+      mongodb-clients
 
 WORKDIR /app
 

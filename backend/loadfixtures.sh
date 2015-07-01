@@ -1,2 +1,3 @@
 #!/bin/bash
-mongo blackbeard < fixtures.js
+mongo db/blackbeard --eval "printjson(db.dropDatabase())"
+mongo db/blackbeard < fixtures.js
