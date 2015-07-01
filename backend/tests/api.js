@@ -12,6 +12,10 @@ var testUserEmail = 'user+' + time + '@jambroo.com'
 var testContactEmail = 'contact+' + time + '@jambroo.com'
 var testSignupEmail = 'signup+' + time + '@jambroo.com'
 
+server.start(function() {
+  console.log('Server running at:', server.info.uri)
+})
+
 //server.route({
 //  method: 'POST',
 //  path: '/user',
@@ -349,22 +353,11 @@ lab.experiment('/app', function() {
           body: requestData
         },
         function(error, response, body) {
-          Code.expect(postBody).to.be.an.object()
-          Code.expect(postBody.status).to.be.a.string()
-          Code.expect(postBody.status).to.equal("App successfully added.")
-          Code.expect(postBody.appId).to.be.a.string()
-
-          Code.expect(getBody).to.be.an.array();
-          Code.expect(getBody[0]._id).to.equal(postBody.appId)
+          Code.expect(postBody.name).to.equal('Test App')
+          Code.expect(getBody[0].name).to.equal('Test App')
+          //Code.expect(updateBody.name).to.equal('Test App')
+          //Code.expect(body.name).to.equal('Test App')
           
-          Code.expect(updateBody).to.be.an.object()
-          Code.expect(updateBody.status).to.be.a.string()
-          Code.expect(updateBody.status).to.equal("App successfully updated.")
-
-          Code.expect(body).to.be.an.object()
-          Code.expect(body.status).to.be.a.string()
-          Code.expect(body.status).to.equal("App successfully removed.")
-
           done()
         })
     }
