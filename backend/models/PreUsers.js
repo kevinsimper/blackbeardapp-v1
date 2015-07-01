@@ -6,7 +6,7 @@ var schema = new mongoose.Schema({
     minlength: 6
   },
   active: Boolean,
-  timestamp: Date,
+  timestamp: String,
   ip: String,
   comment: String
 })
