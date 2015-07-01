@@ -196,9 +196,12 @@ exports.inviteUser = function(request, reply) {
     }
 
     Mail.send(data, function (error, body) {
+      if (error) {
+        return reply(Boom.badRequest('Could invite user.'))
+      }
+
       reply({
-        status: 'Invitation successfully sent.',
-        mailgunResponse: body
+        status: 'Invitation successfully sent.'
       })
     })
   }
