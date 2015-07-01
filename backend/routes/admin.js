@@ -4,7 +4,7 @@ var passwordHash = require('password-hash')
 var _ = require('lodash')
 var Boom = require('boom')
 var User = require('../models/User')
-var MailgunJs = require('mailgun-js')
+var Mail = require('../services/Mail')
 
 var config = require('../config')
 
@@ -186,8 +186,6 @@ exports.inviteUser = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    var mailgun = MailgunJs({apiKey: config.MAILGUN.key, domain: config.MAILGUN.domain});
-
     var data = {
         from: 'Blackbeard <info@blackbeard.io>',
         to: user.email,
@@ -197,10 +195,13 @@ exports.inviteUser = function(request, reply) {
           "\n\nRegards,\nThe team at Blackbeard"
     }
 
-    mailgun.messages().send(data, function (error, body) {
+    Mail.send(data, function (error, body) {
+      if (error) {
+        return reply(Boom.badRequest('Could invite user.'))
+      }
+
       reply({
-        status: 'Invitation successfully sent.',
-        mailgunResponse: body
+        status: 'Invitation successfully sent.'
       })
     })
   }

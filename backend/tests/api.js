@@ -136,7 +136,6 @@ lab.experiment('/admin/user GET', function() {
           Code.expect(getAdminUserResponse.credit).to.equal(0)
 
           Code.expect(body.status).to.equal("Invitation successfully sent.")
-          Code.expect(body.mailgunResponse.message).to.equal("Queued. Thank you.")
 
           done()
         })
