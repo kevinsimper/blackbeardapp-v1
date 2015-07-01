@@ -4,6 +4,7 @@
   "description": "",
   "main": "start.js",
   "scripts": {
+    "start": "node start.js",
     "test": "lab tests/api.js"
   },
   "author": "",
