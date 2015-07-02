@@ -1,5 +1,5 @@
 var React = require('react')
-var AppsList = require('./AppsList.jsx')
+var AppsList = require('../components/AppsList/')
 var Authentication = require('../mixins/authentication')
 
 var Dashboard = React.createClass({

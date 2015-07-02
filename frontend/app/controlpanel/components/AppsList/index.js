@@ -1,7 +1,7 @@
 var React = require('react')
 var Link = require('react-router').Link
-var AppStore = require('./App/Store')
-var AppActions = require('./App/Actions')
+var AppStore = require('../../Routes/App/Store')
+var AppActions = require('../../Routes/App/Actions')
 
 var getState = function() {
   return {
@@ -25,16 +25,19 @@ var AppsList = React.createClass({
   },
   render: function() {
     return (
-      <div>
+      <div className='AppsList'>
         <Link to='/app/create'>Create new app</Link>
         <h3>My Apps</h3>
         <div>
           {this.state.apps.map(function(item){
             return (
-              <div>
-                <Link to='AppShow' params={{id: item._id}}>{item.name}</Link>
+              <div className='AppsList__Item'>
+                <Link className='AppsList__Link' to='AppShow' params={{id: item._id}}>
+                  <div className='AppsList__Item__Icon'/>
+                  {item.name}
+                </Link>
               </div>
-            );
+            )
           })}
         </div>
       </div>
