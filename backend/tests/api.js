@@ -466,6 +466,27 @@ lab.experiment('/user/{id}/creditcard', function() {
         done()
       })
   })
+
+  lab.test('delete', function(done) {
+      var requestData = {
+        name: 'New Card'
+      }
+      request({
+        method: 'DELETE',
+        uri: appUrl + '/user/' + createdUserId + '/creditcard',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        json: true,
+        body: requestData
+      },
+      function(error, response, body) {
+        expect(body, 'to equal', { status: 'Creditcard successfully removed.' });
+
+        done()
+      })
+  })
 })
 
 //server.route({
