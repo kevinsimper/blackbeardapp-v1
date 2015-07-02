@@ -9,7 +9,8 @@ var AppCreate = require('./Routes/App/Create.jsx')
 var AppShow = require('./Routes/App/Show.jsx')
 var PreUsersList = require('./Routes/PreUsers/List.jsx')
 var PreUsersShow = require('./Routes/PreUsers/Show.jsx')
-var Login = require('./Routes/Login.jsx')
+var Login = require('./components/Login/')
+var ForgotPassword = require('./components/ForgotPassword/')
 
 console.log(process.env.BACKEND_HOST)
 
@@ -17,6 +18,7 @@ var routes = (
   <Route handler={ControlpanelApp}>
     <DefaultRoute handler={Dashboard}/>
     <Route name='login' handler={Login}/>
+    <Route name='forgot' handler={ForgotPassword}/>
     <Route name='dashboard' handler={Dashboard}/>
     <Route name='app' path='/app'>
       <Route path='create' handler={AppCreate}/>
