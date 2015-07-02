@@ -17,7 +17,6 @@ exports.postUser = function(request, reply) {
 
   var insertCallback = function(err, result) {
     if (err) {
-      console.log(err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
@@ -28,7 +27,6 @@ exports.postUser = function(request, reply) {
 
   var resultCallback = function(err, user) {
     if (err) {
-      console.log(err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     if (user) {
@@ -96,7 +94,7 @@ exports.postForgot = function(request, reply) {
 
     Mail.send(data, function (error, body) {
       if (error) {
-        return reply(Boom.badRequest('Could invite user.'))
+        return reply(Boom.badRequest('Error sending password reset email.'))
       }
 
       reply({
@@ -112,7 +110,11 @@ exports.postForgot = function(request, reply) {
           return reply(Boom.badRequest('Error generating forgot password link.'))
         }
 
-        user.resetToken = buf.toString('hex');
+        if (process.env.NODE_ENV === 'production') {
+          user.resetToken = buf.toString('hex');
+        } else {
+          user.resetToken = 'PredictableToken';
+        }
         user.resetExpiry = Math.round(Date.now() / 1000) + 60*60*24 // Expiry in one day.
 
         user.save(updateCallback)
@@ -123,12 +125,35 @@ exports.postForgot = function(request, reply) {
   })
 }
 
-// /forgot GET
-exports.getForgotResent = function(request, reply) {
+// /forgot POST
+exports.postForgotReset = function(request, reply) {
   // This will receive the token 
-  var token = request.payload.token
+  var token = request.params.token
+
+  var updateCallback = function(err, user) {
+     if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    reply({
+      status: 'Password successfully reset.'
+    })
+  }
 
   // will find user from this and reset password
   // return success or fail
+  User.findOne({ resetToken: token }, function(err, user) {
+    if (Math.round(Date.now() / 1000) > user.resetExpiry) {
+      return reply(Boom.badRequest('Password reset token has expired.'))
+    }
 
+    var password = request.payload.password
+    var hashedPassword = passwordHash.generate(password)
+
+    user.password = hashedPassword
+    user.resetExpiry = null;
+    user.resetToken = null;
+
+    user.save(updateCallback)
+  })
 }
