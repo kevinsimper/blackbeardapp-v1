@@ -2,6 +2,7 @@ var React = require('react')
 var ProfileStore = require('./Store')
 var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
+var Payment = require('../../components/Payment/')
 
 var getState = function() {
   return {
@@ -22,14 +23,17 @@ var Profile = React.createClass({
   render: function() {
     return (
       <div>
-        <h1>Profile</h1>
-        <div>Name</div>
-        <Input type='text' value={this.state.profile.name} />
-        <div>E-mail</div>
-        <Input type='text' value={this.state.profile.email} />
         <div>
-          <Button>Update</Button>
+          <h1>Profile</h1>
+          <div>Name</div>
+          <Input type='text' value={this.state.profile.name} />
+          <div>E-mail</div>
+          <Input type='text' value={this.state.profile.email} />
+          <div>
+            <Button>Update</Button>
+          </div>
         </div>
+        <Payment/>
       </div>
     );
   }
