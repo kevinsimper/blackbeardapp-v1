@@ -135,8 +135,14 @@ exports.postForgotReset = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
+    // Automatically log user in
+    var token = jwt.sign(user._id, config.AUTH_SECRET, {
+      expiresInMinutes: 1440 // 24h
+    });
+
     reply({
-      status: 'Password successfully reset.'
+      status: 'Password successfully reset.',
+      token: token
     })
   }
 

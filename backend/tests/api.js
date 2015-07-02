@@ -429,6 +429,7 @@ lab.experiment('/forgot', function() {
       },
       function(error, response, body) {
         Code.expect(body.status).to.equal("Password successfully reset.")
+        Code.expect(body.token).to.be.a.string()
 
         done()
       })
