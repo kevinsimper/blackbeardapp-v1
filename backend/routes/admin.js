@@ -8,7 +8,6 @@ var Mail = require('../services/Mail')
 
 var config = require('../config')
 
-
 // /admin/user
 exports.getAdminUser = function(request, reply) {
   MongoClient.connect(config.DATABASE_URL, function(err, db) {
