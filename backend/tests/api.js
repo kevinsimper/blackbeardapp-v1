@@ -4,6 +4,7 @@ var Code = require('code')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
 var request = require('request')
+var expect = require('unexpected');
 
 var appUrl = 'http://localhost:8000'
 var hrTime = process.hrtime()
@@ -384,7 +385,6 @@ lab.experiment('/app', function() {
   })
 })
 
-
 lab.experiment('/forgot', function() {
   //server.route({
   //  method: 'POST',
@@ -430,6 +430,38 @@ lab.experiment('/forgot', function() {
       function(error, response, body) {
         Code.expect(body.status).to.equal("Password successfully reset.")
         Code.expect(body.token).to.be.a.string()
+
+        done()
+      })
+  })
+})
+
+lab.experiment('/user/{id}/creditcard', function() {
+  //server.route({
+  //  method: 'POST',
+  //  path: '/user/{id}/creditcard',
+  //  handler: userRoutes.postCreditCard
+  //})
+  lab.test('send', function(done) {
+      var requestData = {
+        name: 'New Card',
+        creditcard: '4111111111111111',
+        expiryMonth: '06',
+        expiryYear: '2018',
+        cvv: '123'
+      }
+      request({
+        method: 'POST',
+        uri: appUrl + '/user/' + createdUserId + '/creditcard',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        json: true,
+        body: requestData
+      },
+      function(error, response, body) {
+        expect(body, 'to equal', { status: 'Creditcard successfully saved.' });
 
         done()
       })
