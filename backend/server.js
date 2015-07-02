@@ -142,6 +142,24 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   });
 
   server.route({
+    method: 'POST',
+    path: '/forgot',
+    config: {
+      auth: false,
+      handler: userRoutes.postForgot
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/forgot/{token}',
+    config: {
+      auth: false,
+      handler: userRoutes.postForgotReset
+    }
+  })
+
+  server.route({
     method: 'GET',
     path: '/admin/user',
     config: {

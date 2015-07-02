@@ -384,6 +384,58 @@ lab.experiment('/app', function() {
   })
 })
 
+
+lab.experiment('/forgot', function() {
+  //server.route({
+  //  method: 'POST',
+  //  path: '/forgot',
+  //  handler: userRoutes.postForgot
+  //})
+  lab.test('send', function(done) {
+    request({
+        method: 'POST',
+        uri: appUrl + '/forgot',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        json: true,
+        body: {
+          email: testUserEmail
+        }
+      },
+      function(error, response, body) {
+        Code.expect(body).to.deep.equal({"status": "Reset password link successfully sent."})
+
+        done()
+      })
+  })
+
+  //server.route({
+  //  method: 'POST',
+  //  path: '/forgot',
+  //  handler: userRoutes.postForgotReset
+  //})
+  lab.test('click link', function(done) {
+    request({
+        method: 'POST',
+        uri: appUrl + '/forgot/PredictableToken',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        json: true,
+        body: {
+          password: 'password_new2'
+        }
+      },
+      function(error, response, body) {
+        Code.expect(body.status).to.equal("Password successfully reset.")
+        Code.expect(body.token).to.be.a.string()
+
+        done()
+      })
+  })
+})
+
 //server.route({
 //  method: 'DELETE',
 //  path: '/admin/user',
