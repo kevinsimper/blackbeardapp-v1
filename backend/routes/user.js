@@ -88,7 +88,7 @@ exports.postForgot = function(request, reply) {
     // Email to user
     var data = {
       from: 'Blackbeard <info@blackbeard.io>',
-      to: 'jambroo@gmail.com', //user.email,
+      to: user.email,
       subject: 'Blackbeard - Passsoword Reset',
       text: "Please click on the following link to reset your passsword. http://blackbeard.io/forgot/"+user.resetToken+
         "\n\nRegards,\nThe team at Blackbeard"
@@ -121,4 +121,14 @@ exports.postForgot = function(request, reply) {
       reply(Boom.notFound('A user account with this email address does not exists.'))
     }
   })
+}
+
+// /forgot GET
+exports.getForgotResent = function(request, reply) {
+  // This will receive the token 
+  var token = request.payload.token
+
+  // will find user from this and reset password
+  // return success or fail
+
 }
