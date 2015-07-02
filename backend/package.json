@@ -5,7 +5,7 @@
   "main": "start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "lab tests/api.js"
+    "test": "lab tests/*.js"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,7 @@
     "mongoose": "4.0.3",
     "newrelic": "1.19.0",
     "password-hash": "1.2.2",
-    "request": "2.55.0"
+    "request": "2.55.0",
+    "unexpected": "8.5.1"
   }
 }
