@@ -12,16 +12,17 @@
   "dependencies": {
     "boom": "2.7.1",
     "code": "1.4.0",
+    "crypto": "0.0.3",
     "hapi": "8.3.1",
     "hapi-auth-jwt2": "4.4.0",
     "jsonwebtoken": "5.0.1",
     "lab": "5.8.1",
     "lodash": "3.8.0",
+    "mailgun-js": "0.6.9",
     "mongodb": "1.4.34",
     "mongoose": "4.0.3",
     "newrelic": "1.19.0",
     "password-hash": "1.2.2",
-    "request": "2.55.0",
-    "mailgun-js": "0.6.9"
+    "request": "2.55.0"
   }
 }
