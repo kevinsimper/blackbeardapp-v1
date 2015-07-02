@@ -160,6 +160,15 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
 
   server.route({
+    method: 'POST',
+    path: '/user/{id}/creditcard',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.postCreditCard
+    }
+  })
+
+  server.route({
     method: 'GET',
     path: '/admin/user',
     config: {
@@ -194,7 +203,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: adminRoutes.inviteUser
     }
   })
-
 
   // Apps
   server.route({
