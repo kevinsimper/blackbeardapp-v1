@@ -37,6 +37,6 @@ db:
    - "27017:27017"
 
 registry:
-  image: registry:latest
+  image: registry:2
   ports:
    - "5000:5000"
