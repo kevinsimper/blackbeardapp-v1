@@ -131,7 +131,7 @@ exports.postForgotReset = function(request, reply) {
   var token = request.params.token
 
   var updateCallback = function(err, user) {
-     if (err) {
+    if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
@@ -159,6 +159,51 @@ exports.postForgotReset = function(request, reply) {
     user.password = hashedPassword
     user.resetExpiry = null;
     user.resetToken = null;
+
+    user.save(updateCallback)
+  })
+}
+
+
+// /user/creditcard POST
+exports.postCreditCard = function(request, reply) {
+  var id = request.params.id
+
+  var updateCallback = function(err, user) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database.'))
+    }
+
+    reply({ status: 'Creditcard successfully saved.' })
+  }
+
+  User.findOne({ _id: id }, function(err, user) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database.'))
+    }
+
+    if (!user) {
+      return reply(Boom.notFound('The specified user could not be found.'))
+    }
+
+    var creditcard = {
+      name: request.payload.name,
+      creditcard: request.payload.creditcard,
+      expiryMonth: request.payload.expiryMonth,
+      expiryYear: request.payload.expiryYear,
+      cvv: request.payload.cvv
+    }
+
+    if (!user.creditcard) {
+      user.creditCards = []
+    }
+
+    // Validate credit card
+    if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
+      return reply(Boom.notAcceptable('Incomplete creditcard details.'))
+    }
+
+    user.creditCards.push(creditcard)
 
     user.save(updateCallback)
   })
