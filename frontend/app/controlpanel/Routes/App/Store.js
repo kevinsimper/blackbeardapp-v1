@@ -2,6 +2,7 @@ var Reflux = require('reflux')
 var actions = require('./Actions')
 var request = require('superagent')
 var config = require('../../config')
+var findWhere = require('lodash/collection/findWhere')
 
 var _apps = []
 
@@ -37,6 +38,9 @@ var AppStore = Reflux.createStore({
   },
   getApps: function() {
     return _apps;
+  },
+  getOneApp: function(id) {
+    return findWhere(_apps, {_id: id})
   }
 })
 
