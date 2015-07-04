@@ -19,6 +19,7 @@ var routes = (
     <DefaultRoute handler={Dashboard}/>
     <Route name='login' handler={Login}/>
     <Route name='forgot' handler={ForgotPassword}/>
+    <Route path='/forgot/:id' handler={ForgotPassword}/>
     <Route name='dashboard' handler={Dashboard}/>
     <Route name='app' path='/app'>
       <Route path='create' handler={AppCreate}/>
