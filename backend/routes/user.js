@@ -20,7 +20,7 @@ exports.postUser = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
-      status: 'User successfully added.',
+      message: 'User successfully added.',
       userId: result._id
     })
   }
@@ -61,7 +61,7 @@ exports.postLogin = function(request, reply) {
         });
 
         reply({
-          status: 'Login successful.',
+          message: 'Login successful.',
           token: token
         })
       } else {
@@ -98,7 +98,7 @@ exports.postForgot = function(request, reply) {
       }
 
       reply({
-        status: 'Reset password link successfully sent.'
+        message: 'Reset password link successfully sent.'
       })
     })
   }
@@ -141,7 +141,7 @@ exports.postForgotReset = function(request, reply) {
     });
 
     reply({
-      status: 'Password successfully reset.',
+      message: 'Password successfully reset.',
       token: token
     })
   }
