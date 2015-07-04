@@ -21,7 +21,7 @@ exports.postUser = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
-      status: 'User successfully added.',
+      message: 'User successfully added.',
       userId: result._id
     })
   }
@@ -62,7 +62,7 @@ exports.postLogin = function(request, reply) {
         });
 
         reply({
-          status: 'Login successful.',
+          message: 'Login successful.',
           token: token
         })
       } else {
@@ -99,7 +99,7 @@ exports.postForgot = function(request, reply) {
       }
 
       reply({
-        status: 'Reset password link successfully sent.'
+        message: 'Reset password link successfully sent.'
       })
     })
   }
@@ -130,6 +130,11 @@ exports.postForgot = function(request, reply) {
 exports.postForgotReset = function(request, reply) {
   // This will receive the token 
   var token = request.params.token
+  var password = request.payload.password
+
+  if(!password) {
+    return reply(Boom.badRequest('You have to fill out a Password!'))
+  }
 
   var updateCallback = function(err, user) {
     if (err) {
@@ -142,19 +147,19 @@ exports.postForgotReset = function(request, reply) {
     });
 
     reply({
-      status: 'Password successfully reset.',
+      message: 'Password successfully reset.',
       token: token
     })
   }
 
-  // will find user from this and reset password
-  // return success or fail
   User.findOne({ resetToken: token }, function(err, user) {
+    if(!user) {
+      return reply(Boom.notFound())
+    }
     if (Math.round(Date.now() / 1000) > user.resetExpiry) {
-      return reply(Boom.badRequest('Password reset token has expired.'))
+      return reply(Boom.badRequest('Password reset has expired.'))
     }
 
-    var password = request.payload.password
     var hashedPassword = passwordHash.generate(password)
 
     user.password = hashedPassword

@@ -1,8 +1,10 @@
 var React = require('react')
 var Navigation = require('react-router').Navigation;
-var auth = require('../auth')
-var Button = require('../components/Button/')
-var Input = require('../components/Input/')
+var Link = require('react-router').Link;
+var auth = require('../../auth')
+var Button = require('../Button/')
+var Input = require('../Input/')
+var Label = require('../Label/')
 
 var Login = React.createClass({
   mixins: [Navigation],
@@ -38,15 +40,16 @@ var Login = React.createClass({
   },
   render: function() {
     return (
-      <div>
+      <div className='Login'>
         <h1>Login</h1>
         <form onSubmit={this.onSubmit}>
-          <div>Email</div>
+          <Label>Email</Label>
           <Input type="email" value={this.state.username} onChange={this.onUsernameChange} required/>
-          <div>Password</div>
+          <Label>Password</Label>
           <Input type="password" value={this.state.password} onChange={this.onPasswordChange} required/>
           <div>
             <Button type="submit">Log in</Button>
+            <Link to='/forgot' className='Login__Forgot'>Forgot password?</Link>
           </div>
           <div>{this.state.message}</div>
         </form>

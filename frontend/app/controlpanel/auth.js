@@ -27,7 +27,10 @@ var auth = {
   getToken: function () {
     return localStorage.token;
   },
-
+  setToken: function(token) {
+    localStorage.token = token
+    auth.onChange(true)
+  },
   logout: function (cb) {
     delete localStorage.token;
     auth.onChange(false);
