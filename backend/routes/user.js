@@ -129,6 +129,11 @@ exports.postForgot = function(request, reply) {
 exports.postForgotReset = function(request, reply) {
   // This will receive the token 
   var token = request.params.token
+  var password = request.payload.password
+
+  if(!password) {
+    return reply(Boom.badRequest('You have to fill out a Password!'))
+  }
 
   var updateCallback = function(err, user) {
      if (err) {
@@ -146,14 +151,14 @@ exports.postForgotReset = function(request, reply) {
     })
   }
 
-  // will find user from this and reset password
-  // return success or fail
   User.findOne({ resetToken: token }, function(err, user) {
+    if(!user) {
+      return reply(Boom.notFound())
+    }
     if (Math.round(Date.now() / 1000) > user.resetExpiry) {
-      return reply(Boom.badRequest('Password reset token has expired.'))
+      return reply(Boom.badRequest('Password reset has expired.'))
     }
 
-    var password = request.payload.password
     var hashedPassword = passwordHash.generate(password)
 
     user.password = hashedPassword
