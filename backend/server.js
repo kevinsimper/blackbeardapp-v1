@@ -171,7 +171,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'POST',
-    path: '/user/{id}/creditcard',
+    path: '/user/{id}/creditcards',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.postCreditCards
