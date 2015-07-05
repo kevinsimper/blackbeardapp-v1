@@ -3,6 +3,7 @@ var ProfileStore = require('./Store')
 var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
 var Payment = require('../../components/Payment/')
+var Creditcards = require('../../components/Creditcards/')
 
 var getState = function() {
   return {
@@ -33,6 +34,7 @@ var Profile = React.createClass({
             <Button>Update</Button>
           </div>
         </div>
+        <Creditcards/>
         <Payment/>
       </div>
     );
