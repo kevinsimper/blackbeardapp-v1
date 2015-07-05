@@ -3,7 +3,7 @@ var Input = require('../Input')
 var Button = require('../Button')
 var Label = require('../Label')
 
-var Payment = React.createClass({
+var CreditcardsFormular = React.createClass({
   getInitialState: function() {
     return {
       loading: false
@@ -34,4 +34,4 @@ var Payment = React.createClass({
   }
 })
 
-module.exports = Payment
+module.exports = CreditcardsFormular

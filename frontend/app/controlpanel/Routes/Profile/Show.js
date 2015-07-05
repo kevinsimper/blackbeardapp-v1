@@ -2,7 +2,7 @@ var React = require('react')
 var ProfileStore = require('./Store')
 var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
-var Payment = require('../../components/Payment/')
+var CreditcardsFormular = require('../../components/CreditcardsFormular/')
 var Creditcards = require('../../components/Creditcards/')
 
 var getState = function() {
@@ -35,7 +35,7 @@ var Profile = React.createClass({
           </div>
         </div>
         <Creditcards/>
-        <Payment/>
+        <CreditcardsFormular/>
       </div>
     );
   }
