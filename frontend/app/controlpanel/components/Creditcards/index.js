@@ -1,6 +1,7 @@
 var React = require('react')
 var Actions = require('./actions')
 var Store = require('./store')
+var CreditcardsItem = require('../CreditcardsItem/')
 
 var Creditcards = React.createClass({
   getInitialState: function() {
@@ -26,12 +27,7 @@ var Creditcards = React.createClass({
       <div className='Creditcards'>
         <h2>Creditcards</h2>
         {this.state.creditCards.map(function(item) {
-          return (
-            <div>
-              {item.name}
-              <div>{item.creditcard}</div>
-            </div>
-          )
+          return <CreditcardsItem item={item}/>
         })}
       </div>
     )
