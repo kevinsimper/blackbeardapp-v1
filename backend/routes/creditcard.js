@@ -1,5 +1,6 @@
 var Boom = require('boom')
 var User = require('../models/User')
+var _ = require('lodash')
 
 exports.getCreditCards = function(request, reply) {
   User.findOne({ _id: request.auth.credentials._id}, function(err, user) {
@@ -64,13 +65,13 @@ exports.deleteCreditCards = function(request, reply) {
   } else {
     return reply(Boom.unauthorized('Can\'t access other users!'))
   }
+  var name = request.params.name
 
   var updateCallback = function(err, user) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
-
-    reply({ status: 'Creditcard successfully removed.' })
+    reply({message: 'Creditcard successfully removed.'})
   }
 
   User.findOne({ _id: id }, function(err, user) {
@@ -82,21 +83,21 @@ exports.deleteCreditCards = function(request, reply) {
       return reply(Boom.notFound('The specified user could not be found.'))
     }
 
-    var name = request.payload.name
 
     if (!user.creditCards) {
       return reply(Boom.notFound('The creditcard specified could not be found.'))
     }
 
-    var record = _.findIndex(user.creditCards, function(creditcard) {
-      return creditcard.name == name;
-    });
+    var removed = _.remove(user.creditCards, function(creditcard) {
+      return creditcard.name === name;
+    })
+    removed.forEach(function(item) {
+      item.remove()
+    })
 
-    if (record == -1) {
+    if (removed.length === 0) {
       return reply(Boom.notFound('The creditcard specified could not be found.'))
     }
-
-    user.creditCards.splice(record)
 
     user.save(updateCallback)
   })
