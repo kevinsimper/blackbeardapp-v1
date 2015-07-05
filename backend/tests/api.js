@@ -19,7 +19,7 @@ server.start(function() {
 
 var createdUserId = -1
 var token = -1
-lab.experiment('/user', function() {
+lab.experiment('/users', function() {
   lab.test('POST', function(done) {
     var requestData = {
       email: testUserEmail,
@@ -28,7 +28,7 @@ lab.experiment('/user', function() {
 
     request({
         method: 'POST',
-        uri: appUrl + '/user',
+        uri: appUrl + '/users',
         json: true,
         body: requestData
       },
@@ -238,7 +238,7 @@ lab.experiment('/forgot', function() {
   })
 })
 
-lab.experiment('/user/{id}/creditcards', function() {
+lab.experiment('/users/{id}/creditcards', function() {
   lab.test('POST', function(done) {
       var requestData = {
         name: 'New Card',
@@ -249,7 +249,7 @@ lab.experiment('/user/{id}/creditcards', function() {
       }
       request({
         method: 'POST',
-        uri: appUrl + '/user/me/creditcards',
+        uri: appUrl + '/users/me/creditcards',
         headers: {
           'Authorization': token
         },
@@ -268,7 +268,7 @@ lab.experiment('/user/{id}/creditcards', function() {
       }
       request({
         method: 'DELETE',
-        uri: appUrl + '/user/me/creditcards/' + requestData.name,
+        uri: appUrl + '/users/me/creditcards/' + requestData.name,
         headers: {
           'Authorization': token
         },
