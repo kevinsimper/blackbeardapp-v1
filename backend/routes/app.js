@@ -9,7 +9,7 @@ var config = require('../config')
 
 // /app
 exports.getApps = function(request, reply) {
-  user = request.auth.credentials
+  var user = request.auth.credentials
   App.find({
     user: user._id
   }, function(err, result) {
