@@ -34,9 +34,6 @@ lab.experiment('/user', function() {
     request({
         method: 'POST',
         uri: appUrl + '/user',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: requestData
       },
@@ -63,9 +60,6 @@ lab.experiment('/login', function() {
     request({
         method: 'POST',
         uri: appUrl + '/login',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: requestData
       },
@@ -94,9 +88,6 @@ lab.experiment('/contact', function() {
     request({
         method: 'POST',
         uri: appUrl + '/contact',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: requestData
       },
@@ -176,9 +167,6 @@ lab.experiment('/admin/user GET', function() {
     request({
         method: 'GET',
         uri: appUrl + '/admin/user',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true
       },
       function(error, response, body) {
@@ -206,9 +194,6 @@ lab.experiment('/admin/user PUT', function() {
     request({
         method: 'PUT',
         uri: appUrl + '/admin/user',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: requestData
       },
@@ -253,9 +238,6 @@ lab.experiment('/presignup', function() {
     request({
         method: 'POST',
         uri: appUrl + '/presignup',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: requestData
       },
@@ -279,9 +261,6 @@ lab.experiment('/preusers', function() {
     request({
         method: 'GET',
         uri: appUrl + '/preusers',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true
       },
       function(error, response, body) {
@@ -395,9 +374,6 @@ lab.experiment('/forgot', function() {
     request({
         method: 'POST',
         uri: appUrl + '/forgot',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: {
           email: testUserEmail
@@ -419,9 +395,6 @@ lab.experiment('/forgot', function() {
     request({
         method: 'POST',
         uri: appUrl + '/forgot/PredictableToken',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: {
           password: 'password_new2'
@@ -454,7 +427,6 @@ lab.experiment('/user/{id}/creditcard', function() {
         method: 'POST',
         uri: appUrl + '/user/' + createdUserId + '/creditcard',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': token
         },
         json: true,
@@ -475,7 +447,6 @@ lab.experiment('/user/{id}/creditcard', function() {
         method: 'DELETE',
         uri: appUrl + '/user/' + createdUserId + '/creditcard',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': token
         },
         json: true,
@@ -504,9 +475,6 @@ lab.experiment('/admin/user DELETE', function() {
     request({
         method: 'DELETE',
         uri: appUrl + '/admin/user',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         json: true,
         body: requestData
       },
