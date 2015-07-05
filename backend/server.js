@@ -17,6 +17,7 @@ var frontRoutes = require('./routes/front')
 var userRoutes = require('./routes/user')
 var adminRoutes = require('./routes/admin')
 var appRoutes = require('./routes/app')
+var creditcardRoutes = require('./routes/creditcard')
 
 var server = new Hapi.Server({
   connections: {
@@ -160,11 +161,20 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
 
   server.route({
+    method: 'GET',
+    path: '/user/{id}/creditcards',
+    config: {
+      auth: 'jwt',
+      handler: creditcardRoutes.getCreditCards
+    }
+  })
+
+  server.route({
     method: 'POST',
     path: '/user/{id}/creditcard',
     config: {
       auth: 'jwt',
-      handler: userRoutes.postCreditCard
+      handler: creditcardRoutes.postCreditCards
     }
   })
 
@@ -173,7 +183,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/user/{id}/creditcard',
     config: {
       auth: 'jwt',
-      handler: userRoutes.deleteCreditCard
+      handler: creditcardRoutes.deleteCreditCards
     }
   })
 
