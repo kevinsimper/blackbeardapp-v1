@@ -9,14 +9,27 @@ exports.getCreditCards = function(request, reply) {
 
 // /user/XX/creditcards POST
 exports.postCreditCards = function(request, reply) {
-  var id = request.params.id
+  var id = null
+  if(request.params.id === 'me') {
+    id = request.auth.credentials._id
+  } else {
+    return reply(Boom.unauthorized('Can\'t access other users!'))
+  }
+
+  var creditcard = {
+    name: request.payload.name,
+    creditcard: request.payload.creditcard,
+    expiryMonth: request.payload.expiryMonth,
+    expiryYear: request.payload.expiryYear,
+    cvv: request.payload.cvv
+  }
 
   var updateCallback = function(err, user) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
 
-    reply({ status: 'Creditcard successfully saved.' })
+    reply(creditcard)
   }
 
   User.findOne({ _id: id }, function(err, user) {
@@ -28,15 +41,7 @@ exports.postCreditCards = function(request, reply) {
       return reply(Boom.notFound('The specified user could not be found.'))
     }
 
-    var creditcard = {
-      name: request.payload.name,
-      creditcard: request.payload.creditcard,
-      expiryMonth: request.payload.expiryMonth,
-      expiryYear: request.payload.expiryYear,
-      cvv: request.payload.cvv
-    }
-
-    if (!user.creditcard) {
+    if (!user.creditCards) {
       user.creditCards = []
     }
 
