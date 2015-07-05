@@ -2,6 +2,7 @@ var Reflux = require('reflux')
 var request = require('superagent')
 var Actions = require('./actions')
 var config = require('../../config')
+var remove = require('lodash/array/remove')
 
 var _creditCards = []
 
@@ -41,6 +42,18 @@ var Store = Reflux.createStore({
   onNewCompleted: function(item) {
     _creditCards.push(item)
     this.trigger(item)
+  },
+  onDel: function(creditcardName) {
+    console.log(creditcardName)
+    remove(_creditCards, function(item) {
+      return creditcardName === item.name
+    })
+    this.trigger()
+    request.del(config.BACKEND_HOST + '/user/me/creditcards/' + creditcardName)
+    .set('Authorization', localStorage.token)
+    .end(function(err, res) {
+      Actions.del.completed()
+    })
   }
 })
 
