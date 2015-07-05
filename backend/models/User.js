@@ -8,7 +8,13 @@ var schema = new mongoose.Schema({
   ip: String,
   resetToken: String,
   resetExpiry: String,
-  creditCards: []
+  creditCards: [{
+    name: String,
+    creditcard: String,
+    expiryMonth: String,
+    expiryYear: String,
+    cvv: String
+  }]
 })
 
 module.exports = mongoose.model('user', schema)
