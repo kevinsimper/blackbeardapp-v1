@@ -30,6 +30,9 @@ var Header = React.createClass({
           <div style={styles.item}>
             <a style={styles.link} href="#/preusers">PreUsers</a>
           </div>
+          <div style={styles.item}>
+            <a style={styles.link} href="#/users">Users</a>
+          </div>
           <div style={styles.item} style={{padding: 10}}>
             <button onClick={auth.logout}>Log ud</button>
           </div>
