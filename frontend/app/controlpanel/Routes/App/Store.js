@@ -11,7 +11,7 @@ var AppStore = Reflux.createStore({
   onLoad: function() {
     var self = this
     request
-      .get(config.BACKEND_HOST + '/app')
+      .get(config.BACKEND_HOST + '/users/me/apps')
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
         actions.load.completed(res.body)
@@ -23,7 +23,7 @@ var AppStore = Reflux.createStore({
   },
   onNew: function(app) {
     request
-      .post(config.BACKEND_HOST + '/app')
+      .post(config.BACKEND_HOST + '/users/me/apps')
       .set('Authorization', localStorage.token)
       .send({
         name: app.name
