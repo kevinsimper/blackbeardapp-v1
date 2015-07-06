@@ -9,7 +9,7 @@ var _creditCards = []
 var Store = Reflux.createStore({
   listenables: Actions,
   onLoad: function() {
-    request.get(config.BACKEND_HOST + '/user/me/creditcards')
+    request.get(config.BACKEND_HOST + '/users/me/creditcards')
     .set('Authorization', localStorage.token)
     .end(function(err, res) {
       Actions.load.completed(res.body)
@@ -23,7 +23,7 @@ var Store = Reflux.createStore({
     return _creditCards
   },
   onNew: function(item) {
-    request.post(config.BACKEND_HOST + '/user/me/creditcards')
+    request.post(config.BACKEND_HOST + '/users/me/creditcards')
     .set('Authorization', localStorage.token)
     .send({
       name: item.name,
@@ -49,7 +49,7 @@ var Store = Reflux.createStore({
       return creditcardName === item.name
     })
     this.trigger()
-    request.del(config.BACKEND_HOST + '/user/me/creditcards/' + creditcardName)
+    request.del(config.BACKEND_HOST + '/users/me/creditcards/' + creditcardName)
     .set('Authorization', localStorage.token)
     .end(function(err, res) {
       Actions.del.completed()

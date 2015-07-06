@@ -16,13 +16,9 @@ exports.getApps = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    
-    // Should probably only return a subset of this information
     reply(result)
   })
 }
-
-// /app
 exports.postApp = function(request, reply) {
   var name = request.payload.name
 
@@ -40,10 +36,8 @@ exports.postApp = function(request, reply) {
   })
   newApp.save(insertCallback)
 }
-// /app
 exports.putApp = function(request, reply) {
-  var name = request.payload.name
-  var appId = request.payload.appId
+  var id = request.params.id
 
   var updateCallback = function(err, app) {
     if (err) {
@@ -52,53 +46,32 @@ exports.putApp = function(request, reply) {
     reply(app)
   }
 
-  // Verify user has ownership of app
-  var user = request.auth.credentials
-  App.find({
-    _id: ObjectID(appId),
-    user: user
-  }, function(err, result) {
+  App.findById(id, function(err, app) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    if (result.length > 0) {
-      var app = result[0]
-      app.name = name;
-      app.save(updateCallback)
-    } else {
-      return reply(Boom.notFound('Could not find App'))  
-    }
+    app.name = request.payload.name;
+    app.save(updateCallback)
   })
 }
 
 exports.deleteApp = function(request, reply) {
-  var appId = request.payload.appId
+  var id = request.params.id
 
   var rmCallback = function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
-      status: 'App successfully removed.',
-      appId: result._id
+      message: 'App successfully removed.'
     })
   }
 
-  // Verify user has ownership of app
   var user = request.auth.credentials
-  App.find({
-    _id: ObjectID(appId),
-    user: user
-  }, function(err, result) {
+  App.findById(id, function(err, app) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-
-    if (result.length > 0) {
-      var app = result[0]
-      app.remove(rmCallback)
-    } else {
-      return reply(Boom.notFound('Could not find App in system.'))  
-    }
+    app.remove(rmCallback)
   })
 }

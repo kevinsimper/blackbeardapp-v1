@@ -19,7 +19,7 @@ server.start(function() {
 
 var createdUserId = -1
 var token = -1
-lab.experiment('/user', function() {
+lab.experiment('/users', function() {
   lab.test('POST', function(done) {
     var requestData = {
       email: testUserEmail,
@@ -28,7 +28,7 @@ lab.experiment('/user', function() {
 
     request({
         method: 'POST',
-        uri: appUrl + '/user',
+        uri: appUrl + '/users',
         json: true,
         body: requestData
       },
@@ -116,93 +116,72 @@ lab.experiment('/preusers', function() {
   })
 })
 
-var appId = null
 lab.experiment('/app', function() {
-  lab.test('status', function(done) {
-    var postBody = null;
-    var getBody = null;
-    var updateBody = null;
-    var getApps = function() {
-      request({
-          method: 'GET',
-          uri: appUrl + '/app',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          json: true
-        },
-        function(error, response, body) {
-          getBody = body;
-          updateApp()
-        })
-    }
-
-    var updateApp = function() {
-      var requestData = {
-        appId: appId,
-        name: 'Test App Updated'
-      }
-      request({
-          method: 'PUT',
-          uri: appUrl + '/app',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          json: true,
-          body: requestData
-        },
-        function(error, response, body) {
-          updateBody = body
-          deleteApp()
-        })
-    }
-
-    var deleteApp = function() {
-      var requestData = {
-        appId: appId
-      }
-      request({
-          method: 'DELETE',
-          uri: appUrl + '/app',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          json: true,
-          body: requestData
-        },
-        function(error, response, body) {
-          Code.expect(postBody.name).to.equal('Test App')
-          Code.expect(getBody[0].name).to.equal('Test App')
-          //Code.expect(updateBody.name).to.equal('Test App')
-          //Code.expect(body.name).to.equal('Test App')
-          
-          done()
-        })
-    }
-
-
+  var appId = null
+  lab.test('POST', function(done) {
     var requestData = {
       name: 'Test App'
     }
     request({
         method: 'POST',
-        uri: appUrl + '/app',
+        uri: appUrl + '/users/me/apps',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': token
         },
         body: requestData,
         json: true
       },
       function(error, response, body) {
-        appId = body.appId
-        postBody = body
-        getApps()
+        expect(response.statusCode, 'to be', 200)
+        expect(body.name, 'to be', requestData.name)
+        appId = body._id
+        done()
       })
-
+  })
+  lab.test('PUT', function(done) {
+    var requestData = {
+      name: 'Test App Updated'
+    }
+    request({
+      method: 'PUT',
+      uri: appUrl + '/users/me/apps/' + appId,
+      headers: {
+        'Authorization': token
+      },
+      body: requestData,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body.name, 'to be', requestData.name)
+      done()
+    })
+  })
+  lab.test('GET', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps',
+      headers: {
+        'Authorization': token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body, 'to be non-empty')
+      done()
+    })
+  })
+  lab.test('DELETE', function(done) {
+    request({
+      method: 'DELETE',
+      uri: appUrl + '/users/me/apps/' + appId,
+      headers: {
+        'Authorization': token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
   })
 })
 
@@ -238,7 +217,7 @@ lab.experiment('/forgot', function() {
   })
 })
 
-lab.experiment('/user/{id}/creditcards', function() {
+lab.experiment('/users/{id}/creditcards', function() {
   lab.test('POST', function(done) {
       var requestData = {
         name: 'New Card',
@@ -249,7 +228,7 @@ lab.experiment('/user/{id}/creditcards', function() {
       }
       request({
         method: 'POST',
-        uri: appUrl + '/user/me/creditcards',
+        uri: appUrl + '/users/me/creditcards',
         headers: {
           'Authorization': token
         },
@@ -268,7 +247,7 @@ lab.experiment('/user/{id}/creditcards', function() {
       }
       request({
         method: 'DELETE',
-        uri: appUrl + '/user/me/creditcards/' + requestData.name,
+        uri: appUrl + '/users/me/creditcards/' + requestData.name,
         headers: {
           'Authorization': token
         },

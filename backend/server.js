@@ -126,7 +126,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'POST',
-    path: '/user',
+    path: '/users',
     config: {
       auth: false,
       handler: userRoutes.postUser
@@ -162,7 +162,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'GET',
-    path: '/user/{id}/creditcards',
+    path: '/users/{id}/creditcards',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.getCreditCards
@@ -171,7 +171,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'POST',
-    path: '/user/{id}/creditcards',
+    path: '/users/{id}/creditcards',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.postCreditCards
@@ -180,7 +180,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'DELETE',
-    path: '/user/{id}/creditcards/{name}',
+    path: '/users/{id}/creditcards/{name}',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.deleteCreditCards
@@ -226,7 +226,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   // Apps
   server.route({
     method: 'GET',
-    path: '/app',
+    path: '/users/{user}/apps',
     config: {
       auth: 'jwt',
       handler: appRoutes.getApps
@@ -234,7 +234,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'POST',
-    path: '/app',
+    path: '/users/{user}/apps',
     config: {
       auth: 'jwt',
       handler: appRoutes.postApp
@@ -242,7 +242,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'DELETE',
-    path: '/app',
+    path: '/users/{user}/apps/{id}',
     config: {
       auth: 'jwt',
       handler: appRoutes.deleteApp
@@ -250,7 +250,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'PUT',
-    path: '/app',
+    path: '/users/{user}/apps/{id}',
     config: {
       auth: 'jwt',
       handler: appRoutes.putApp
