@@ -9,6 +9,15 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
 
+exports.getUsers = function() {
+  User.find(function(err, users) {
+    if(err) {
+      return reply(Boom.badImplementation())
+    }
+    reply(users)
+  })
+}
+
 // /user
 exports.postUser = function(request, reply) {
   var email = request.payload.email
