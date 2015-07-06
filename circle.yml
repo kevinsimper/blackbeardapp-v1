@@ -9,8 +9,10 @@ dependencies:
     - chmod +x ./docker-compose
 test:
   override:
-    - docker build -t blackbeardapp_frontend frontend/
-    - docker build -t blackbeardapp_backend backend/
+    - mv config/development.yml.sample config/development.yml
+    - sudo service mongodb stop
+    - ./docker-compose up -d
+    - ./docker-compose run backend npm test
 deployment:
   production:
     branch: master
