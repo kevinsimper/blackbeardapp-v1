@@ -12,7 +12,7 @@ test:
     - mv config/development.yml.sample config/development.yml
     - sudo service mongodb stop
     - ./docker-compose up -d
-    - ./docker-compose run backend npm test
+    - ./docker-compose run backend /bin/bash -c "npm install && npm test"      
 deployment:
   production:
     branch: master
