@@ -9,7 +9,7 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
 
-exports.getUsers = function() {
+exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
     if(err) {
       return reply(Boom.badImplementation())

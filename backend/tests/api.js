@@ -19,8 +19,8 @@ server.start(function() {
 
 var createdUserId = -1
 var token = -1
-lab.experiment('/users', function() {
-  lab.test('POST', function(done) {
+lab.experiment('Signup', function() {
+  lab.test('create user', function(done) {
     var requestData = {
       email: testUserEmail,
       password: 'password'
@@ -56,6 +56,24 @@ lab.experiment('/login', function() {
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
         token = body.token
+        done()
+      })
+  })
+})
+
+lab.experiment('/users', function() {
+  lab.test('GET', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        expect(body, 'to be non-empty')
         done()
       })
   })
