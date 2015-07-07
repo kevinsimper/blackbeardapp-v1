@@ -141,6 +141,22 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: userRoutes.getUsers
     }
   })
+  server.route({
+    method: 'GET',
+    path: '/users/{id}',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.getOneUser
+    }
+  })
+  server.route({
+    method: 'PUT',
+    path: '/users/{id}',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.putUsers
+    }
+  })
 
   server.route({
     method: 'POST',

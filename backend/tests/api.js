@@ -77,6 +77,55 @@ lab.experiment('/users', function() {
         done()
       })
   })
+  lab.test('GET /me', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/me',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        done()
+      })
+  })
+  lab.test('PUT /me', function(done) {
+    var requestData = {
+      email: 'updated@blackbeard.io'
+    }
+
+    request({
+        method: 'PUT',
+        uri: appUrl + '/users/me',
+        json: true,
+        headers: {
+          'Authorization': token
+        },
+        body: requestData
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        expect(body.email, 'to be', requestData.email)
+        request({
+            method: 'PUT',
+            uri: appUrl + '/users/me',
+            json: true,
+            headers: {
+              'Authorization': token
+            },
+            body: {
+              email: testUserEmail
+            }
+          },
+          function(error, response, body) {
+            expect(response.statusCode, 'to be', 200)
+            expect(body.email, 'to be', testUserEmail)
+            done()
+          })
+      })
+  })
 })
 
 lab.experiment('/contact', function() {

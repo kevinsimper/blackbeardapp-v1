@@ -9,12 +9,27 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
 
+var getUserId = function(request) {
+  if(request.params.id === 'me') {
+    return request.auth.credentials._id
+  } else {
+    return request.params.id
+  }
+}
+
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
     if(err) {
       return reply(Boom.badImplementation())
     }
     reply(users)
+  })
+}
+
+exports.getOneUser = function(request, reply) {
+  var id = getUserId(request)
+  User.findById(id, function(err, user) {
+    reply(user)
   })
 }
 
@@ -55,6 +70,19 @@ exports.postUser = function(request, reply) {
   User.findOne({
     email: email
   }, resultCallback)
+}
+
+exports.putUsers = function(request, reply) {
+  var id = getUserId(request)
+  User.findById(id, function(err, user) {
+    user.email = request.payload.email
+    user.save(function(err, updated) {
+      if (err) {
+        return reply(Boom.badImplementation('There was a problem with the database'))
+      }
+      reply(updated)
+    })
+  })
 }
 
 // /login
