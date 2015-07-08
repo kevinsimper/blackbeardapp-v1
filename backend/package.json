@@ -5,7 +5,9 @@
   "main": "start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "./loadfixtures.sh && lab tests/*.js"
+    "test": "npm run load-fixtures && npm run lab",
+    "lab": "lab tests/*.js",
+    "load-fixtures": "./loadfixtures.sh"
   },
   "author": "",
   "license": "ISC",
