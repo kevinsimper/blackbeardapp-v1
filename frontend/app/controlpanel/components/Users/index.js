@@ -23,20 +23,24 @@ var Users = React.createClass({
       <div className='Users'>
         <h1>Users</h1>
         <table style={{width: '100%'}}>
-          <tr>
-            <th>Email</th>
-            <th>Credit</th>
-            <th>Timestamp</th>
-          </tr>
-          {this.state.users.map(function(item) {
-            return (
-              <tr>
-                <td>{item.email}</td>
-                <td>{item.credit}</td>
-                <td>{item.timestamp}</td>
-              </tr>
-            )
-          })}
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Credit</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.users.map(function(item) {
+              return (
+                <tr>
+                  <td>{item.email}</td>
+                  <td>{item.credit}</td>
+                  <td>{item.timestamp}</td>
+                </tr>
+              )
+            })}
+          </tbody>
         </table>
       </div>
     )
