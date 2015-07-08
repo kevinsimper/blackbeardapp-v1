@@ -31,16 +31,20 @@ var ListPreUsers = React.createClass({
       <div>
         <h1>PreUsers</h1>
         <table>
-          <tr>
-            <th>Email</th>
-            <th>IP</th>
-            <th>Active</th>
-            <th>Comment</th>
-            <th>Actions</th>
-          </tr>
-          {this.state.preUsers.map(function(preUser, i) {
-            return <PreUsersItem preUser={preUser} key={i} />;
-          })}
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>IP</th>
+              <th>Active</th>
+              <th>Comment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.preUsers.map(function(preUser, i) {
+              return <PreUsersItem preUser={preUser} key={i} />;
+            })}
+          </tbody>
         </table>
       </div>
     );
