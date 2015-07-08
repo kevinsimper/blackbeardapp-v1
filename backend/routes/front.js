@@ -60,4 +60,16 @@ exports.postSignup = function(request, reply) {
       })
     })
   }
-};
+}
+
+exports.getQueue = function(request, reply) {
+  PreUsers.findOne({
+    email: request.payload.email
+  }, function(err, preuser) {
+    PreUsers.where({timestamp: {$lt: preuser.timestamp}, active: false}).count(function(err, result) {
+      reply({
+        number: result + 1
+      })
+    })  
+  })
+}
