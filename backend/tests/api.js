@@ -150,7 +150,7 @@ lab.experiment('/contact', function() {
 })
 
 lab.experiment('/presignup', function() {
-  lab.test('status', function(done) {
+  lab.test('POST', function(done) {
     var requestData = {
       email: testSignupEmail
     }
@@ -163,6 +163,22 @@ lab.experiment('/presignup', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
+        done()
+      })
+  })
+  lab.test('Queue number', function(done) {
+    var requestData = {
+      email: testSignupEmail
+    }
+    request({
+        method: 'POST',
+        uri: appUrl + '/queue',
+        json: true,
+        body: requestData
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        expect(body.number, 'to be positive')
         done()
       })
   })

@@ -123,7 +123,15 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       auth: false,
       handler: frontRoutes.postContact
     }
-  });
+  })
+  server.route({
+    method: 'POST',
+    path: '/queue',
+    config: {
+      auth: false,
+      handler: frontRoutes.getQueue
+    }
+  })
 
   server.route({
     method: 'POST',
