@@ -40,7 +40,7 @@ var Signup = React.createClass({
       <div>
         <button className="btn-signup" onClick={this.onClickSignup} >Signup now</button>
         <SignupPopup show={this.state.popupShow} closeHandler={this.onClickClose} />
-        {this.state.queue && <div>You have already signed up and are number {this.state.queue}</div>}
+        {this.state.queue && <h4 style={{marginBottom: 0}}>You have already signed up and are number {this.state.queue} in the queue!</h4>}
       </div>
     );
   }
