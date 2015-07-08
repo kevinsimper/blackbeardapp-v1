@@ -4,7 +4,7 @@ var Code = require('code')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
 var request = require('request')
-var expect = require('unexpected');
+var expect = require('unexpected')
 
 var appUrl = 'http://localhost:8000'
 var hrTime = process.hrtime()
@@ -19,8 +19,8 @@ server.start(function() {
 
 var createdUserId = -1
 var token = -1
-lab.experiment('/users', function() {
-  lab.test('POST', function(done) {
+lab.experiment('Signup', function() {
+  lab.test('create user', function(done) {
     var requestData = {
       email: testUserEmail,
       password: 'password'
@@ -57,6 +57,73 @@ lab.experiment('/login', function() {
         expect(response.statusCode, 'to be', 200)
         token = body.token
         done()
+      })
+  })
+})
+
+lab.experiment('/users', function() {
+  lab.test('GET', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        expect(body, 'to be non-empty')
+        done()
+      })
+  })
+  lab.test('GET /me', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/me',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        done()
+      })
+  })
+  lab.test('PUT /me', function(done) {
+    var requestData = {
+      email: 'updated@blackbeard.io'
+    }
+
+    request({
+        method: 'PUT',
+        uri: appUrl + '/users/me',
+        json: true,
+        headers: {
+          'Authorization': token
+        },
+        body: requestData
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        expect(body.email, 'to be', requestData.email)
+        request({
+            method: 'PUT',
+            uri: appUrl + '/users/me',
+            json: true,
+            headers: {
+              'Authorization': token
+            },
+            body: {
+              email: testUserEmail
+            }
+          },
+          function(error, response, body) {
+            expect(response.statusCode, 'to be', 200)
+            expect(body.email, 'to be', testUserEmail)
+            done()
+          })
       })
   })
 })
@@ -116,75 +183,6 @@ lab.experiment('/preusers', function() {
   })
 })
 
-lab.experiment('/app', function() {
-  var appId = null
-  lab.test('POST', function(done) {
-    var requestData = {
-      name: 'Test App'
-    }
-    request({
-        method: 'POST',
-        uri: appUrl + '/users/me/apps',
-        headers: {
-          'Authorization': token
-        },
-        body: requestData,
-        json: true
-      },
-      function(error, response, body) {
-        expect(response.statusCode, 'to be', 200)
-        expect(body.name, 'to be', requestData.name)
-        appId = body._id
-        done()
-      })
-  })
-  lab.test('PUT', function(done) {
-    var requestData = {
-      name: 'Test App Updated'
-    }
-    request({
-      method: 'PUT',
-      uri: appUrl + '/users/me/apps/' + appId,
-      headers: {
-        'Authorization': token
-      },
-      body: requestData,
-      json: true
-    }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
-      expect(body.name, 'to be', requestData.name)
-      done()
-    })
-  })
-  lab.test('GET', function(done) {
-    request({
-      method: 'GET',
-      uri: appUrl + '/users/me/apps',
-      headers: {
-        'Authorization': token
-      },
-      json: true
-    }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
-      expect(body, 'to be non-empty')
-      done()
-    })
-  })
-  lab.test('DELETE', function(done) {
-    request({
-      method: 'DELETE',
-      uri: appUrl + '/users/me/apps/' + appId,
-      headers: {
-        'Authorization': token
-      },
-      json: true
-    }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
-      done()
-    })
-  })
-})
-
 lab.experiment('/forgot', function() {
   lab.test('POST', function(done) {
     request({
@@ -212,50 +210,6 @@ lab.experiment('/forgot', function() {
       },
       function(error, response, body) {
         expect(body, 'to have keys', 'message', 'token')
-        done()
-      })
-  })
-})
-
-lab.experiment('/users/{id}/creditcards', function() {
-  lab.test('POST', function(done) {
-      var requestData = {
-        name: 'New Card',
-        creditcard: '4111111111111111',
-        expiryMonth: '06',
-        expiryYear: '2018',
-        cvv: '123'
-      }
-      request({
-        method: 'POST',
-        uri: appUrl + '/users/me/creditcards',
-        headers: {
-          'Authorization': token
-        },
-        json: true,
-        body: requestData
-      },
-      function(error, response, body) {
-        expect(response.statusCode, 'to be', 200)
-        done()
-      })
-  })
-
-  lab.test('DELETE', function(done) {
-      var requestData = {
-        name: 'New Card'
-      }
-      request({
-        method: 'DELETE',
-        uri: appUrl + '/users/me/creditcards/' + requestData.name,
-        headers: {
-          'Authorization': token
-        },
-        json: true,
-        body: requestData
-      },
-      function(error, response, body) {
-        expect(response.statusCode, 'to be', 200)
         done()
       })
   })

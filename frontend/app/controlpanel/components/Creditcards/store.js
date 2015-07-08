@@ -44,7 +44,6 @@ var Store = Reflux.createStore({
     this.trigger(item)
   },
   onDel: function(creditcardName) {
-    console.log(creditcardName)
     remove(_creditCards, function(item) {
       return creditcardName === item.name
     })

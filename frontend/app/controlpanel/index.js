@@ -4,13 +4,14 @@ var Route = Router.Route
 var DefaultRoute = Router.DefaultRoute
 var ControlpanelApp = require('./AdminApp.jsx')
 var Dashboard = require('./Routes/Dashboard.jsx')
-var Profile = require('./Routes/Profile/Show.js')
+var Profile = require('./components/Profile/')
 var AppCreate = require('./Routes/App/Create.jsx')
 var AppShow = require('./Routes/App/Show.jsx')
 var PreUsersList = require('./Routes/PreUsers/List.jsx')
 var PreUsersShow = require('./Routes/PreUsers/Show.jsx')
 var Login = require('./components/Login/')
 var ForgotPassword = require('./components/ForgotPassword/')
+var Users = require('./components/Users')
 
 console.log(process.env.BACKEND_HOST)
 
@@ -28,6 +29,7 @@ var routes = (
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>
+    <Route path='/users' handler={Users}/>
   </Route>
 )
 

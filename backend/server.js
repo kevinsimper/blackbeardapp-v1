@@ -18,6 +18,7 @@ var userRoutes = require('./routes/user')
 var adminRoutes = require('./routes/admin')
 var appRoutes = require('./routes/app')
 var creditcardRoutes = require('./routes/creditcard')
+var forgotRoutes = require('./routes/forgot')
 
 var server = new Hapi.Server({
   connections: {
@@ -132,6 +133,30 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: userRoutes.postUser
     }
   })
+  server.route({
+    method: 'GET',
+    path: '/users',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.getUsers
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{id}',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.getOneUser
+    }
+  })
+  server.route({
+    method: 'PUT',
+    path: '/users/{id}',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.putUsers
+    }
+  })
 
   server.route({
     method: 'POST',
@@ -147,7 +172,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/forgot',
     config: {
       auth: false,
-      handler: userRoutes.postForgot
+      handler: forgotRoutes.postForgot
     }
   })
 
@@ -156,7 +181,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/forgot/{token}',
     config: {
       auth: false,
-      handler: userRoutes.postForgotReset
+      handler: forgotRoutes.postForgotReset
     }
   })
 
