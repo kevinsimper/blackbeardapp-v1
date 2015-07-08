@@ -76,7 +76,7 @@ gulp.task('sass', function() {
 
 gulp.task('build', ['browserify', 'browserify-controlpanel', 'sass']);
 gulp.task('default', ['browserify', 'browserify-controlpanel', 'sass'], function() {
-  gulp.watch(['./app/*.js'], ['browserify']);
+  gulp.watch(['./app/*.js', './app/*.jsx'], ['browserify']);
   gulp.watch(['./app/controlpanel/**/*.js', './app/controlpanel/**/*.jsx'], ['browserify-controlpanel']);
   gulp.watch(['./app/controlpanel/**/*.scss'], ['sass']);
 });
