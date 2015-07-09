@@ -18,6 +18,7 @@ db.users.insert({
   "_id": ObjectId("559396be05974b0c00b6b281"),
   "email": "admin+users@blackbeard.io",
   "password": "sha1$5474e86b$1$0d184fe27ec8573b8f34cf5b33e9a7a237fe5b27",
+  "name": "Blackbeard",
   "credit": 10,
   "timestamp": "1435735743",
   "ip": "127.0.0.1",
