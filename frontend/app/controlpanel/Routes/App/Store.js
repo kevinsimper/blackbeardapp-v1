@@ -41,6 +41,14 @@ var AppStore = Reflux.createStore({
   },
   getOneApp: function(id) {
     return findWhere(_apps, {_id: id})
+  },
+  onDel: function(id) {
+    request
+      .del(config.BACKEND_HOST + '/users/me/apps/' + id)
+      .set('Authorization', localStorage.token)
+      .end(function(err, res) {
+        actions.del.completed()
+      })
   }
 })
 
