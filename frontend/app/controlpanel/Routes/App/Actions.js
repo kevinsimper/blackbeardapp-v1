@@ -1,10 +1,13 @@
 var Reflux = require('reflux')
 
 var actions = Reflux.createActions({
-  'load': {
+  load: {
     asyncResult: true
   },
-  'new': {
+  new: {
+    asyncResult: true
+  },
+  del: {
     asyncResult: true
   }
 })
