@@ -1,4 +1,4 @@
-FROM node:wheezy
+FROM node:0.12
 
 RUN apt-get update -y && apt-get upgrade -y
 

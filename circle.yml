@@ -4,12 +4,23 @@ machine:
   environment:
     NODE_ENV: development
 dependencies:
+  cache_directories:
+    - "~/docker"
   override:
+    - if [[ -e ~/docker/mongo.tar ]]; then docker load -i ~/docker/mongo.tar; fi
+    - if [[ -e ~/docker/node.tar ]]; then docker load -i ~/docker/node.tar; fi
+    - if [[ -e ~/docker/registry.tar ]]; then docker load -i ~/docker/registry.tar; fi
     - curl -L https://github.com/docker/compose/releases/download/1.2.0/docker-compose-`uname -s`-`uname -m` > ./docker-compose
     - chmod +x ./docker-compose
+    - mv config/development.yml.sample config/development.yml
+    - docker pull mongo:latest
+    - docker pull node:0.12
+    - docker pull registry:2
+    - mkdir -p ~/docker; docker save mongo > ~/docker/mongo.tar
+    - mkdir -p ~/docker; docker save node > ~/docker/node.tar
+    - mkdir -p ~/docker; docker save registry > ~/docker/registry.tar
 test:
   override:
-    - mv config/development.yml.sample config/development.yml
     - sudo service mongodb stop
     - ./docker-compose up -d
     - ./docker-compose run backend /bin/bash -c "./loadfixtures.sh && npm install && npm test"      
