@@ -76,6 +76,7 @@ exports.putUsers = function(request, reply) {
   var id = getUserId(request)
   User.findById(id, function(err, user) {
     user.email = request.payload.email
+    user.name = request.payload.name
     user.save(function(err, updated) {
       if (err) {
         return reply(Boom.badImplementation('There was a problem with the database'))

@@ -93,7 +93,8 @@ lab.experiment('/users', function() {
   })
   lab.test('PUT /me', function(done) {
     var requestData = {
-      email: 'updated@blackbeard.io'
+      email: 'updated@blackbeard.io',
+      name: 'Mary Ormond'
     }
 
     request({
@@ -108,6 +109,7 @@ lab.experiment('/users', function() {
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
         expect(body.email, 'to be', requestData.email)
+        expect(body.name, 'to be', requestData.name)
         request({
             method: 'PUT',
             uri: appUrl + '/users/me',
