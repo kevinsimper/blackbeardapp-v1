@@ -23,7 +23,7 @@ test:
   override:
     - sudo service mongodb stop
     - ./docker-compose up -d
-    - ./docker-compose run backend /bin/bash -c "./loadfixtures.sh && npm install && npm test"      
+    - ./docker-compose run backend /bin/bash -c "npm install && npm test"
 deployment:
   production:
     branch: master
