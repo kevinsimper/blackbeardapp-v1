@@ -5,4 +5,12 @@
   color: #FFF;
   font-size: 1em;
   margin: 10px 0;
+  cursor: pointer;
+}
+
+.Button--danger {
+  background-color: red;
+  &:hover {
+    background-color: darken(red, 10%);
+  }
 }
