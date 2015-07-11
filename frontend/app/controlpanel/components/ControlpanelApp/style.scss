@@ -1,0 +1,12 @@
+.ControlpanelApp {
+  display: flex;
+  height: 100%;
+}
+.ControlpanelApp__Sidebar {
+  flex: 3;
+  background-color: #252F3B;
+}
+.ControlpanelApp__Content {
+  flex: 7;
+  padding: 20px;
+}
