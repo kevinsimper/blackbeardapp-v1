@@ -151,7 +151,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'GET',
-    path: '/users/{id}',
+    path: '/users/{user}',
     config: {
       auth: 'jwt',
       handler: userRoutes.getOneUser
@@ -159,7 +159,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'PUT',
-    path: '/users/{id}',
+    path: '/users/{user}',
     config: {
       auth: 'jwt',
       handler: userRoutes.putUsers
@@ -195,7 +195,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'GET',
-    path: '/users/{id}/creditcards',
+    path: '/users/{user}/creditcards',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.getCreditCards
@@ -204,7 +204,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'POST',
-    path: '/users/{id}/creditcards',
+    path: '/users/{user}/creditcards',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.postCreditCards
@@ -213,7 +213,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'DELETE',
-    path: '/users/{id}/creditcards/{name}',
+    path: '/users/{user}/creditcards/{name}',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.deleteCreditCards
@@ -275,7 +275,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'DELETE',
-    path: '/users/{user}/apps/{id}',
+    path: '/users/{user}/apps/{app}',
     config: {
       auth: 'jwt',
       handler: appRoutes.deleteApp
@@ -283,13 +283,36 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'PUT',
-    path: '/users/{user}/apps/{id}',
+    path: '/users/{user}/apps/{app}',
     config: {
       auth: 'jwt',
       handler: appRoutes.putApp
     }
   })
-  
+  server.route({
+    method: 'POST',
+    path: '/users/{user}/apps/{app}/containers',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.postContainers
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/apps/{app}/containers',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.getContainers
+    }
+  })
+  server.route({
+    method: 'DELETE',
+    path: '/users/{user}/apps/{app}/containers/{container}',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.deleteContainers
+    }
+  })
 })
 
 module.exports = server

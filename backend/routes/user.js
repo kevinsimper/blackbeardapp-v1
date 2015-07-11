@@ -9,13 +9,6 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
 
-var getUserId = function(request) {
-  if(request.params.id === 'me') {
-    return request.auth.credentials._id
-  } else {
-    return request.params.id
-  }
-}
 
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
@@ -27,7 +20,7 @@ exports.getUsers = function(request, reply) {
 }
 
 exports.getOneUser = function(request, reply) {
-  var id = getUserId(request)
+  var id = User.getUserIdFromRequest(request)
   User.findById(id, function(err, user) {
     reply(user)
   })
@@ -73,7 +66,7 @@ exports.postUser = function(request, reply) {
 }
 
 exports.putUsers = function(request, reply) {
-  var id = getUserId(request)
+  var id = User.getUserIdFromRequest(request)
   User.findById(id, function(err, user) {
     user.email = request.payload.email
     user.name = request.payload.name

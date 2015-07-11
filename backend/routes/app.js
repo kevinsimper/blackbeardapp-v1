@@ -37,7 +37,7 @@ exports.postApp = function(request, reply) {
   newApp.save(insertCallback)
 }
 exports.putApp = function(request, reply) {
-  var id = request.params.id
+  var id = request.params.app
 
   var updateCallback = function(err, app) {
     if (err) {
@@ -56,7 +56,7 @@ exports.putApp = function(request, reply) {
 }
 
 exports.deleteApp = function(request, reply) {
-  var id = request.params.id
+  var id = request.params.app
 
   var rmCallback = function(err, result) {
     if (err) {
@@ -73,5 +73,45 @@ exports.deleteApp = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     app.remove(rmCallback)
+  })
+}
+
+exports.postContainers = function(request, reply) {
+  var app = request.params.app
+  var user = User.getUserIdFromRequest(request)
+
+  var container = {
+    region: request.payload.region,
+    status: 'Starting'
+  }
+
+  App.findById(app, function(err, result) {
+    result.containers = result.containers || []
+    result.containers.push(container)
+    result.save(function(err, app) {
+      reply(app.containers[app.containers.length - 1])
+    })
+  })
+}
+
+exports.getContainers = function(request, reply) {
+  var app = request.params.app
+  var user = User.getUserIdFromRequest(request)
+
+  App.findById(app, function(err, result) {
+    reply(result.containers)
+  })
+}
+
+exports.deleteContainers = function(request, reply) {
+  var app = request.params.app
+  var container = request.params.container
+  var user = User.getUserIdFromRequest(request)
+
+  App.findById(app, function(err, result) {
+    result.containers.id(container).remove()
+    result.save(function(err) {
+      reply()
+    })
   })
 }
