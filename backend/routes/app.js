@@ -75,3 +75,43 @@ exports.deleteApp = function(request, reply) {
     app.remove(rmCallback)
   })
 }
+
+exports.postContainers = function(request, reply) {
+  var app = request.params.app
+  var user = User.getUserIdFromRequest(request)
+
+  var container = {
+    region: request.payload.region,
+    status: 'Starting'
+  }
+
+  App.findById(app, function(err, result) {
+    result.containers = result.containers || []
+    result.containers.push(container)
+    result.save(function(err, app) {
+      reply(app.containers[app.containers.length - 1])
+    })
+  })
+}
+
+exports.getContainers = function(request, reply) {
+  var app = request.params.app
+  var user = User.getUserIdFromRequest(request)
+
+  App.findById(app, function(err, result) {
+    reply(result.containers)
+  })
+}
+
+exports.deleteContainers = function(request, reply) {
+  var app = request.params.app
+  var container = request.params.container
+  var user = User.getUserIdFromRequest(request)
+
+  App.findById(app, function(err, result) {
+    result.containers.id(container).remove()
+    result.save(function(err) {
+      reply()
+    })
+  })
+}

@@ -289,7 +289,30 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: appRoutes.putApp
     }
   })
-  
+  server.route({
+    method: 'POST',
+    path: '/users/{user}/apps/{app}/containers',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.postContainers
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/apps/{app}/containers',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.getContainers
+    }
+  })
+  server.route({
+    method: 'DELETE',
+    path: '/users/{user}/apps/{app}/containers/{container}',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.deleteContainers
+    }
+  })
 })
 
 module.exports = server
