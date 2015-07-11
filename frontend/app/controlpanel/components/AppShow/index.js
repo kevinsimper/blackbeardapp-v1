@@ -5,6 +5,7 @@ var Actions = require('../../Routes/App/Actions')
 var moment = require('moment')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
+var StatusIcon = require('../StatusIcon/')
 
 var Show = React.createClass({
   mixins: [Navigation],
@@ -48,10 +49,19 @@ var Show = React.createClass({
     if(!this.state.loaded) {
       return <div>Loading ...</div>
     }
+    console.log(this.state.app.containers.length)
     return (
-      <div>
-        <h1>{this.state.app.name}</h1>
+      <div className='AppShow'>
+        <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
+        <div className='AppShow__Containers'>
+          {this.state.app.containers.map(function(item) {
+            return <div>item.region</div>
+          })}
+          {this.state.app.containers.length === 0 && 
+            <div>No running containers</div>
+          }
+        </div>
         <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>
     );

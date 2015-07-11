@@ -20,9 +20,9 @@ var routes = (
     <Route name='forgot' handler={ForgotPassword}/>
     <Route path='/forgot/:id' handler={ForgotPassword}/>
     <Route name='dashboard' handler={Dashboard}/>
-    <Route name='app' path='/app'>
+    <Route name='app' path='/apps'>
       <Route path='create' handler={AppCreate}/>
-      <Route name="AppShow" path='show/:id' handler={AppShow}/>
+      <Route name="AppShow" path=':id' handler={AppShow}/>
     </Route>
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
