@@ -1,6 +1,7 @@
 var React = require('react')
 var Actions = require('./actions')
 var Store = require('./store')
+var Table = require('../Table')
 
 var Users = React.createClass({
   getState: function() {
@@ -22,7 +23,7 @@ var Users = React.createClass({
     return (
       <div className='Users'>
         <h1>Users</h1>
-        <table style={{width: '100%'}}>
+        <Table variant='striped'>
           <thead>
             <tr>
               <th>Email</th>
@@ -41,7 +42,7 @@ var Users = React.createClass({
               )
             })}
           </tbody>
-        </table>
+        </Table>
       </div>
     )
   }
