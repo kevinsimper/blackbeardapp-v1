@@ -1,9 +1,9 @@
 var React = require('react')
-var Header = require('./Layout/Header.jsx');
+var Sidebar = require('../Sidebar/');
 var Router = require('react-router')
 var RouteHandler = Router.RouteHandler
 var Navigation = Router.Navigation
-var auth = require('./auth')
+var auth = require('../../auth')
 
 var ControlpanelApp = React.createClass({
   mixins: [Navigation],
@@ -25,12 +25,16 @@ var ControlpanelApp = React.createClass({
   },
   render: function() {
     return (
-      <div>
-        {this.state.loggedIn && <Header/>}
-        <RouteHandler/>
+      <div className='ControlpanelApp'>
+        <div className='ControlpanelApp__Sidebar'>
+          {this.state.loggedIn && <Sidebar/>}
+        </div>
+        <div className='ControlpanelApp__Content'>
+          <RouteHandler/>
+        </div>
       </div>
-    );
+    )
   }
-});
+})
 
-module.exports = ControlpanelApp;
+module.exports = ControlpanelApp

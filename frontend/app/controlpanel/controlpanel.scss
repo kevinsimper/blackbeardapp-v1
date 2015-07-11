@@ -3,3 +3,41 @@
 @import "components/AppsList/style.scss";
 @import "components/Label/style.scss";
 @import "components/Login/style.scss";
+@import "components/ControlpanelApp/style.scss";
+@import "components/Sidebar/style.scss";
+
+$layoutWidth: 1100px;
+
+html, body, #adminapp {
+  height: 100%
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 0 auto;
+  padding: 0px;
+}
+
+img {
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #111111; 
+}
+a:hover {
+  text-decoration: none;
+}
+
+%container {
+  max-width: $layoutWidth;
+  margin: 0 auto;
+  position: relative;
+}
+.container {
+  @extend %container;
+}

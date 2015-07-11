@@ -1,0 +1,29 @@
+.Sidebar {}
+.Sidebar__Logo {
+  color: #FFF;
+  text-align: center;
+}
+.Sidebar__List {
+  display: flex;
+  flex-direction: column;
+}
+.Sidebar__Item {
+  flex: 1;
+  text-align: center;
+}
+.Sidebar__Link {
+  color: white;
+  padding: 10px;
+  display: block;
+  background-color: lighten(#252F3B, 3%);
+  text-decoration: none;
+  &:hover {
+    background-color: lighten(#252F3B, 10%);
+  }
+}
+.Sidebar__Item:nth-child(even) .Sidebar__Link {
+  background-color: lighten(#252F3B, 6%); 
+  &:hover {
+    background-color: lighten(#252F3B, 10%);
+  }
+}

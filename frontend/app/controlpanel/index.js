@@ -2,7 +2,7 @@ var React = require('react');
 var Router = require('react-router')
 var Route = Router.Route
 var DefaultRoute = Router.DefaultRoute
-var ControlpanelApp = require('./AdminApp.jsx')
+var ControlpanelApp = require('./components/ControlpanelApp/')
 var Dashboard = require('./Routes/Dashboard.jsx')
 var Profile = require('./components/Profile/')
 var AppCreate = require('./Routes/App/Create.jsx')
@@ -12,8 +12,6 @@ var PreUsersShow = require('./Routes/PreUsers/Show.jsx')
 var Login = require('./components/Login/')
 var ForgotPassword = require('./components/ForgotPassword/')
 var Users = require('./components/Users')
-
-console.log(process.env.BACKEND_HOST)
 
 var routes = (
   <Route handler={ControlpanelApp}>
