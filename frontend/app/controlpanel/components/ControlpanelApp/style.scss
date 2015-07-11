@@ -1,10 +1,17 @@
 .ControlpanelApp {
   display: flex;
   height: 100%;
+  @media(max-width: 500px) {
+    flex-direction: column;
+  }
 }
 .ControlpanelApp__Sidebar {
-  flex: 3;
   background-color: #252F3B;
+  flex: none;
+  @media(min-width: 500px) {
+    flex: 3;
+    min-width: 200px;
+  }
 }
 .ControlpanelApp__Content {
   flex: 7;
