@@ -1,9 +1,9 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
-var AppStore = require('./Store')
-var Actions = require('./Actions')
+var AppStore = require('../../Routes/App/Store')
+var Actions = require('../../Routes/App/Actions')
 var moment = require('moment')
-var Button = require('../../components/Button/')
+var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 
 var Show = React.createClass({
