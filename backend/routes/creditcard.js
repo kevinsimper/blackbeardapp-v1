@@ -10,12 +10,10 @@ exports.getCreditCards = function(request, reply) {
 
 // /user/XX/creditcards POST
 exports.postCreditCards = function(request, reply) {
-  var id = null
-  if(request.params.id === 'me') {
-    id = request.auth.credentials._id
-  } else {
+  if(request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
   }
+  var id = User.getUserIdFromRequest(request)
 
   var creditcard = {
     name: request.payload.name,
@@ -59,12 +57,11 @@ exports.postCreditCards = function(request, reply) {
 
 // /user/XX/creditcards DELETE
 exports.deleteCreditCards = function(request, reply) {
-  var id = null
-  if(request.params.id === 'me') {
-    id = request.auth.credentials._id
-  } else {
+  if(request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
   }
+  var id = User.getUserIdFromRequest(request)
+
   var name = request.params.name
 
   var updateCallback = function(err, user) {

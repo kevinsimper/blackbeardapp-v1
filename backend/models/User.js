@@ -18,4 +18,12 @@ var schema = new mongoose.Schema({
   }]
 })
 
+schema.statics.getUserIdFromRequest = function(request) {
+  if(request.params.user === 'me') {
+    return request.auth.credentials._id
+  } else {
+    return request.params.user
+  }
+}
+
 module.exports = mongoose.model('user', schema)

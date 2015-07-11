@@ -37,7 +37,7 @@ exports.postApp = function(request, reply) {
   newApp.save(insertCallback)
 }
 exports.putApp = function(request, reply) {
-  var id = request.params.id
+  var id = request.params.app
 
   var updateCallback = function(err, app) {
     if (err) {
@@ -56,7 +56,7 @@ exports.putApp = function(request, reply) {
 }
 
 exports.deleteApp = function(request, reply) {
-  var id = request.params.id
+  var id = request.params.app
 
   var rmCallback = function(err, result) {
     if (err) {
