@@ -45,23 +45,31 @@ var Show = React.createClass({
         self.replaceWith('/')
       })
   },
+  onClickStart: function() {
+    this.transitionTo('/apps/' + this.props.params.id + '/containers')
+  },
+  onClickStopContainer: function(item) {
+    Actions.stopContainer(this.props.params.id, item._id)
+  },
   render: function() {
+    var self = this
     if(!this.state.loaded) {
       return <div>Loading ...</div>
     }
-    console.log(this.state.app.containers.length)
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
         <div className='AppShow__Containers'>
           {this.state.app.containers.map(function(item) {
-            return <div>item.region</div>
+            var clickFunction = self.onClickStopContainer.bind(self, item)
+            return <div>{item.region} <Button onClick={clickFunction}>Stop</Button></div>
           })}
           {this.state.app.containers.length === 0 && 
             <div>No running containers</div>
           }
         </div>
+        <Button onClick={this.onClickStart}>Start containers</Button>
         <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>
     );
