@@ -4,6 +4,7 @@ var passwordHash = require('password-hash')
 var Boom = require('boom')
 var config = require('../config')
 var User = require('../models/User')
+var Roles = require('../models/roles/')
 var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 var _ = require('lodash')
@@ -54,7 +55,8 @@ exports.postUser = function(request, reply) {
         password: hashedPassword,
         credit: 0,
         timestamp: Math.round(Date.now() / 1000),
-        ip: request.info.remoteAddress
+        ip: request.info.remoteAddress,
+        role: Roles.USER // Regular user account
       })
       newUser.save(insertCallback)
     }
