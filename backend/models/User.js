@@ -28,4 +28,17 @@ schema.statics.getUserIdFromRequest = function(request) {
   }
 }
 
+schema.methods.getProperties = function (role, cb) {
+  var properties = {
+    email: this.email,
+    name: this.name,
+    role: this.role
+  }
+  if (role == roles.ADMIN) {
+    properties.creditCards = this.creditCards
+  }
+
+  return properties
+};
+
 module.exports = mongoose.model('user', schema)

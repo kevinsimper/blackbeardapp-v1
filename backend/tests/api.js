@@ -87,6 +87,8 @@ lab.experiment('/users', function() {
         }
       },
       function(error, response, body) {
+        console.log(body)
+        
         expect(response.statusCode, 'to be', 200)
         done()
       })

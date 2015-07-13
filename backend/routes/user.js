@@ -22,8 +22,11 @@ exports.getUsers = function(request, reply) {
 
 exports.getOneUser = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
+
   User.findById(id, function(err, user) {
-    reply(user)
+    user.getProperties(function(result) {
+      reply(result)
+    })
   })
 }
 
