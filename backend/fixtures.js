@@ -22,6 +22,7 @@ db.users.insert({
   "credit": 10,
   "timestamp": "1435735743",
   "ip": "127.0.0.1",
+  "role": "ADMIN",
   "__v": 0,
   "creditCards": [{
     name: 'Test Creditcard',
