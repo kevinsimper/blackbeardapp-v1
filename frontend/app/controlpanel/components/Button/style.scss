@@ -6,6 +6,9 @@
   font-size: 1em;
   margin: 10px 0;
   cursor: pointer;
+  &:hover {
+    background-color: darken(#1E90FF, 10%);
+  }
 }
 
 .Button--danger {

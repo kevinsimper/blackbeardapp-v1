@@ -3,6 +3,7 @@ var Actions = require('./Actions')
 var PreUsersStore = require('./Store')
 var Authentication = require('../../mixins/authentication')
 var PreUsersItem = require('./Item.jsx')
+var Table = require('../../components/Table/')
 
 var getState = function() {
   return {
@@ -30,7 +31,7 @@ var ListPreUsers = React.createClass({
     return (
       <div>
         <h1>PreUsers</h1>
-        <table>
+        <Table variant='striped'>
           <thead>
             <tr>
               <th>Email</th>
@@ -45,7 +46,7 @@ var ListPreUsers = React.createClass({
               return <PreUsersItem preUser={preUser} key={i} />;
             })}
           </tbody>
-        </table>
+        </Table>
       </div>
     );
   }

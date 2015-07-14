@@ -2,6 +2,7 @@ var React = require('react')
 var Link = require('react-router').Link
 var AppStore = require('../../Routes/App/Store')
 var AppActions = require('../../Routes/App/Actions')
+var StatusIcon = require('../StatusIcon/')
 
 var getState = function() {
   return {
@@ -33,7 +34,7 @@ var AppsList = React.createClass({
             return (
               <div className='AppsList__Item'>
                 <Link className='AppsList__Link' to='AppShow' params={{id: item._id}}>
-                  <div className='AppsList__Item__Icon'/>
+                  <StatusIcon/>
                   {item.name}
                 </Link>
               </div>

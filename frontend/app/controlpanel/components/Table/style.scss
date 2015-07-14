@@ -1,0 +1,32 @@
+.Table {}
+
+.Table table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.Table th {
+  text-align: left;
+}
+
+.Table > table > tbody > tr > td,
+.Table > table > tbody > tr > th,
+.Table > table > tfoot > tr > td,
+.Table > table > tfoot > tr > th,
+.Table > table > thead > tr > td,
+.Table > table > thead > tr > th {
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border-top: 1px solid #DDD;
+}
+
+.Table > table > thead > tr > th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #DDD;
+}
+
+.Table__striped table > tbody > tr:nth-of-type(odd) {
+  background-color: #F9F9F9;
+}

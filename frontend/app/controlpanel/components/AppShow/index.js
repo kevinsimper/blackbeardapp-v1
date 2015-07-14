@@ -1,10 +1,11 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
-var AppStore = require('./Store')
-var Actions = require('./Actions')
+var AppStore = require('../../Routes/App/Store')
+var Actions = require('../../Routes/App/Actions')
 var moment = require('moment')
-var Button = require('../../components/Button/')
+var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
+var StatusIcon = require('../StatusIcon/')
 
 var Show = React.createClass({
   mixins: [Navigation],
@@ -44,14 +45,31 @@ var Show = React.createClass({
         self.replaceWith('/')
       })
   },
+  onClickStart: function() {
+    this.transitionTo('/apps/' + this.props.params.id + '/containers')
+  },
+  onClickStopContainer: function(item) {
+    Actions.stopContainer(this.props.params.id, item._id)
+  },
   render: function() {
+    var self = this
     if(!this.state.loaded) {
       return <div>Loading ...</div>
     }
     return (
-      <div>
-        <h1>{this.state.app.name}</h1>
+      <div className='AppShow'>
+        <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
+        <div className='AppShow__Containers'>
+          {this.state.app.containers.map(function(item) {
+            var clickFunction = self.onClickStopContainer.bind(self, item)
+            return <div>{item.region} <Button onClick={clickFunction}>Stop</Button></div>
+          })}
+          {this.state.app.containers.length === 0 && 
+            <div>No running containers</div>
+          }
+        </div>
+        <Button onClick={this.onClickStart}>Start containers</Button>
         <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>
     );
