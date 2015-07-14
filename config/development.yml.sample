@@ -1,5 +1,5 @@
 common:
   environment:
     - DB_HOST=127.0.0.1:27017
-    - BACKEND_HOST=127.0.0.1:27017
+    - BACKEND_HOST=http://127.0.0.1:8000
     - STRIPE_SECRET=oss6Rtx2CURfwdcgUqsFnFsiYFaYySI0
