@@ -34,11 +34,7 @@ schema.statics.findOneByRole = function (role, id, cb) {
     fields = 'email name credit timestamp resetToken resetExpiry creditCards role'
   }
 
-  return this.where('_id', id).select(fields).limit(1).exec(function(err, users) {
-    if (err || !users || (users.length != 1)) return false
-    return cb(users[0])
-  })
+  return this.where('_id', id).select(fields).findOne(cb)
 }
-
 
 module.exports = mongoose.model('user', schema)
