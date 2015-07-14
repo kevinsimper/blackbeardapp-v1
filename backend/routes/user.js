@@ -24,9 +24,8 @@ exports.getOneUser = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
 
   User.findById(id, function(err, user) {
-    user.getProperties(function(result) {
-      reply(result)
-    })
+    // Get properties of user for current logged in user role
+    reply(user.getProperties(request.auth.credentials.role))
   })
 }
 

@@ -87,9 +87,9 @@ lab.experiment('/users', function() {
         }
       },
       function(error, response, body) {
-        console.log(body)
-        
         expect(response.statusCode, 'to be', 200)
+        // User should not have creditcard details attached as we are querying not as ADMIN but USER
+        expect(response.creditCards, 'to be', undefined)
         done()
       })
   })

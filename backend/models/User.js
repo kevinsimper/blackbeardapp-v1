@@ -28,7 +28,7 @@ schema.statics.getUserIdFromRequest = function(request) {
   }
 }
 
-schema.methods.getProperties = function (role, cb) {
+schema.methods.getProperties = function (role) {
   var properties = {
     email: this.email,
     name: this.name,
