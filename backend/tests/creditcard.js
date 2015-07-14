@@ -48,6 +48,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
+        expect(body.stripeToken, 'not to be empty')
         done()
       })
   })

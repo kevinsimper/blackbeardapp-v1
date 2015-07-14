@@ -3,11 +3,9 @@ var roles = require('./roles/')
 
 var schema = new mongoose.Schema({
   email: String,
-  password: String,
   name: String,
   credit: Number,
   timestamp: String,
-  ip: String,
   resetToken: String,
   resetExpiry: String,
   creditCards: [{
@@ -15,9 +13,12 @@ var schema = new mongoose.Schema({
     creditcard: String,
     expiryMonth: String,
     expiryYear: String,
-    cvv: String
+    cvv: String,
+    stripeToken: String
   }],
-  role: String
+  role: String,
+  ip: String,
+  password: String,
 })
 
 schema.statics.getUserIdFromRequest = function(request) {

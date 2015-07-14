@@ -1,6 +1,7 @@
 var Boom = require('boom')
 var User = require('../models/User')
 var _ = require('lodash')
+var stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 exports.getCreditCards = function(request, reply) {
   User.findOne({ _id: request.auth.credentials._id}, function(err, user) {
@@ -27,8 +28,7 @@ exports.postCreditCards = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
-
-    reply(creditcard)
+    reply({message: 'Creditcard successfully saved.', stripeToken: creditcard.stripeToken})
   }
 
   User.findOne({ _id: id }, function(err, user) {
@@ -49,9 +49,24 @@ exports.postCreditCards = function(request, reply) {
       return reply(Boom.notAcceptable('Incomplete creditcard details.'))
     }
 
-    user.creditCards.push(creditcard)
+    // Now save to StripeAPI
+    stripe.tokens.create({
+      card: {
+        "number": creditcard.creditcard,
+        "exp_month": creditcard.expiryMonth,
+        "exp_year": creditcard.expiryYear,
+        "cvc": creditcard.cvv
+      }
+    }, function(err, token) {
+      if (err) {
+        return reply(Boom.badImplementation('There was an error saving your credit card details.'))
+      }
 
-    user.save(updateCallback)
+      creditcard.stripeToken = token.id
+      user.creditCards.push(creditcard)
+
+      user.save(updateCallback)
+    });
   })
 }
 
