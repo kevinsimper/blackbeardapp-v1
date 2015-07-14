@@ -10,6 +10,9 @@ var sass = require('gulp-sass')
 var plumber = require('gulp-plumber')
 var through2 = require('through2')
 var vinyl = require('vinyl')
+var yaml = require('js-yaml')
+var fs = require('fs')
+var path = require('path')
 
 var production = (process.env.NODE_ENV) ? true : false;
 console.log(production)
@@ -17,11 +20,13 @@ console.log(production)
 // This can be improved 
 // when we switch to something else than harp for templating
 // Then we can just put in the host in the main template
-if(!production) {
-  process.env.BACKEND_HOST = 'http://docker.dev:8000'
-} else {
+if(production) {
   process.env.BACKEND_HOST = 'http://api.blackbeard.io'
+} else {
+  var doc = yaml.safeLoad(fs.readFileSync(path.join(__dirname, '../config/development.yml'), 'utf8'));
+  process.env.BACKEND_HOST = doc.common.environment[0].split('=')[1]
 }
+console.log(process.env.BACKEND_HOST)
 
 gulp.task('browserify', function() {
   var b = browserify()
