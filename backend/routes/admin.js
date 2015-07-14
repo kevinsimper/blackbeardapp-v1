@@ -176,8 +176,8 @@ exports.inviteUser = function(request, reply) {
   var userId = request.query.userId
   var credit = request.query.credit
   if (!credit) {
-    // Default credit to 10
-    credit = 10;
+    // Default credit to 1000 (10 dollars)
+    credit = 1000;
   }
 
   var updateCallback = function(err, user) {
