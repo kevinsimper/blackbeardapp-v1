@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node start.js",
     "test": "npm run load-fixtures && npm run lab",
-    "lab": "lab tests/*.js",
+    "lab": "lab -m 20000 tests/*.js",
     "load-fixtures": "./loadfixtures.sh"
   },
   "author": "",
