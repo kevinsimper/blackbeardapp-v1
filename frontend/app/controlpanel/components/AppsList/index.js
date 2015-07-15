@@ -27,7 +27,7 @@ var AppsList = React.createClass({
   render: function() {
     return (
       <div className='AppsList'>
-        <Link to='/app/create'>Create new app</Link>
+        <Link to='/apps/create'>Create new app</Link>
         <h3>My Apps</h3>
         <div>
           {this.state.apps.map(function(item){
