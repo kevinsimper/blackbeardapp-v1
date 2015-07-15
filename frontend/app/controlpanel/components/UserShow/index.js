@@ -7,6 +7,7 @@ var Input = require('../Input/')
 var moment = require('moment')
 
 var UserShow = React.createClass({
+  mixins: [React.addons.LinkedStateMixin],
   getState: function() {
     return store.getUser()
   },
@@ -24,11 +25,11 @@ var UserShow = React.createClass({
     this.setState(this.getState())
   },
   onClickSave: function() {
-
+    actions.save(this.state)
   },
-  onClickDelete: function() {
-    if(confirm('Do you want to delete this user?')) {
-      alert('deleted!')
+  onClickDeactivate: function() {
+    if(confirm('Do you want to deactivate this user?')) {
+      actions.del(this.props.params.id)
     }
   },
   render: function() {
@@ -49,16 +50,16 @@ var UserShow = React.createClass({
             </tr>
             <tr>
               <td>Email</td>
-              <td><Input value={this.state.email}/></td>
+              <td><Input valueLink={this.linkState('email')}/></td>
             </tr>
             <tr>
               <td>Credit</td>
-              <td><Input value={this.state.credit}/></td>
+              <td><Input valueLink={this.linkState('credit')}/></td>
             </tr>
             <tr>
               <td>Role</td>
               <td>
-                <select value={this.state.email}>
+                <select valueLink={this.linkState('role')}>
                   <option value='USER'>User</option>
                   <option value='ADMIN'>Admin</option>
                 </select>
@@ -75,7 +76,7 @@ var UserShow = React.createClass({
           </tbody>
         </Table>
         <div>
-          <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
+          <Button variant='danger' onClick={this.onClickDeactivate}>Deactivate</Button>
           <Button onClick={this.onClickSave}>Save</Button>
         </div>
       </div>
