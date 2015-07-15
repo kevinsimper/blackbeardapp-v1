@@ -30,7 +30,11 @@ exports.postCreditCards = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
-    reply({name: addedCard.name, number: addedCard.number, brand: addedCard.brand})
+    reply({
+      name: addedCard.name,
+      number: addedCard.number,
+      brand: addedCard.brand
+    })
   }
 
   User.findOne({ _id: id }, function(err, user) {
@@ -54,17 +58,22 @@ exports.postCreditCards = function(request, reply) {
     // Now save to StripeAPI
     stripe.tokens.create({
       card: {
-        "number": creditcard.creditcard,
-        "exp_month": creditcard.expiryMonth,
-        "exp_year": creditcard.expiryYear,
-        "cvc": creditcard.cvv
+        number: creditcard.creditcard,
+        exp_month: creditcard.expiryMonth,
+        exp_year: creditcard.expiryYear,
+        cvc: creditcard.cvv
       }
     }, function(err, token) {
       if (err) {
         return reply(Boom.badImplementation('There was an error saving your credit card details.'))
       }
 
-      addedCard = {name: creditcard.name, token: token.id, number: token.card.last4, brand: token.card.brand}
+      addedCard = {
+        name: creditcard.name,
+        token: token.id,
+        number: token.card.last4,
+        brand: token.card.brand
+      }
       user.creditCards.push(addedCard)
 
       user.save(updateCallback)
