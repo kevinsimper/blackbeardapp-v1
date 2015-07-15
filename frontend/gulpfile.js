@@ -74,7 +74,7 @@ gulp.task('browserify-controlpanel', function() {
 });
 
 gulp.task('sass', function() {
-  return gulp.src(['./app/controlpanel/controlpanel.scss'])
+  return gulp.src(['./app/controlpanel/controlpanel.scss', './public/styles/main.scss'])
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('./public/build'))
 })
