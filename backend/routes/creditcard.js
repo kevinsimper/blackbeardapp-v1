@@ -11,6 +11,8 @@ exports.getCreditCards = function(request, reply) {
 
 // /user/XX/creditcards POST
 exports.postCreditCards = function(request, reply) {
+  var addedCard = null;
+
   if(request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
   }
@@ -28,7 +30,7 @@ exports.postCreditCards = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
-    reply({message: 'Creditcard successfully saved.'})
+    reply({name: addedCard.name, number: addedCard.number, brand: addedCard.brand})
   }
 
   User.findOne({ _id: id }, function(err, user) {
@@ -62,8 +64,8 @@ exports.postCreditCards = function(request, reply) {
         return reply(Boom.badImplementation('There was an error saving your credit card details.'))
       }
 
-      creditcard.stripeToken = token.id
-      user.creditCards.push(creditcard)
+      addedCard = {name: creditcard.name, token: token.id, number: token.card.last4, brand: token.card.brand}
+      user.creditCards.push(addedCard)
 
       user.save(updateCallback)
     });
