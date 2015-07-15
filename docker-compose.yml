@@ -40,3 +40,13 @@ registry:
   image: registry:2
   ports:
    - "5000:5000"
+
+proxy:
+  extends:
+    file: config/development.yml
+    service: common
+  build: ./registry-proxy/
+  environment:
+    NODE_ENV: development
+  ports:
+   - "6000:6000"
