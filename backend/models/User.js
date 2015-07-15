@@ -3,11 +3,9 @@ var roles = require('./roles/')
 
 var schema = new mongoose.Schema({
   email: String,
-  password: String,
   name: String,
   credit: Number,
   timestamp: String,
-  ip: String,
   resetToken: String,
   resetExpiry: String,
   creditCards: [{
@@ -17,7 +15,9 @@ var schema = new mongoose.Schema({
     expiryYear: String,
     cvv: String
   }],
-  role: String
+  role: String,
+  ip: String,
+  password: String,
 })
 
 schema.statics.getUserIdFromRequest = function(request) {
@@ -26,6 +26,15 @@ schema.statics.getUserIdFromRequest = function(request) {
   } else {
     return request.params.user
   }
+}
+
+schema.statics.findOneByRole = function (role, id, cb) {
+  var fields = ''
+  if (role != roles.ADMIN) {
+    fields = 'email name credit timestamp resetToken resetExpiry creditCards role'
+  }
+
+  return this.where('_id', id).select(fields).findOne(cb)
 }
 
 module.exports = mongoose.model('user', schema)
