@@ -222,33 +222,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'GET',
-    path: '/admin/user',
-    config: {
-      auth: false,
-      handler: adminRoutes.getAdminUser
-    }
-  })
-
-  server.route({
-    method: 'PUT',
-    path: '/admin/user',
-    config: {
-      auth: false,
-      handler: adminRoutes.putAdminUser
-    }
-  })
-
-  server.route({
-    method: 'DELETE',
-    path: '/admin/user',
-    config: {
-      auth: false,
-      handler: adminRoutes.deleteAdminUser
-    }
-  })
-
-  server.route({
-    method: 'GET',
     path: '/admin/invite',
     config: {
       auth: 'jwt',
