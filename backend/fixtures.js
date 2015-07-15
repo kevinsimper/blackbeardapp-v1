@@ -26,10 +26,9 @@ db.users.insert({
   "__v": 0,
   "creditCards": [{
     name: 'Test Creditcard',
-    creditcard: '1234123412341234',
-    expiryMonth: '11',
-    expiryYear: '2017',
-    cvv: '345'
+    number: '1234',
+    brand: 'visa',
+    token: '12345678'
   }]
 });
 db.supports.insert({

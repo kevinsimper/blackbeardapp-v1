@@ -10,10 +10,10 @@ var schema = new mongoose.Schema({
   resetExpiry: String,
   creditCards: [{
     name: String,
-    creditcard: String,
-    expiryMonth: String,
+    number: String,
+    brand: String,
     expiryYear: String,
-    cvv: String
+    token: String
   }],
   role: String,
   ip: String,

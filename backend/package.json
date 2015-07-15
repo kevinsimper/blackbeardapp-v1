@@ -26,6 +26,7 @@
     "newrelic": "1.19.0",
     "password-hash": "1.2.2",
     "request": "2.55.0",
+    "stripe": "3.6.0",
     "unexpected": "8.5.1"
   }
 }
