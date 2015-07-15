@@ -14,6 +14,7 @@ var Users = React.createClass({
   },
   getInitialState: function() {
     return this.getState()
+    
   },
   componentDidMount: function() {
     Actions.load()
@@ -41,7 +42,7 @@ var Users = React.createClass({
           </thead>
           <tbody>
             {this.state.users.map(function(item) {
-              var handler = self.onClickView.bind(this, item)
+              var handler = self.onClickView.bind(null, item)
               return (
                 <tr>
                   <td>{item.email}</td>
