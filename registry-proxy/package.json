@@ -1,0 +1,16 @@
+{
+  "name": "registry-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js",
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "boom": "2.7.1",
+    "hapi": "8.3.1",
+    "hapi-auth-jwt2": "4.4.0",
+  }
+}
