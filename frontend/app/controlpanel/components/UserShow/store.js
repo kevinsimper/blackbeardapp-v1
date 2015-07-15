@@ -1,4 +1,4 @@
-var Reflux = require('Reflux')
+var Reflux = require('reflux')
 var actions = require('./actions')
 var request = require('superagent')
 var config = require('../../config')
