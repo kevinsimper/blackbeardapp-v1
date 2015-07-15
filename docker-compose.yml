@@ -49,4 +49,4 @@ proxy:
   environment:
     NODE_ENV: development
   ports:
-   - "6000:6000"
+   - "9500:9500"
