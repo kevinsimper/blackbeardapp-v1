@@ -13,6 +13,7 @@ var Login = require('./components/Login/')
 var ForgotPassword = require('./components/ForgotPassword/')
 var Users = require('./components/Users')
 var ContainerFormular = require('./components/ContainerFormular/')
+var UserShow = require('./components/UserShow/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -30,6 +31,7 @@ var routes = (
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>
     <Route path='/users' handler={Users}/>
+    <Route path='/users/:id' handler={UserShow}/>
   </Route>
 )
 
