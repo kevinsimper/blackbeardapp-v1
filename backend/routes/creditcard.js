@@ -28,7 +28,7 @@ exports.postCreditCards = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
-    reply({message: 'Creditcard successfully saved.', stripeToken: creditcard.stripeToken})
+    reply({message: 'Creditcard successfully saved.'})
   }
 
   User.findOne({ _id: id }, function(err, user) {
