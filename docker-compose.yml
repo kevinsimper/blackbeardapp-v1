@@ -50,3 +50,5 @@ proxy:
     NODE_ENV: development
   ports:
    - "9500:9500"
+  volumes:
+   - ./registry-proxy/:/app

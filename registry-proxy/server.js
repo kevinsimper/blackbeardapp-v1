@@ -1,12 +1,12 @@
 var Hapi = require('hapi')
-var Fs = require('fs')
+var fs = require('fs')
 var server = new Hapi.Server()
 
 server.connection({
     port: '9500',
     tls: {
-        key: Fs.readFileSync(__dirname + 'registry.blackbeard.dev.key', 'utf8'),
-        cert: Fs.readFileSync(__dirname + 'registry.blackbeard.dev.crt', 'utf8')
+        key: fs.readFileSync(__dirname + '/registry.blackbeard.dev.key', 'utf8'),
+        cert: fs.readFileSync(__dirname + '/registry.blackbeard.dev.crt', 'utf8')
     }
 });
 
