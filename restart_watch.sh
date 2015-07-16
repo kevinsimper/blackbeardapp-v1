@@ -1,1 +1,1 @@
-nodemon --exec "docker-compose stop -t 0 backend && docker-compose start backend && docker-compose logs backend" -w backend/
+nodemon --exec "docker-compose stop -t 0 $1 && docker-compose start $1 && docker-compose logs $1" -w $2/
