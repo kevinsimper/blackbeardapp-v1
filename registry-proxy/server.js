@@ -2,6 +2,7 @@ var Hapi = require('hapi')
 var fs = require('fs')
 var req = require('request')
 var server = new Hapi.Server()
+var child_process = require('child_process')
 
 server.connection({
   port: '9500',
@@ -11,15 +12,19 @@ server.connection({
   }
 })
 
+var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
+  encoding: 'utf8'
+})
+
 server.route({
   method: '*',
   path: '/{p*}',
   config: {
     handler: function(request, reply) {
+      var url = 'http://' + ip.trim() + ':5000/v2/'
       return reply.proxy({
-        host: 'www.kevinsimper.dk',
-        port: 80,
-        protocol: 'http'
+        uri: url,
+        passThrough: true
       })
     },
     payload: {
