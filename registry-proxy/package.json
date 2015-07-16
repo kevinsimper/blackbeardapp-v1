@@ -4,7 +4,7 @@
   "description": "",
   "main": "start.js",
   "scripts": {
-    "test": "lab tests/*.js",
+    "test": "lab -m 15000 tests/*.js",
     "start": "node start.js"
   },
   "author": "",
