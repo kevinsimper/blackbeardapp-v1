@@ -1,5 +1,6 @@
 common:
   environment:
     - DB_HOST=127.0.0.1:27017
-    - BACKEND_HOST=http://127.0.0.1:8000
+    - BACKEND_HOST=http://blackbeard.dev:8000
+    - ROUTER_HOST=http://blackbeard.dev:9500
     - STRIPE_SECRET=oss6Rtx2CURfwdcgUqsFnFsiYFaYySI0
