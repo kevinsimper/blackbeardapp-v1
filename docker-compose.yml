@@ -41,14 +41,14 @@ registry:
   ports:
    - "5000:5000"
 
-proxy:
+registryproxy:
   extends:
     file: config/development.yml
     service: common
-  build: ./registry-proxy/
+  build: ./registryproxy/
   environment:
     NODE_ENV: development
   ports:
    - "9500:9500"
   volumes:
-   - ./registry-proxy/:/app
+   - ./registryproxy/:/app

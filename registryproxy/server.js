@@ -28,7 +28,7 @@ var validate = function (request, username, password, callback) {
     },
     function(error, response, body) {
       if (error) {
-        return callback(null, false);
+        return callback(error, false);
       }
       return callback(error, true, body);
     })
