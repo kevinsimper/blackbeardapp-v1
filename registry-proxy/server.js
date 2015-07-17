@@ -16,24 +16,6 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
   encoding: 'utf8'
 })
 
-server.route({
-  method: '*',
-  path: '/{p*}',
-  config: {
-    handler: function(request, reply) {
-      var url = 'http://' + ip.trim() + ':5000/v2/'
-      return reply.proxy({
-        uri: url,
-        passThrough: true
-      })
-    },
-    payload: {
-      output: 'stream',
-      parse: false
-    }
-  }
-})
-
 var validate = function (request, username, password, callback) {
   req({
       method: 'POST',
@@ -55,12 +37,20 @@ var validate = function (request, username, password, callback) {
 server.register(require('hapi-auth-basic'), function (err) {
   server.auth.strategy('simple', 'basic', { validateFunc: validate });
   server.route({
-    method: 'GET',
-    path: '/',
+    method: '*',
+    path: '/{p*}',
     config: {
       auth: 'simple',
       handler: function(request, reply) {
-        reply('hello world');
+        var url = 'http://' + ip.trim() + ':5000/v2/'
+        return reply.proxy({
+          uri: url,
+          passThrough: true
+        })
+      },
+      payload: {
+        output: 'stream',
+        parse: false
       }
     }
   });
