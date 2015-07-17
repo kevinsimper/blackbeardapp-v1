@@ -11,6 +11,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "hapi": "8.4.0",
+    "hapi-auth-basic": "3.0.0",
     "request": "2.58.0"
   },
   "devDependencies": {

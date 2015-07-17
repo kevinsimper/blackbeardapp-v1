@@ -34,4 +34,36 @@ server.route({
   }
 })
 
+var validate = function (request, username, password, callback) {
+  req({
+      method: 'POST',
+      uri: 'http://' + ip.trim() + ':8000/login',
+      json: true,
+      body: {
+        email: username,
+        password: password
+      }
+    },
+    function(error, response, body) {
+      if (error) {
+        return callback(null, false);
+      }
+      return callback(error, true, body);
+    })
+};
+
+server.register(require('hapi-auth-basic'), function (err) {
+  server.auth.strategy('simple', 'basic', { validateFunc: validate });
+  server.route({
+    method: 'GET',
+    path: '/',
+    config: {
+      auth: 'simple',
+      handler: function(request, reply) {
+        reply('hello world');
+      }
+    }
+  });
+});
+
 module.exports = server
