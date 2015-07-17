@@ -19,10 +19,14 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
 var validate = function (request, username, password, callback) {
   // If dev then do fake response
   if (process.env.NODE_ENV != 'production') {
-    return callback(null, true, {
+    if (username === 'blackbeard' && password === 'password') {
+      return callback(null, true, {
           message: 'Login successful.',
           token: 'token'
         });
+    } else {
+      return callback(null, false, false);
+    }
   } else {
     req({
         method: 'POST',
@@ -37,7 +41,7 @@ var validate = function (request, username, password, callback) {
         if (error) {
           return callback(error, false);
         }
-        return callback(error, (body.statusCode == 300), body);
+        return callback(null, (body.statusCode == 300), body);
       })
   }
 };

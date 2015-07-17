@@ -24,9 +24,9 @@ lab.test('get registry output', function(done) {
   })
 })
 
-lab.test('get registry output', function(done) {
+lab.test('valid login and password', function(done) {
   var user = {
-    username: 'admin+users@blackbeard.io',
+    username: 'blackbeard',
     password: 'password'
   }
   var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
@@ -41,3 +41,18 @@ lab.test('get registry output', function(done) {
   })
 })
 
+lab.test('invalid login and password', function(done) {
+  var user = {
+    username: 'invalid',
+    password: 'invalid'
+  }
+  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
+  request.get({
+    url: url,
+    rejectUnauthorized: false,
+    json: true
+  }, function(error, response, body) {
+    expect(response.statusCode, 'to be', 401)
+    done()
+  })
+})
