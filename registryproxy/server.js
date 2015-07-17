@@ -49,6 +49,16 @@ var validate = function (request, username, password, callback) {
 server.register(require('hapi-auth-basic'), function (err) {
   server.auth.strategy('simple', 'basic', { validateFunc: validate });
   server.route({
+    method: 'GET',
+    path: '/v1/_ping',
+    config: {
+      auth: false,
+      handler: function(request, reply) {
+        reply('V2 registry')
+      }
+    }
+  })
+  server.route({
     method: '*',
     path: '/{p*}',
     config: {

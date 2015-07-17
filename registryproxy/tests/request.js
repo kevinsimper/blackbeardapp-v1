@@ -56,3 +56,22 @@ lab.test('invalid login and password', function(done) {
     done()
   })
 })
+
+
+lab.test('/v1/_ping', function(done) {
+  var user = {
+    username: 'invalid',
+    password: 'invalid'
+  }
+  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v1/_ping'
+  request.get({
+    url: url,
+    rejectUnauthorized: false,
+    json: true
+  }, function(error, response, body) {
+    expect(body, 'to be', 'V2 registry')
+    done()
+  })
+})
+
+
