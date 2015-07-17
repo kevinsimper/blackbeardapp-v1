@@ -17,6 +17,7 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
 })
 
 var validate = function (request, username, password, callback) {
+
   req({
       method: 'POST',
       uri: 'http://' + ip.trim() + ':8000/login',
@@ -30,7 +31,7 @@ var validate = function (request, username, password, callback) {
       if (error) {
         return callback(error, false);
       }
-      return callback(error, true, body);
+      return callback(error, (body.statusCode == 300), body);
     })
 };
 
