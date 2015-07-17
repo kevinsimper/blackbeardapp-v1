@@ -27,7 +27,7 @@ lab.test('get registry output', function(done) {
 lab.test('get registry output', function(done) {
   var user = {
     username: 'admin+users@blackbeard.io',
-    password: 'password'
+    password: 'password_new'
   }
   var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
   request.get({
