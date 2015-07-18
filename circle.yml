@@ -25,7 +25,7 @@ test:
     - ./docker-compose up -d
     - ./docker-compose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose start backend
-    - ./docker-compose run backend npm run load-fixtures && ./docker-compose run proxy /bin/bash -c "npm install && npm test"
+    - ./docker-compose run registryproxy /bin/bash -c "npm install && npm test"
 deployment:
   production:
     branch: master

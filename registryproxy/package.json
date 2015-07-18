@@ -1,5 +1,5 @@
 {
-  "name": "registry-proxy",
+  "name": "registryproxy",
   "version": "1.0.0",
   "description": "",
   "main": "start.js",
@@ -15,7 +15,7 @@
     "request": "2.58.0"
   },
   "devDependencies": {
-    "lab": "^5.13.0",
-    "unexpected": "^9.2.1"
+    "lab": "5.13.0",
+    "unexpected": "9.2.1"
   }
 }

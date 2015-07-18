@@ -17,25 +17,47 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
 })
 
 var validate = function (request, username, password, callback) {
-  req({
-      method: 'POST',
-      uri: 'http://' + ip.trim() + ':8000/login',
-      json: true,
-      body: {
-        email: username,
-        password: password
-      }
-    },
-    function(error, response, body) {
-      if (error) {
-        return callback(null, false);
-      }
-      return callback(error, true, body);
-    })
+  // If dev then do fake response
+  if (process.env.NODE_ENV != 'production') {
+    if (username === 'blackbeard' && password === 'password') {
+      return callback(null, true, {
+          message: 'Login successful.',
+          token: 'token'
+        });
+    } else {
+      return callback(null, false, false);
+    }
+  } else {
+    req({
+        method: 'POST',
+        uri: 'http://' + ip.trim() + ':8000/login',
+        json: true,
+        body: {
+          email: username,
+          password: password
+        }
+      },
+      function(error, response, body) {
+        if (error) {
+          return callback(error, false);
+        }
+        return callback(null, (body.statusCode == 300), body);
+      })
+  }
 };
 
 server.register(require('hapi-auth-basic'), function (err) {
   server.auth.strategy('simple', 'basic', { validateFunc: validate });
+  server.route({
+    method: 'GET',
+    path: '/v1/_ping',
+    config: {
+      auth: false,
+      handler: function(request, reply) {
+        reply('V2 registry')
+      }
+    }
+  })
   server.route({
     method: '*',
     path: '/{p*}',
