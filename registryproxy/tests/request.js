@@ -1,7 +1,7 @@
 var expect = require('unexpected')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var server = require('../server')
+var app = require('../express')
 var request = require('request')
 var child_process = require('child_process')
 
@@ -10,9 +10,9 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
 })
 
 lab.before(function(done) {
-  server.start(function() {
-    console.log('Server running at:', server.info.uri)
-    done()
+  var port = 9500
+  app.listen(port, function() {
+    console.log('Listening on port ' + port)
   })
 })
 

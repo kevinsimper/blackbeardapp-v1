@@ -5,12 +5,13 @@
   "main": "start.js",
   "scripts": {
     "test": "lab -m 15000 tests/*.js",
-    "start": "DEBUG=* node start.js"
+    "start": "node start.js"
   },
   "author": "",
   "license": "BSD-2-Clause",
   "dependencies": {
     "boom": "^2.8.0",
+    "express": "^4.13.1",
     "hapi": "8.4.0",
     "hapi-auth-basic": "3.0.0",
     "request": "2.58.0"
