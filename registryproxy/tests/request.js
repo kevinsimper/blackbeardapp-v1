@@ -33,12 +33,18 @@ lab.test('valid login and password', function(done) {
     username: 'blackbeard',
     password: 'password'
   }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
+  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
   request.get({
     url: url,
     rejectUnauthorized: false,
+    followRedirect: false,
     json: true
   }, function(error, response, body) {
+    console.log('start')
+    console.log(error)
+    console.log(response.headers)
+    console.log(body)
+    console.log('slut')
     expect(response.statusCode, 'to be', 200)
     expect(typeof body, 'to be', typeof {})
     done()
@@ -50,7 +56,7 @@ lab.test('invalid login and password', function(done) {
     username: 'invalid',
     password: 'invalid'
   }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
+  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
   request.get({
     url: url,
     rejectUnauthorized: false,
