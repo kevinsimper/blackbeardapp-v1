@@ -64,10 +64,8 @@ server.register(require('hapi-auth-basic'), function (err) {
     config: {
       auth: 'simple',
       handler: function(request, reply) {
-        var url = 'http://' + ip.trim() + ':5000/v2/'
         return reply.proxy({
-          uri: url,
-          passThrough: true
+          uri: 'http://' + ip.trim() + ':5000/'+request.url.href
         })
       },
       payload: {
