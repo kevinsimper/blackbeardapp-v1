@@ -28,60 +28,53 @@ lab.test('get registry output', function(done) {
   })
 })
 
-lab.test('valid login and password', function(done) {
-  var user = {
-    username: 'blackbeard',
-    password: 'password'
-  }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
-  request.get({
-    url: url,
-    rejectUnauthorized: false,
-    followRedirect: false,
-    json: true
-  }, function(error, response, body) {
-    console.log('start')
-    console.log(error)
-    console.log(response.headers)
-    console.log(body)
-    console.log('slut')
-    expect(response.statusCode, 'to be', 200)
-    expect(typeof body, 'to be', typeof {})
-    done()
+lab.experiment('docker interaction', function() {
+  lab.test('docker pings the registry', function(done) {
+    var url = 'https://' + server.info.host + ':' + server.info.port + '/v2/'
+    request.get({
+      url: url,
+      rejectUnauthorized: false,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 401)
+      expect(response.headers, 'to satisfy', {
+        'www-authenticate': 'Basic',
+        'docker-distribution-api-version': 'registry/2.0'
+      })
+      done()
+    })
+  })
+
+  lab.test('valid login and password', function(done) {
+    var user = {
+      username: 'blackbeard',
+      password: 'password'
+    }
+    var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
+    request.get({
+      url: url,
+      rejectUnauthorized: false,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(typeof body, 'to be', typeof {})
+      done()
+    })
+  })
+
+  lab.test('invalid login and password', function(done) {
+    var user = {
+      username: 'invalid',
+      password: 'invalid'
+    }
+    var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
+    request.get({
+      url: url,
+      rejectUnauthorized: false,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 401)
+      done()
+    })
   })
 })
-
-lab.test('invalid login and password', function(done) {
-  var user = {
-    username: 'invalid',
-    password: 'invalid'
-  }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
-  request.get({
-    url: url,
-    rejectUnauthorized: false,
-    json: true
-  }, function(error, response, body) {
-    expect(response.statusCode, 'to be', 401)
-    done()
-  })
-})
-
-
-lab.test('/v1/_ping', function(done) {
-  var user = {
-    username: 'invalid',
-    password: 'invalid'
-  }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v1/_ping'
-  request.get({
-    url: url,
-    rejectUnauthorized: false,
-    json: true
-  }, function(error, response, body) {
-    expect(body, 'to be', 'V2 registry')
-    done()
-  })
-})
-
-

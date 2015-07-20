@@ -58,24 +58,12 @@ server.ext('onRequest', function(request, reply) {
   return reply.continue()
 })
 
-// server.route({
-//   method: 'GET',
-//   path: '/v2/',
-//   config: {
-//     auth: false,
-//     handler: function(request, reply) {
-//       debug('V2 Request')
-//       reply({})
-//     }
-//   }
-// })
-
 server.route({
   method: '*',
   path: '/v1/{p*}',
   config: {
     handler: function(request, reply) {
-      reply().code(404).header('Docker-Distribution-API-Version', 'registry/2.0')
+      reply('You need to upgrade to docker min. 1.6').code(404).header('Docker-Distribution-API-Version', 'registry/2.0')
     }
   }
 })
@@ -91,7 +79,6 @@ server.route({
       var req = request.raw.req;
       var authorization = req.headers.authorization;
       if (!authorization) {
-        console.log('boom unauthorized 0')
         return reply().code(401).header('WWW-Authenticate', 'Basic').header('Docker-Distribution-API-Version', 'registry/2.0')
 
       }
@@ -118,11 +105,10 @@ server.route({
       var username = credentialsPart.slice(0, sep);
       var password = credentialsPart.slice(sep + 1);
 
-      if (!username && !settings.allowEmptyUsername) {
+      if (!username) {
         console.log('boom unauthorized 4')
         return reply(Boom.unauthorized('HTTP authentication header missing username', 'Basic'));
       }
-      console.log('USER validationFunc')
 
       validate(request, username, password, function(err, isValid, credentials) {
         debug('isValid', isValid)
@@ -153,8 +139,8 @@ server.route({
           debug('V1 request', request.url.path, 404)
           return reply().code(404)
         }
+
         var url = 'http://' + ip.trim() + ':5000' + request.url.href
-        console.log('URLLLL', url)
         return reply.proxy({
           uri: url
         })
