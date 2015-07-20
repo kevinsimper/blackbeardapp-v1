@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "2.9.34",
     "boom": "2.7.1",
     "code": "1.4.0",
     "crypto": "0.0.3",
@@ -23,10 +24,11 @@
     "mailgun-js": "0.6.9",
     "mongodb": "1.4.34",
     "mongoose": "4.0.3",
+    "mongoose-delete": "blackbeardapp/mongoose-delete",
     "newrelic": "1.19.0",
     "password-hash": "1.2.2",
     "request": "2.55.0",
     "stripe": "3.6.0",
-    "unexpected": "8.5.1"
+    "unexpected": "9.2.1"
   }
 }

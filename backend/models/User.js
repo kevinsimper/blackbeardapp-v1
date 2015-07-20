@@ -1,5 +1,6 @@
 var mongoose = require('mongoose')
 var roles = require('./roles/')
+var mongooseDelete = require('mongoose-delete')
 
 var schema = new mongoose.Schema({
   email: String,
@@ -18,7 +19,11 @@ var schema = new mongoose.Schema({
   role: String,
   ip: String,
   password: String,
+  deleted: Boolean,
+  deletedAt: String
 })
+
+schema.plugin(mongooseDelete)
 
 schema.statics.getUserIdFromRequest = function(request) {
   if(request.params.user === 'me') {
@@ -29,12 +34,29 @@ schema.statics.getUserIdFromRequest = function(request) {
 }
 
 schema.statics.findOneByRole = function (role, id, cb) {
-  var fields = ''
-  if (role != roles.ADMIN) {
-    fields = 'email name credit timestamp resetToken resetExpiry creditCards role'
+  var fields = []
+  // As default do not show deleted
+  var conditions = {
+      deleted: {
+          '$ne': true
+      }
   }
 
-  return this.where('_id', id).select(fields).findOne(cb)
+  if(roles.isAllowed(roles.USER, role)) {
+    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role')
+  }
+
+  if(roles.isAllowed(roles.ADMIN, role)) {
+    fields.push('resetToken', 'resetExpiry')
+    // Show deleted to admins
+    var conditions = {
+        deleted: {
+            '$ne': false
+        }
+    }
+  }
+
+  return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(cb)
 }
 
 module.exports = mongoose.model('user', schema)
