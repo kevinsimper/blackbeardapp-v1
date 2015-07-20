@@ -65,25 +65,18 @@ server.register(require('hapi-auth-basic'), function (err) {
     config: {
       auth: 'simple',
       handler: function(request, reply) {
-         /*
-         proxy_set_header Host $host;
-         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-         proxy_set_header X-Real-IP $remote_addr;
-         proxy_set_header X-Forwarded-Proto $scheme;
-         proxy_set_header X-Original-URI $request_uri;
-         proxy_set_header Docker-Distribution-Api-Version registry/2.0;
-       
-         location / {
-           auth_basic "Restricted";
-           auth_basic_user_file /etc/nginx/.htpasswd;
-           proxy_pass http://docker-registry:5000;
-         }
-         */
         var requestUri = 'http://' + ip.trim() + ':5000/'+request.url.href
+        var proxyReq = {
+          'Host': ip.trim() + ':5000',
+          'X-Forwarded-For': request.info.remoteAddress,
+          'X-Real-IP': ip.trim(),
+          'X-Forwarded-Proto': 'http',
+          'X-Original-URI': request.headers.host+request.url.path,
+          'Docker-Distribution-Api-Version': 'registry/2.0'
+        }
         return reply.proxy({
           mapUri:  function (request, callback) {
-            requestUri = 'http://blackbeard.io'
-            callback(false, requestUri, {Testingheader: '123'})
+            callback(false, requestUri, proxyReq)
           }
         })
       },
