@@ -3,6 +3,7 @@ var fs = require('fs')
 var req = require('request')
 var server = new Hapi.Server()
 var child_process = require('child_process')
+var debug = require('debug')('proxy')
 
 server.connection({
   port: '9500',
@@ -64,8 +65,26 @@ server.register(require('hapi-auth-basic'), function (err) {
     config: {
       auth: 'simple',
       handler: function(request, reply) {
+         /*
+         proxy_set_header Host $host;
+         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+         proxy_set_header X-Real-IP $remote_addr;
+         proxy_set_header X-Forwarded-Proto $scheme;
+         proxy_set_header X-Original-URI $request_uri;
+         proxy_set_header Docker-Distribution-Api-Version registry/2.0;
+       
+         location / {
+           auth_basic "Restricted";
+           auth_basic_user_file /etc/nginx/.htpasswd;
+           proxy_pass http://docker-registry:5000;
+         }
+         */
+        var requestUri = 'http://' + ip.trim() + ':5000/'+request.url.href
         return reply.proxy({
-          uri: 'http://' + ip.trim() + ':5000/'+request.url.href
+          mapUri:  function (request, callback) {
+            requestUri = 'http://blackbeard.io'
+            callback(false, requestUri, {Testingheader: '123'})
+          }
         })
       },
       payload: {
