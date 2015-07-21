@@ -165,6 +165,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: userRoutes.putUsers
     }
   })
+  server.route({
+    method: 'DELETE',
+    path: '/users/{user}',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.delUsers
+    }
+  })
 
   server.route({
     method: 'POST',

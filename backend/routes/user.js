@@ -22,9 +22,13 @@ exports.getUsers = function(request, reply) {
 
 exports.getOneUser = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
+  var role = request.auth.credentials.role
 
-  User.findOneByRole(request.auth.credentials.role, id, function(err, user) {
+  User.findOneByRole(role, id, function(err, user) {
     // Get properties of user for current logged in user role
+    if(!user) {
+      return reply(Boom.notFound('User not found!'))
+    }
     reply(user)
   })
 }
@@ -79,6 +83,15 @@ exports.putUsers = function(request, reply) {
         return reply(Boom.badImplementation('There was a problem with the database'))
       }
       reply(updated)
+    })
+  })
+}
+
+exports.delUsers = function(request, reply) {
+  var id = User.getUserIdFromRequest(request)
+  User.findById(id, function(err, user) {
+    user.delete(function(err, savedUser) {
+      reply()
     })
   })
 }
