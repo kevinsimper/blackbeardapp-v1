@@ -3,6 +3,7 @@ var roles = require('./roles/')
 
 var schema = new mongoose.Schema({
   name: String,
+  cname: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   timestamp: String,
   containers: [{
@@ -15,7 +16,7 @@ var schema = new mongoose.Schema({
 schema.statics.findOneByRole = function (role, id, cb) {
   var fields = ''
   if (role != roles.ADMIN) {
-    fields = 'name user timestamp'
+    fields = 'name cname user timestamp'
   }
 
   return this.where('_id', id).select(fields).findOne(cb)

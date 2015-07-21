@@ -19,8 +19,27 @@ exports.getApps = function(request, reply) {
     reply(result)
   })
 }
+
+exports.getOneApp = function(request, reply) {
+  var cname = request.params.cname
+
+  App.find({
+    cname: cname
+  }, function(err, result) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    if (result.length == 1) {
+      reply(result[0])
+    } else {
+      return reply(Boom.badImplementation('Could not find requested app.'))
+    }
+  })
+}
+
 exports.postApp = function(request, reply) {
   var name = request.payload.name
+  var cname = request.payload.cname
 
   var insertCallback = function(err, app) {
     if (err) {
@@ -31,6 +50,7 @@ exports.postApp = function(request, reply) {
 
   var newApp = new App({
     name: name,
+    cname: cname,
     user: request.auth.credentials,
     timestamp: Math.round(Date.now() / 1000)
   })
