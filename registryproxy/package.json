@@ -10,9 +10,10 @@
   "author": "",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "basic-auth": "^1.0.3",
-    "boom": "^2.8.0",
-    "express": "^4.13.1",
+    "basic-auth": "1.0.3",
+    "bluebird": "2.9.34",
+    "boom": "2.8.0",
+    "express": "4.13.1",
     "hapi": "8.4.0",
     "hapi-auth-basic": "3.0.0",
     "request": "2.58.0"
