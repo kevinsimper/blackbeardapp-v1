@@ -1,38 +1,26 @@
 var expect = require('unexpected')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var server = require('../server')
+var app = require('../server')
 var request = require('request')
 var child_process = require('child_process')
 
-console.log('Server running at:', server.info.uri)
 var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
   encoding: 'utf8'
 })
 
-lab.test('get registry output', function(done) {
-  server.start(function() {
-    var url = 'http://' + ip.trim() + ':5000/v2/'
-    request.get({
-      url: url,
-      json: true
-    }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
-      expect(typeof body, 'to be', typeof {})
-      done()
-    })
+lab.before(function(done) {
+  var port = 9500
+  app.listen(port, function() {
+    console.log('Listening on port ' + port)
+    done()
   })
 })
 
-lab.test('valid login and password', function(done) {
-  var user = {
-    username: 'blackbeard',
-    password: 'password'
-  }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
+lab.test('get registry output', function(done) {
+  var url = 'http://' + ip.trim() + ':5000/v2/'
   request.get({
     url: url,
-    rejectUnauthorized: false,
     json: true
   }, function(error, response, body) {
     expect(response.statusCode, 'to be', 200)
@@ -41,37 +29,52 @@ lab.test('valid login and password', function(done) {
   })
 })
 
-lab.test('invalid login and password', function(done) {
-  var user = {
-    username: 'invalid',
-    password: 'invalid'
-  }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/'
-  request.get({
-    url: url,
-    rejectUnauthorized: false,
-    json: true
-  }, function(error, response, body) {
-    expect(response.statusCode, 'to be', 401)
-    done()
+lab.experiment('docker interaction', function() {
+  lab.test('docker pings the registry', function(done) {
+    var url = 'https://' + 'localhost' + ':' + '9500' + '/v2/'
+    request.get({
+      url: url,
+      rejectUnauthorized: false,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 401)
+      expect(response.headers, 'to satisfy', {
+        'docker-distribution-api-version': 'registry/2.0'
+      })
+      done()
+    })
+  })
+
+  lab.test('valid login and password', function(done) {
+    var user = {
+      username: 'blackbeard',
+      password: 'password'
+    }
+    var url = 'https://' + user.username + ':' + user.password + '@' + 'localhost' + ':' + '9500' + '/v2/'
+    request.get({
+      url: url,
+      rejectUnauthorized: false,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(typeof body, 'to be', typeof {})
+      done()
+    })
+  })
+
+  lab.test('invalid login and password', function(done) {
+    var user = {
+      username: 'invalid',
+      password: 'invalid'
+    }
+    var url = 'https://' + user.username + ':' + user.password + '@' + 'localhost' + ':' + '9500' + '/v2/'
+    request.get({
+      url: url,
+      rejectUnauthorized: false,
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 401)
+      done()
+    })
   })
 })
-
-
-lab.test('/v1/_ping', function(done) {
-  var user = {
-    username: 'invalid',
-    password: 'invalid'
-  }
-  var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v1/_ping'
-  request.get({
-    url: url,
-    rejectUnauthorized: false,
-    json: true
-  }, function(error, response, body) {
-    expect(body, 'to be', 'V2 registry')
-    done()
-  })
-})
-
-

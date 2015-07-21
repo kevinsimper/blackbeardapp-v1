@@ -2,8 +2,9 @@ if(process.env.NODE_ENV === 'production') {
   require('newrelic')
 }
 
-var server = require('./server')
+var app = require('./server')
 
-server.start(function() {
-  console.log('Server running at:', server.info.uri)
+var port = 9500
+app.listen(port, function() {
+  console.log('Listening on port ' + port)
 })
