@@ -5,6 +5,7 @@ var fs = require('fs')
 var child_process = require('child_process')
 var auth = require('basic-auth')
 var request = require('request')
+var debug = require('debug')('proxy')
 
 var port = 9500
 var options = {
@@ -26,11 +27,12 @@ app.all('/v2/*', function(req, res) {
     res.end('Access denied')
   } else {
     var url = 'http://' + ip.trim() + ':5000' + req.originalUrl
-    var proxyRequest = request({
-      url: url,
-      method: req.method
+    debug('Url requested', req.method, url)
+    var proxyRequest = request(url)
+    proxyRequest.on('error', function(err) {
+      debug('ERROR', err)
     })
-    req.pipe(request(url)).pipe(res)
+    req.pipe(proxyRequest).pipe(res)
   }
 })
 

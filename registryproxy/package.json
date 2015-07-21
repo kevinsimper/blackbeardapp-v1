@@ -5,7 +5,7 @@
   "main": "start.js",
   "scripts": {
     "test": "lab -m 15000 tests/*.js",
-    "start": "node start.js"
+    "start": "DEBUG=proxy node start.js"
   },
   "author": "",
   "license": "BSD-2-Clause",
