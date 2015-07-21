@@ -32,7 +32,8 @@ lab.experiment('/app', function() {
 
   lab.test('POST', function(done) {
     var requestData = {
-      name: 'Test App'
+      name: 'Test App',
+      cname: 'testapp'
     }
     request({
         method: 'POST',
@@ -52,7 +53,8 @@ lab.experiment('/app', function() {
   })
   lab.test('PUT', function(done) {
     var requestData = {
-      name: 'Test App Updated'
+      name: 'Test App Updated',
+      cname: 'testapp'
     }
     request({
       method: 'PUT',
@@ -82,6 +84,24 @@ lab.experiment('/app', function() {
       done()
     })
   })
+  lab.test('Search POST', function(done) {
+    var requestData = {
+      cname: 'testapp'
+    }
+    request({
+      method: 'POST',
+      uri: appUrl + '/apps',
+      body: requestData,
+      headers: {
+        'Authorization': token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body, 'to be non-empty', 'name')
+      done()
+    })
+  })
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',
@@ -96,7 +116,6 @@ lab.experiment('/app', function() {
     })
   })
 })
-
 lab.experiment('/app/containers', function() {
   var appId = null
   var containerId = null
