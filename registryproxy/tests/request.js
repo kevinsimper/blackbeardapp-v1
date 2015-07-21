@@ -13,6 +13,7 @@ lab.before(function(done) {
   var port = 9500
   app.listen(port, function() {
     console.log('Listening on port ' + port)
+    done()
   })
 })
 
@@ -30,7 +31,7 @@ lab.test('get registry output', function(done) {
 
 lab.experiment('docker interaction', function() {
   lab.test('docker pings the registry', function(done) {
-    var url = 'https://' + server.info.host + ':' + server.info.port + '/v2/'
+    var url = 'https://' + 'localhost' + ':' + '9500' + '/v2/'
     request.get({
       url: url,
       rejectUnauthorized: false,
@@ -38,7 +39,6 @@ lab.experiment('docker interaction', function() {
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 401)
       expect(response.headers, 'to satisfy', {
-        'www-authenticate': 'Basic',
         'docker-distribution-api-version': 'registry/2.0'
       })
       done()
@@ -50,7 +50,7 @@ lab.experiment('docker interaction', function() {
       username: 'blackbeard',
       password: 'password'
     }
-    var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
+    var url = 'https://' + user.username + ':' + user.password + '@' + 'localhost' + ':' + '9500' + '/v2/'
     request.get({
       url: url,
       rejectUnauthorized: false,
@@ -67,7 +67,7 @@ lab.experiment('docker interaction', function() {
       username: 'invalid',
       password: 'invalid'
     }
-    var url = 'https://' + user.username + ':' + user.password + '@' + server.info.host + ':' + server.info.port + '/v2/'
+    var url = 'https://' + user.username + ':' + user.password + '@' + 'localhost' + ':' + '9500' + '/v2/'
     request.get({
       url: url,
       rejectUnauthorized: false,

@@ -76,18 +76,6 @@ server.route({
     handler: function(request, reply) {
       debug('Request Headers', request.url.path, request.headers)
 
-
-      if (request.url.path.indexOf('v1') !== -1) {
-        debug('V1 request', request.url.path, 404)
-        return reply().code(404)
-      }
-
-      var url = 'http://' + ip.trim() + ':5000' + request.url.href
-      return reply.proxy({
-        uri: url,
-        passThrough: true
-      })
-
       var req = request.raw.req;
       var authorization = req.headers.authorization;
       if (!authorization) {
