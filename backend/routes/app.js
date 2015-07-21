@@ -20,8 +20,8 @@ exports.getApps = function(request, reply) {
   })
 }
 
-exports.getOneApp = function(request, reply) {
-  var cname = request.params.cname
+exports.search = function(request, reply) {
+  var cname = request.payload.cname
 
   App.find({
     cname: cname
@@ -29,11 +29,7 @@ exports.getOneApp = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    if (result.length == 1) {
-      reply(result[0])
-    } else {
-      return reply(Boom.badImplementation('Could not find requested app.'))
-    }
+    reply(result)
   })
 }
 

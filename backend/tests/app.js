@@ -84,18 +84,21 @@ lab.experiment('/app', function() {
       done()
     })
   })
-  lab.test('GET', function(done) {
-    var cname = 'testapp'
+  lab.test('Search POST', function(done) {
+    var requestData = {
+      cname: 'testapp'
+    }
     request({
-      method: 'GET',
-      uri: appUrl + '/apps/' + cname,
+      method: 'POST',
+      uri: appUrl + '/apps',
+      body: requestData,
       headers: {
         'Authorization': token
       },
       json: true
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body, 'to have keys', 'name')
+      expect(body, 'to be non-empty', 'name')
       done()
     })
   })
