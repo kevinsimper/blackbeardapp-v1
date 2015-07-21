@@ -35,6 +35,8 @@ deployment:
       - docker push tutum.co/kevinsimper/blackbeardapp_frontend
       - docker tag blackbeardapp_backend tutum.co/kevinsimper/blackbeardapp_backend
       - docker push tutum.co/kevinsimper/blackbeardapp_backend
+      - docker tag blackbeardapp_registryproxy tutum.co/kevinsimper/blackbeardapp_registryproxy
+      - docker push tutum.co/kevinsimper/blackbeardapp_registryproxy
 experimental:
   notify:
     branches:

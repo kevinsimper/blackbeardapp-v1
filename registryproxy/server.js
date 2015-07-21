@@ -19,6 +19,15 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
   encoding: 'utf8'
 })
 
+var REGISTRY_HOST
+if(process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
+  REGISTRY_HOST = process.env.REGISTRY_HOST
+} else {
+  REGISTRY_HOST = 'http://' + ip.trim() + ':5000'
+}
+
+var BACKEND_HOST = process.env.BACKEND_HOST
+
 var checkCredentials = function(credentials) {
   return new Promise(function(resolve, reject) {
     if (process.env.NODE_ENV !== 'production') {
@@ -33,7 +42,7 @@ var checkCredentials = function(credentials) {
     } else {
       request({
         method: 'POST',
-        uri: 'http://' + ip.trim() + ':8000/login',
+        uri: BACKEND_HOST + '/login',
         json: true,
         body: {
           email: credentials.name,
@@ -64,8 +73,8 @@ app.all('/v2/*', function(req, res) {
       return res.end('Access denied')
     }
 
-    var url = 'http://' + ip.trim() + ':5000' + req.originalUrl
     debug('Url requested', req.method, url)
+    var url = REGISTRY_HOST + req.originalUrl
     var proxyRequest = proxy(url)
     proxyRequest.on('error', function(err) {
       debug('ERROR', err)
