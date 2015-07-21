@@ -25,6 +25,11 @@ backend:
    - db
 
 router:
+  environment:
+    NODE_ENV: development
+  extends:
+    file: config/development.yml
+    service: common
   build: ./router/
   ports:
    - "8500:8500"

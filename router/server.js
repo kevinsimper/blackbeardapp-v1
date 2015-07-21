@@ -1,40 +1,59 @@
-var Hapi = require('hapi'),
-    MongoClient = require('mongodb').MongoClient; // This should not be required as we should communicate with Mongo through backend API.
+var Hapi = require('hapi')
+var child_process = require('child_process')
+var debug = require('debug')('router')
+var request = require('request')
+var Boom = require('boom')
 
-var server = new Hapi.Server();
+var server = new Hapi.Server()
 server.connection({
     port: '8500'
-});
+})
 
 // Had to add hosts file entry to test this as:
 // 88.80.187.61 jambroo.dev.jambroo.com
 // TODO: Register domain and handle subdomains properly
 
-var mapper = function (request, callback) {
-    var requestedHostname = request.info.host;
-    var requestedHostnameSplit = requestedHostname.split('.');
-    if (requestedHostnameSplit && requestedHostnameSplit.length) {
-        var requestedCname = requestedHostnameSplit[0];
+var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
+  encoding: 'utf8'
+})
+
+var mapper = function (req, callback) {
+  if (process.env.NODE_ENV != 'production') {
+    if (req.path == 'testcname') {
+      return callback(null, 'http://173.255.221.154:80');
     } else {
-        throw 'No subdomain in request.';
+      return Boom.notFound('Could not find any running containers matching this CNAME.')
+    }
+  } else {
+    var requestedCname = null
+    var requestedHostnameSplit = req.info.host.split('.')
+    if (requestedHostnameSplit && requestedHostnameSplit.length) {
+        requestedCname = requestedHostnameSplit[0]
     }
 
-    var url = 'mongodb://db.blackbeard.io:27017/blackbeard';
+    if (!requestedCname) {
+        return Boom.badRequest("Could not extract CNAME from requested URI.")
+    }
 
-
-    // Use connect method to connect to the `
-    MongoClient.connect(url, function(err, db) {
-        var collection = db.collection('apps');
-
-        collection.findOne({cname: requestedCname}, function(error, result) {
-            if (result) {
-                var uri = "http://"+result.ip+":"+result.port;
-                callback(null, uri);
-            } else {
-                throw 'No app found matching CNAME.';
-            }
-        })
-    });
+    request({
+      method: 'GET',
+      uri: ip + ':8000/apps/search',
+      json: true,
+      body: requestedCname
+    },
+    function(error, response, body) {
+      if (error) {
+        return Boom.badImplementation()
+      }
+      var containers = body.containers
+      if (containers.length > 0) {
+        // Which container to use? Which instance?
+        var container = containers[0]
+        return callback(null, "http://"+container.ip);
+      }
+      return Boom.notFound('Could not find any running containers matching this CNAME.')
+    })
+  }
 }
 
 server.route({
