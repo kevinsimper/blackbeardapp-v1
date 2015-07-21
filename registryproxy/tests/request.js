@@ -1,7 +1,7 @@
 var expect = require('unexpected')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var app = require('../express')
+var app = require('../server')
 var request = require('request')
 var child_process = require('child_process')
 

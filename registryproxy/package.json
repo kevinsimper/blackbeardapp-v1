@@ -12,15 +12,12 @@
   "dependencies": {
     "basic-auth": "1.0.3",
     "bluebird": "2.9.34",
-    "boom": "2.8.0",
     "express": "4.13.1",
-    "hapi": "8.4.0",
-    "hapi-auth-basic": "3.0.0",
-    "request": "2.58.0"
+    "request": "2.58.0",
+    "debug": "2.2.0"
   },
   "devDependencies": {
     "lab": "5.13.0",
-    "unexpected": "9.2.1",
-    "debug": "2.2.0"
+    "unexpected": "9.2.1"
   }
 }
