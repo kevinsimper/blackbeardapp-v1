@@ -26,14 +26,20 @@ if(process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
   REGISTRY_HOST = 'http://' + ip.trim() + ':5000'
 }
 
-var BACKEND_HOST = process.env.BACKEND_HOST
+var BACKEND_HOST
+if(process.env.BACKEND_HOST && process.env.NODE_ENV === 'production') {
+  BACKEND_HOST = process.env.BACKEND_HOST
+} else {
+  BACKEND_HOST = 'http://' + ip.trim() + ':8000'
+}
+console.log(BACKEND_HOST)
 
 var checkCredentials = function(credentials) {
   return new Promise(function(resolve, reject) {
-    if (process.env.NODE_ENV !== 'production') {
-      if (!credentials) {
-        resolve(false)
-      }
+    if (!credentials) {
+      return resolve(false)
+    }
+    if (process.env.NODE_ENV === 'production') {
       if (credentials.name === 'blackbeard' || credentials.pass === 'password') {
         resolve(true)
       } else {
