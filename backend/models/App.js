@@ -12,7 +12,7 @@ var schema = new mongoose.Schema({
     region: String,
     ip: String
   }],
-  deleted: Boolean,
+  deleted: { type: Boolean, default: false },
   deletedAt: String
 })
 
