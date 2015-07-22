@@ -115,7 +115,22 @@ lab.experiment('/app', function() {
       done()
     })
   })
+  lab.test('GET with deleted', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps',
+      headers: {
+        'Authorization': token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body.pop().deleted, 'to be', true)
+      done()
+    })
+  })
 })
+
 lab.experiment('/app/containers', function() {
   var appId = null
   var containerId = null

@@ -10,9 +10,9 @@ var config = require('../config')
 // /app
 exports.getApps = function(request, reply) {
   var user = request.auth.credentials
-  App.find({
-    user: user._id
-  }, function(err, result) {
+
+  // Get role
+  App.findByUserAndRole(user._id, user.role, function(err, result, c) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
@@ -74,7 +74,7 @@ exports.putApp = function(request, reply) {
 exports.deleteApp = function(request, reply) {
   var id = request.params.app
 
-  var rmCallback = function(err, result) {
+  var deleteCallback = function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
@@ -88,7 +88,7 @@ exports.deleteApp = function(request, reply) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    app.remove(rmCallback)
+    app.delete(deleteCallback)
   })
 }
 
