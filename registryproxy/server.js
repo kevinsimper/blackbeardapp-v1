@@ -74,7 +74,7 @@ app.disable('x-powered-by')
 app.all('/v2/*', function(req, res) {
   var credentials = auth(req)
   res.setHeader('Docker-Distribution-API-Version', 'registry/2.0')
-
+  debug('request started', req.method, req.originalUrl)
   checkCredentials(credentials).then(function(valid) {
     if (!credentials || !valid) {
       res.statusCode = 401
@@ -84,10 +84,19 @@ app.all('/v2/*', function(req, res) {
 
     debug('Url requested', req.method, url)
     var url = REGISTRY_HOST + req.originalUrl
-    var proxyRequest = proxy(url)
+    var proxyRequest = proxy({
+      url: url,
+      headers: {
+        'Host': req.headers['Host']
+      }
+    })
     proxyRequest.on('error', function(err) {
       debug('ERROR', err)
     })
+    proxyRequest.on('response', function(response) {
+      debug('Answer', response.statusCode, response.headers['content-type'])
+    })
+
     req.pipe(proxyRequest).pipe(res)
 
   })
