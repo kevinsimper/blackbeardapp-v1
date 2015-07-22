@@ -39,7 +39,7 @@ var checkCredentials = function(credentials) {
     if (!credentials) {
       return resolve(false)
     }
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV !== 'production') {
       if (credentials.name === 'blackbeard' || credentials.pass === 'password') {
         resolve(true)
       } else {
@@ -67,6 +67,8 @@ var checkCredentials = function(credentials) {
     }
   })
 }
+
+app.disable('x-powered-by')
 
 app.all('/v2/*', function(req, res) {
   var credentials = auth(req)
