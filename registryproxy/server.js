@@ -84,10 +84,14 @@ app.all('/v2/*', function(req, res) {
 
     debug('Url requested', req.method, url)
     var url = REGISTRY_HOST + req.originalUrl
+    var host = req.headers['Host']
+    if(process.env.NODE_ENV === 'production') {
+      host = 'registry.blackbeard.io'
+    }
     var proxyRequest = proxy({
       url: url,
       headers: {
-        'Host': req.headers['Host']
+        'Host': host
       }
     })
     proxyRequest.on('error', function(err) {
