@@ -3,18 +3,18 @@ var roles = require('./roles/')
 var mongooseDelete = require('mongoose-delete')
 
 // Potentially make this it's own independant schema
-var Container = {
+var containerSchema = new mongoose.Schema({
   status: String,
   region: String,
   ip: String
-}
+})
 
 var schema = new mongoose.Schema({
   name: String,
   cname: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   timestamp: String,
-  containers: [Container],
+  containers: [containerSchema],
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
