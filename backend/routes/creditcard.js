@@ -1,7 +1,7 @@
 var Boom = require('boom')
 var User = require('../models/User')
-var _ = require('lodash')
 var stripe = require('stripe')(process.env.STRIPE_SECRET);
+var _ = require('lodash')
 
 exports.getCreditCards = function(request, reply) {
   User.findOne({ _id: request.auth.credentials._id}, function(err, user) {
