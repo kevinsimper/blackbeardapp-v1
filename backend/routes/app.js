@@ -11,7 +11,6 @@ var config = require('../config')
 exports.getApps = function(request, reply) {
   var user = request.auth.credentials
 
-  // Get role
   App.findByUserAndRole(user._id, user.role, function(err, result, c) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))

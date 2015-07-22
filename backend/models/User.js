@@ -47,7 +47,7 @@ schema.statics.findOneByRole = function (role, id, cb) {
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('resetToken', 'resetExpiry')
+    fields.push('resetToken', 'resetExpiry', 'deleted')
     // Show deleted to admins
     var conditions = {
         deleted: {
