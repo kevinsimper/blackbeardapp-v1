@@ -2,6 +2,7 @@ var express = require('express')
 var Promise = require('bluebird')
 var app = express()
 var https = require('https')
+var http = require('http')
 var fs = require('fs')
 var child_process = require('child_process')
 var auth = require('basic-auth')
@@ -101,4 +102,8 @@ app.all('*', function(req, res) {
   res.redirect('https://blackbeard.io')
 })
 
-module.exports = https.createServer(options, app)
+if(process.env.NODE_ENV === 'production') {
+  module.exports = http.createServer(app)
+} else {
+  module.exports = https.createServer(options, app)
+}
