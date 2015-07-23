@@ -37,6 +37,7 @@ var Users = React.createClass({
               <th>Email</th>
               <th>Credit</th>
               <th>Timestamp</th>
+              <th>Deleted</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -48,6 +49,7 @@ var Users = React.createClass({
                   <td>{item.email}</td>
                   <td>{item.credit}</td>
                   <td>{item.timestamp}</td>
+                  <td>{item.deleted && <span>Yes</span>}</td>
                   <td>
                     <Button size='small' onClick={handler}>View</Button>
                   </td>
