@@ -5,9 +5,10 @@ var Table = require('../Table/')
 var Button = require('../Button/')
 var Input = require('../Input/')
 var moment = require('moment')
+var Navigation = require('react-router').Navigation
 
 var UserShow = React.createClass({
-  mixins: [React.addons.LinkedStateMixin],
+  mixins: [React.addons.LinkedStateMixin, Navigation],
   getState: function() {
     return store.getUser()
   },
@@ -28,8 +29,12 @@ var UserShow = React.createClass({
     actions.save(this.state)
   },
   onClickDeactivate: function() {
+    var self = this
     if(confirm('Do you want to deactivate this user?')) {
       actions.del(this.props.params.id)
+      .then(function() {
+        self.transitionTo('/users')
+      })
     }
   },
   render: function() {
@@ -72,6 +77,10 @@ var UserShow = React.createClass({
             <tr>
               <td>IP when signed up</td>
               <td>{this.state.ip}</td>
+            </tr>
+            <tr>
+              <td>Deleted</td>
+              <td>{this.state.deleted && <span>Yes</span>}</td>
             </tr>
           </tbody>
         </Table>

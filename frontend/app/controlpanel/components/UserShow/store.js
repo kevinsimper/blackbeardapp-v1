@@ -2,12 +2,10 @@ var Reflux = require('reflux')
 var actions = require('./actions')
 var request = require('superagent')
 var config = require('../../config')
-var Navigation = require('react-router').Navigation
 
 var _user = {}
 
 var store = Reflux.createStore({
-  mixins: [Navigation],
   listenables: actions,
   getUser: function() {
     return _user
@@ -29,9 +27,6 @@ var store = Reflux.createStore({
       .end(function(err, res) {
         actions.del.completed(res.body)
       })
-  },
-  onDelCompleted: function() {
-    this.transitionTo('/users')
   },
   onSave: function(user) {
     request.put(config.BACKEND_HOST + '/users/' + user._id)
