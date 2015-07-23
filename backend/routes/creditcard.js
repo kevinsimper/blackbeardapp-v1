@@ -66,7 +66,21 @@ exports.postCreditCards = function(request, reply) {
       }
     }, function(err, token) {
       if (err) {
-        return reply(Boom.badImplementation('There was an error saving your credit card details.'))
+        // Actually retrieve errors
+        // TODO: Should return actual error message and error code here.
+        // return reply({
+        //   message: err.message,
+        //   rawType: err.rawType,
+        //   code: err.code,
+        //   param: err.param,
+        // })
+        return reply(Boom.badRequest(err.message, {
+          rawType: err.rawType,
+          code: err.code,
+          param: err.param,
+        }))
+
+        //return reply(Boom.badImplementation('There was an error saving your credit card details.'))
       }
 
       newCreditCard = new CreditCard({
