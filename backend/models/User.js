@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
 var roles = require('./roles/')
 var mongooseDelete = require('mongoose-delete')
+var _ = require('lodash')
 
 var schema = new mongoose.Schema({
   email: String,
@@ -50,7 +51,21 @@ schema.statics.findOneByRole = function (role, id, cb) {
     conditions = {}
   }
 
-  return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(cb)
+  return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(function(error, result) {
+    // If there is a result and user is not ADMIN then hide payment gateway token
+    if (result && roles.isAllowed(roles.USER, role)) {
+      _.forEach(result.creditCards, function(creditCard, ccKey) {
+        var creditCardSensored = {
+          name: creditCard.name,
+          number: creditCard.number,
+          brand: creditCard.brand
+        }
+        result.creditCards[ccKey] = creditCardSensored
+      })
+    }
+
+    return cb(error, result)
+  })
 }
 
 module.exports = mongoose.model('user', schema)

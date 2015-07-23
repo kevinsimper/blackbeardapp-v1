@@ -2,6 +2,7 @@ var Lab = require('lab')
 var lab = exports.lab = Lab.script()
 var request = require('request')
 var expect = require('unexpected')
+var _ = require('lodash')
 
 var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
@@ -13,6 +14,7 @@ server.start(function() {
 
 lab.experiment('/users/{id}/creditcards', function() {
   var token = null
+  var userId = null
   lab.before(function(done) {
     request({
         method: 'POST',
@@ -45,6 +47,56 @@ lab.experiment('/users/{id}/creditcards', function() {
         },
         json: true,
         body: requestData
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        done()
+      })
+  })
+
+  lab.test('GET admins', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function(error, response, body) {
+        var admin = _.filter(body, function(user) {
+          return user.email == 'admin+users@blackbeard.io';
+        })
+        userId = admin[0]._id
+        done()
+      })
+  })
+
+  lab.test('GET admin', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/'+userId,
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        expect(body.creditCards[0].number, 'to be', '1234')
+        expect(body.creditCards[0].token, 'to be', undefined)
+        done()
+      })
+  })
+
+  lab.test('GET', function(done) {
+      request({
+        method: 'GET',
+        uri: appUrl + '/users/me/creditcards',
+        headers: {
+          'Authorization': token
+        },
+        json: true
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
