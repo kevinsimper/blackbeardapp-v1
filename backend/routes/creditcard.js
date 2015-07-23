@@ -4,7 +4,10 @@ var stripe = require('stripe')(process.env.STRIPE_SECRET);
 var _ = require('lodash')
 
 exports.getCreditCards = function(request, reply) {
-  User.findOne({ _id: request.auth.credentials._id}, function(err, user) {
+  var role = request.auth.credentials.role
+  var id = request.auth.credentials._id
+
+  User.findOneByRole(role, id, function(err, user) {
     return reply(user.creditCards)
   })
 }
