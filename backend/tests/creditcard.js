@@ -54,6 +54,30 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
+  lab.test('POST invalid', function(done) {
+      var requestData = {
+        name: 'New Card',
+        creditcard: '12',
+        expiryMonth: '06',
+        expiryYear: '2018',
+        cvv: '123'
+      }
+      request({
+        method: 'POST',
+        uri: appUrl + '/users/me/creditcards',
+        headers: {
+          'Authorization': token
+        },
+        json: true,
+        body: requestData
+      },
+      function(error, response, body) {
+        expect(body.statusCode, 'to be', 400)
+        expect(body.message, 'to be', 'This card number looks invalid.')
+        done()
+      })
+  })
+
   lab.test('GET admins', function(done) {
     request({
         method: 'GET',

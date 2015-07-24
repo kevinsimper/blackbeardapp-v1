@@ -1,17 +1,22 @@
 var Boom = require('boom')
 var User = require('../models/User')
+var CreditCard = require('../models/CreditCard')
 var stripe = require('stripe')(process.env.STRIPE_SECRET);
 var _ = require('lodash')
 
 exports.getCreditCards = function(request, reply) {
-  User.findOne({ _id: request.auth.credentials._id}, function(err, user) {
+  var role = request.auth.credentials.role
+  var id = request.auth.credentials._id
+
+  User.findOneByRole(role, id, function(err, user) {
     return reply(user.creditCards)
   })
 }
 
 // /user/XX/creditcards POST
 exports.postCreditCards = function(request, reply) {
-  var addedCard = null;
+  var newCreditCard = null
+  var currentUser = null
 
   if(request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
@@ -31,9 +36,9 @@ exports.postCreditCards = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
     reply({
-      name: addedCard.name,
-      number: addedCard.number,
-      brand: addedCard.brand
+      name: newCreditCard.name,
+      number: newCreditCard.number,
+      brand: newCreditCard.brand
     })
   }
 
@@ -44,10 +49,6 @@ exports.postCreditCards = function(request, reply) {
 
     if (!user) {
       return reply(Boom.notFound('The specified user could not be found.'))
-    }
-
-    if (!user.creditCards) {
-      user.creditCards = []
     }
 
     // Validate credit card
@@ -65,16 +66,31 @@ exports.postCreditCards = function(request, reply) {
       }
     }, function(err, token) {
       if (err) {
-        return reply(Boom.badImplementation('There was an error saving your credit card details.'))
+        // Actually retrieve errors
+        // TODO: Should return actual error message and error code here.
+        // return reply({
+        //   message: err.message,
+        //   rawType: err.rawType,
+        //   code: err.code,
+        //   param: err.param,
+        // })
+        return reply(Boom.badRequest(err.message, {
+          rawType: err.rawType,
+          code: err.code,
+          param: err.param,
+        }))
+
+        //return reply(Boom.badImplementation('There was an error saving your credit card details.'))
       }
 
-      addedCard = {
+      newCreditCard = new CreditCard({
         name: creditcard.name,
         token: token.id,
         number: token.card.last4,
         brand: token.card.brand
-      }
-      user.creditCards.push(addedCard)
+      })
+
+      user.creditCards.push(newCreditCard)
 
       user.save(updateCallback)
     });
