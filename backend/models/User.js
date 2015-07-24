@@ -52,6 +52,7 @@ schema.statics.findOneByRole = function (role, id, cb) {
     if (result && roles.isAllowed(roles.USER, role)) {
       _.forEach(result.creditCards, function(creditCard, ccKey) {
         var creditCardSensored = {
+          _id: creditCard._id,
           name: creditCard.name,
           number: creditCard.number,
           brand: creditCard.brand
