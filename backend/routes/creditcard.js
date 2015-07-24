@@ -1,5 +1,6 @@
 var Boom = require('boom')
 var User = require('../models/User')
+var CreditCard = require('../models/CreditCard')
 var stripe = require('stripe')(process.env.STRIPE_SECRET);
 var _ = require('lodash')
 
@@ -14,7 +15,8 @@ exports.getCreditCards = function(request, reply) {
 
 // /user/XX/creditcards POST
 exports.postCreditCards = function(request, reply) {
-  var addedCard = null;
+  var newCreditCard = null
+  var currentUser = null
 
   if(request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
@@ -34,9 +36,9 @@ exports.postCreditCards = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
     reply({
-      name: addedCard.name,
-      number: addedCard.number,
-      brand: addedCard.brand
+      name: newCreditCard.name,
+      number: newCreditCard.number,
+      brand: newCreditCard.brand
     })
   }
 
@@ -47,10 +49,6 @@ exports.postCreditCards = function(request, reply) {
 
     if (!user) {
       return reply(Boom.notFound('The specified user could not be found.'))
-    }
-
-    if (!user.creditCards) {
-      user.creditCards = []
     }
 
     // Validate credit card
@@ -71,13 +69,14 @@ exports.postCreditCards = function(request, reply) {
         return reply(Boom.badImplementation('There was an error saving your credit card details.'))
       }
 
-      addedCard = {
+      newCreditCard = new CreditCard({
         name: creditcard.name,
         token: token.id,
         number: token.card.last4,
         brand: token.card.brand
-      }
-      user.creditCards.push(addedCard)
+      })
+
+      user.creditCards.push(newCreditCard)
 
       user.save(updateCallback)
     });

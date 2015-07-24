@@ -2,25 +2,7 @@ var mongoose = require('mongoose')
 var roles = require('./roles/')
 var mongooseDelete = require('mongoose-delete')
 var _ = require('lodash')
-
-// Credit cards here are changing from inline
-/*creditCards: [{
- name: String,
- number: String,
- brand: String,
- expiryYear: String,
- token: String
- }],*/
-// To a reference to the object CreditCard
-var creditCardSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-  brand: String,
-  expiryYear: String,
-  token: String,
-  deleted: { type: Boolean, default: false },
-  deletedAt: String
-})
+var CreditCard = require('./CreditCard')
 
 var schema = new mongoose.Schema({
   email: String,
@@ -29,13 +11,14 @@ var schema = new mongoose.Schema({
   timestamp: String,
   resetToken: String,
   resetExpiry: String,
-  creditCards: [creditCardSchema],
+  creditCards: [CreditCard.schema],
   role: String,
   ip: String,
   password: String,
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
+
 
 schema.plugin(mongooseDelete)
 
