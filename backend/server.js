@@ -229,6 +229,15 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
 
   server.route({
+    method: 'POST',
+    path: '/users/{user}/creditcards/{creditcard}/charge',
+    config: {
+      auth: 'jwt',
+      handler: creditcardRoutes.postCreditCardPayment
+    }
+  })
+
+  server.route({
     method: 'DELETE',
     path: '/users/{user}/creditcards/{name}',
     config: {
