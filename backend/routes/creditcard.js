@@ -6,10 +6,27 @@ var _ = require('lodash')
 
 exports.getCreditCards = function(request, reply) {
   var role = request.auth.credentials.role
-  var id = request.auth.credentials._id
+  var userId = request.auth.credentials._id
 
-  User.findOneByRole(role, id, function(err, user) {
+  User.findOneByRole(role, userId, function(err, user) {
     return reply(user.creditCards)
+  })
+}
+
+exports.getCreditCard = function(request, reply) {
+  var user = User.getUserIdFromRequest(request)
+  var id = request.params.creditcard
+  var role = request.auth.credentials.role
+
+  User.findOneByRole(role, user, function(err, user) {
+    var creditCard = _.find(user.creditCards, function(card) {
+      return card._id == id;
+    })
+
+    if (creditCard) {
+      return reply(creditCard)
+    }
+    return reply(Boom.notFound('The specified credit card could not be found.'))
   })
 }
 

@@ -96,6 +96,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
+  var creditCardId = null
   lab.test('GET admin', function(done) {
     request({
         method: 'GET',
@@ -109,14 +110,15 @@ lab.experiment('/users/{id}/creditcards', function() {
         expect(response.statusCode, 'to be', 200)
         expect(body.creditCards[0].number, 'to be', '1234')
         expect(body.creditCards[0].token, 'to be', undefined)
+        creditCardId = body.creditCards[0]._id
         done()
       })
   })
 
   lab.test('GET', function(done) {
-      request({
+    request({
         method: 'GET',
-        uri: appUrl + '/users/me/creditcards',
+        uri: appUrl + '/users/'+userId+'/creditcards',
         headers: {
           'Authorization': token
         },
@@ -124,6 +126,36 @@ lab.experiment('/users/{id}/creditcards', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
+        done()
+      })
+  })
+
+  lab.test('GET particular credit card', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/' + userId + '/creditcards/' + creditCardId,
+        headers: {
+          'Authorization': token
+        },
+        json: true
+      },
+      function(error, response, body) {
+        expect(body.number, 'to be', '1234')
+        done()
+      })
+  })
+
+  lab.test('GET particular credit card that does not exist', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/' + userId + '/creditcards/someIdThatDoesntExist',
+        headers: {
+          'Authorization': token
+        },
+        json: true
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 404)
         done()
       })
   })
