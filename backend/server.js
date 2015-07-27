@@ -211,11 +211,29 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
 
   server.route({
+    method: 'GET',
+    path: '/users/{user}/creditcards/{creditcard}',
+    config: {
+      auth: 'jwt',
+      handler: creditcardRoutes.getCreditCard
+    }
+  })
+
+  server.route({
     method: 'POST',
     path: '/users/{user}/creditcards',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.postCreditCards
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/users/{user}/creditcards/{creditcard}/charge',
+    config: {
+      auth: 'jwt',
+      handler: creditcardRoutes.postCreditCardPayment
     }
   })
 

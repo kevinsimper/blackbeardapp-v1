@@ -1,15 +1,138 @@
 var Boom = require('boom')
-var User = require('../models/User')
 var CreditCard = require('../models/CreditCard')
 var stripe = require('stripe')(process.env.STRIPE_SECRET);
 var _ = require('lodash')
+var Promise = require('bluebird')
+var User = require('../models/User')
+var Payment = require('../models/Payment')
+var paymentStatus = require('../models/paymentStatus/')
 
 exports.getCreditCards = function(request, reply) {
   var role = request.auth.credentials.role
-  var id = request.auth.credentials._id
+  var userId = request.auth.credentials._id
 
-  User.findOneByRole(role, id, function(err, user) {
+  User.findOneByRole(role, userId, function(err, user) {
     return reply(user.creditCards)
+  })
+}
+
+// Convenience function to retrieve credit card details
+var getCreditCard = function(request, full) {
+  return new Promise(function(resolve, reject) {
+    var user = User.getUserIdFromRequest(request)
+    var id = request.params.creditcard
+    var role = request.auth.credentials.role
+
+    if (full) {
+      User.findOne({_id: user}, function (err, user) {
+        resolve(_.find(user.creditCards, function (card) {
+          return card._id == id;
+        }))
+      })
+    } else {
+      User.findOneByRole(role, user, function (err, user) {
+        resolve(_.find(user.creditCards, function (card) {
+          return card._id == id;
+        }))
+      })
+    }
+  })
+}
+
+exports.getCreditCard = function(request, reply) {
+  getCreditCard(request, true).then(function(creditCard) {
+    if (creditCard) {
+      return reply(creditCard)
+    }
+    return reply(Boom.notFound('The specified credit card could not be found.'))
+  })
+}
+
+exports.postCreditCardPayment = function(request, reply) {
+  var user = User.getUserIdFromRequest(request)
+  var id = request.params.creditcard
+  var role = request.auth.credentials.role
+  var charge = null
+
+  getCreditCard(request, true).then(function(creditCard) {
+    // Charge this credit card
+    var name = request.payload.name
+    var amount = request.payload.amount
+
+    var paymentSaveCallback = function(err, payment) {
+      if (err) {
+        return reply(Boom.badImplementation('There was a problem with the database.'))
+      }
+
+      return reply({
+        message: 'Payment successfully made.',
+        paymentId: payment._id
+      })
+    }
+
+    var userSaveCallback = function(err, user) {
+      if (err) {
+        return reply(Boom.badImplementation('There was a problem with the database.'))
+      }
+
+      // Now save a Payment entry
+      var newPayment = new Payment({
+        amount: charge.amount,
+        creditcard: creditCard._id,
+        chargeId: charge.id,
+        user: user._id,
+        timestamp: Math.round(Date.now() / 1000),
+        ip: request.info.remoteAddress,
+        status: paymentStatus.SUCCESS
+      })
+
+      newPayment.save(paymentSaveCallback)
+    }
+
+    // Increase users credit
+    User.findOne({_id: user}, function (err, user) {
+      if (err) {
+        return reply(Boom.badImplementation('There was a problem with the database.'))
+      }
+
+      stripe.charges.create({
+        amount: amount,
+        currency: "usd",
+        source: creditCard.token,
+        description: name
+      }, function(err, newCharge) {
+        if (err) {
+          var newPaymentFail = new Payment({
+            amount: amount,
+            creditcard: creditCard._id,
+            user: user._id,
+            timestamp: Math.round(Date.now() / 1000),
+            ip: request.info.remoteAddress,
+            status: paymentStatus.FAIL
+          })
+
+          newPaymentFail.save()
+
+          if (_.has(err, 'code')) {
+            //return reply(Boom.badRequest(err.message, {
+            //  rawType: err.rawType,
+            //  code: err.code,
+            //  param: err.param
+            //}))
+
+            // Because Boom is crap the data sent with this exception is ignored so
+            return reply(Boom.badRequest(err.message))
+          } else {
+            return reply(Boom.badImplementation('There was a problem with the database.'))
+          }
+        }
+
+        charge = newCharge
+        user.credit += newCharge.amount
+
+        user.save(userSaveCallback)
+      });
+    })
   })
 }
 
@@ -66,21 +189,17 @@ exports.postCreditCards = function(request, reply) {
       }
     }, function(err, token) {
       if (err) {
-        // Actually retrieve errors
-        // TODO: Should return actual error message and error code here.
-        // return reply({
-        //   message: err.message,
-        //   rawType: err.rawType,
-        //   code: err.code,
-        //   param: err.param,
-        // })
-        return reply(Boom.badRequest(err.message, {
-          rawType: err.rawType,
-          code: err.code,
-          param: err.param,
-        }))
+        if ('code' in err) {
+          //return reply(Boom.badRequest(err.message, {
+          //  rawType: err.rawType,
+          //  code: err.code,
+          //  param: err.param
+          //}))
+          // Because Boom is crap the data sent with this exception is ignored so
+          return reply(Boom.badRequest(err.message))
+        }
 
-        //return reply(Boom.badImplementation('There was an error saving your credit card details.'))
+        return reply(Boom.badImplementation('There was a problem with the database.'))
       }
 
       newCreditCard = new CreditCard({

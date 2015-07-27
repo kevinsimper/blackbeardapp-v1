@@ -3,8 +3,9 @@ var roles = require('./roles/')
 
 var schema = new mongoose.Schema({
   amount: Number,
-  cardToken: String, // Stripe token for credit card
+  creditCard: {type: mongoose.Schema.Types.ObjectId, ref: 'CreditCard'},
   chargeId: String, // Charge id from Stripe API
+  status: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   timestamp: String,
   ip: String
