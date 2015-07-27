@@ -34,4 +34,24 @@ schema.statics.findOneByRole = function (role, id, cb) {
   return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(cb)
 }
 
-module.exports = mongoose.model('creditCard', schema)
+schema.statics.findByIdsAndRole = function (ids, role, cb) {
+  var fields = []
+  // As default do not show deleted
+  var conditions = {
+    deleted: false
+  }
+
+  if(roles.isAllowed(roles.USER, role)) {
+    fields.push('name', 'number', 'brand')
+  }
+
+  if(roles.isAllowed(roles.ADMIN, role)) {
+    fields.push('expiryYear', 'token', 'deleted', 'deletedAt')
+    // Show deleted to admins
+    conditions = {}
+  }
+
+  return this.where({'_id': { $in: ids }}).where(conditions).select(fields.join(' ')).find(cb)
+}
+
+module.exports = mongoose.model('creditcard', schema)
