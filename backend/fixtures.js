@@ -16,6 +16,15 @@ db.preusers.insert({
   "ip": "127.0.0.1",
   "__v": 0
 });
+db.creditcards.insert({
+  "_id" : ObjectId("55b63553ec5d482b005cfbc6"),
+  "deleted" : false,
+  "name" : "Test Creditcard",
+  "token" : "tok_6gZ0ryDPjVxQdO",
+  "number" : "1234",
+  "brand" : "Visa",
+  "__v" : 0
+})
 db.users.insert({
   "_id": ObjectId("559396be05974b0c00b6b281"),
   "email": "admin+users@blackbeard.io",
@@ -25,12 +34,7 @@ db.users.insert({
   "timestamp": "1435735743",
   "ip": "127.0.0.1",
   "role": "ADMIN",
-  "creditCards": [{ _id: '55b1f17b7b4ad02b00939a81',
-    name: 'Test Creditcard',
-    number: '1234',
-    brand: 'visa',
-    token: '12345678'
-  }],
+  "creditCards": [ObjectId("55b63553ec5d482b005cfbc6")],
   "deleted": false,
   "__v": 0
 });
