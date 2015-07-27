@@ -11,14 +11,13 @@ var schema = new mongoose.Schema({
   timestamp: String,
   resetToken: String,
   resetExpiry: String,
-  creditCards: [CreditCard.schema],
+  creditCards: [{type: mongoose.Schema.Types.ObjectId, ref: 'CreditCard'}],
   role: String,
   ip: String,
   password: String,
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
-
 
 schema.plugin(mongooseDelete)
 
@@ -48,20 +47,23 @@ schema.statics.findOneByRole = function (role, id, cb) {
   }
 
   return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(function(error, result) {
-    // If there is a result and user is not ADMIN then hide payment gateway token
-    if (result && roles.isAllowed(roles.USER, role)) {
-      _.forEach(result.creditCards, function(creditCard, ccKey) {
-        var creditCardSensored = {
-          _id: creditCard._id,
-          name: creditCard.name,
-          number: creditCard.number,
-          brand: creditCard.brand
-        }
-        result.creditCards[ccKey] = creditCardSensored
-      })
+    if (error) {
+      return cb(error, null)
     }
 
-    return cb(error, result)
+    if (result && result.creditCards && result.creditCards.length) {
+      CreditCard.findByIdsAndRole(result.creditCards, role, function (err, creditCards) {
+        var newRes = {}
+        _.each(fields, function (f) {
+          newRes[f] = result[f]
+        })
+        newRes.creditCards = creditCards
+
+        return cb(null, newRes)
+      })
+    } else {
+      return cb(null, result)
+    }
   })
 }
 

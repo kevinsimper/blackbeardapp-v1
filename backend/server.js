@@ -239,7 +239,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'DELETE',
-    path: '/users/{user}/creditcards/{name}',
+    path: '/users/{user}/creditcards/{creditcard}',
     config: {
       auth: 'jwt',
       handler: creditcardRoutes.deleteCreditCards
