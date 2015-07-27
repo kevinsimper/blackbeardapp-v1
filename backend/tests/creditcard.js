@@ -133,7 +133,6 @@ lab.experiment('/users/{id}/creditcards', function() {
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
         expect(body.creditCards[0].number, 'to be', '1234')
-        expect(body.creditCards[0].token, 'to be', undefined)
         creditCardId = body.creditCards[1]._id
         emptyCreditCardId = body.creditCards[2]._id
         done()
@@ -231,17 +230,13 @@ lab.experiment('/users/{id}/creditcards', function() {
   })
 
   lab.test('DELETE', function(done) {
-      var requestData = {
-        name: 'New Card'
-      }
       request({
         method: 'DELETE',
-        uri: appUrl + '/users/me/creditcards/' + requestData.name,
+        uri: appUrl + '/users/' + userId + '/creditcards/' + creditCardId,
         headers: {
           'Authorization': token
         },
-        json: true,
-        body: requestData
+        json: true
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
