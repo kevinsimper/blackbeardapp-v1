@@ -280,6 +280,22 @@ lab.experiment('/users/{id}/creditcards', function() {
     })
   })
 
+  lab.test("GET someone else's creditcards", function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/' + adminUserId + '/creditcards',
+      headers: {
+        'Authorization': userToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.statusCode, 'to be', 401)
+      expect(body.message, 'to be', 'You are not authorized to view other user\'s credit cards.')
+
+      done()
+    })
+  })
+
   lab.test('DELETE', function(done) {
     request({
         method: 'DELETE',

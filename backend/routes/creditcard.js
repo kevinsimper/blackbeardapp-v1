@@ -10,7 +10,11 @@ var roles = require('../models/roles/')
 
 exports.getCreditCards = function(request, reply) {
   var role = request.auth.credentials.role
-  var userId = request.auth.credentials._id
+  var userId = User.getUserIdFromRequest(request)
+
+  if ((role !== roles.ADMIN) && (request.auth.credentials._id !== userId)) {
+    return reply(Boom.unauthorized('You are not authorized to view other user\'s credit cards.'))
+  }
 
   User.findOneByRole(role, userId, function(err, user) {
     return reply(user.creditCards)
