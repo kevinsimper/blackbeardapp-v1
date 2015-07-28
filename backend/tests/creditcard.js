@@ -264,6 +264,22 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
+  lab.test('GET users payment history', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/' + adminUserId + '/payments',
+        headers: {
+          'Authorization': adminToken
+        },
+        json: true
+      },
+      function(error, response, body) {
+        expect(body.length, 'to be', 2)
+
+        done()
+      })
+  })
+
   lab.test("GET someone else's creditcard", function(done) {
     request({
       method: 'GET',
@@ -275,6 +291,22 @@ lab.experiment('/users/{id}/creditcards', function() {
     }, function(error, response, body) {
       expect(body.statusCode, 'to be', 401)
       expect(body.message, 'to be', 'You are not authorized to view the specified credit card.')
+
+      done()
+    })
+  })
+
+  lab.test("GET someone else's payment history", function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/' + adminUserId + '/payments',
+      headers: {
+        'Authorization': userToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.statusCode, 'to be', 401)
+      expect(body.message, 'to be', 'You are not authorized to view other user\'s payments.')
 
       done()
     })

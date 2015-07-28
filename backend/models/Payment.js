@@ -11,24 +11,18 @@ var schema = new mongoose.Schema({
   ip: String
 })
 
-schema.statics.findOneByRole = function (role, id, cb) {
+schema.statics.findByUserAndRole = function (user, role, cb) {
   var fields = []
-  // As default do not show deleted
-  var conditions = {
-      deleted: false
-  }
 
   if(roles.isAllowed(roles.USER, role)) {
     fields.push('amount', 'timestamp')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('cardToken', 'chargeId', 'user', 'ip')
-    // Show deleted to admins
-    conditions = {}
+    fields.push('creditCard', 'chargeId', 'user', 'ip')
   }
 
-  return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(cb)
+  return this.where({user: user}).select(fields.join(' ')).find(cb)
 }
 
 module.exports = mongoose.model('payment', schema)
