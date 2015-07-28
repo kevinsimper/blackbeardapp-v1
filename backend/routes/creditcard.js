@@ -16,35 +16,17 @@ exports.getCreditCards = function(request, reply) {
   })
 }
 
-// Convenience function to retrieve credit card details
-var getCreditCard = function(request, full) {
-  return new Promise(function(resolve, reject) {
-    var user = User.getUserIdFromRequest(request)
-    var id = request.params.creditcard
-    var role = request.auth.credentials.role
-
-    if (full) {
-      User.findOne({_id: user}, function (err, user) {
-        resolve(_.find(user.creditCards, function (card) {
-          return card._id == id;
-        }))
-      })
-    } else {
-      User.findOneByRole(role, user, function (err, user) {
-        resolve(_.find(user.creditCards, function (card) {
-          return card._id == id;
-        }))
-      })
-    }
-  })
-}
-
 exports.getCreditCard = function(request, reply) {
-  getCreditCard(request, true).then(function(creditCard) {
-    if (creditCard) {
-      return reply(creditCard)
+  var user = User.getUserIdFromRequest(request)
+  var id = request.params.creditcard
+  var role = request.auth.credentials.role
+
+  CreditCard.findOneByRole(role, id, function (err, card) {
+    if (err) {
+      return reply(Boom.notFound('The specified credit card could not be found.'))
     }
-    return reply(Boom.notFound('The specified credit card could not be found.'))
+
+    return reply(card)
   })
 }
 
@@ -54,7 +36,11 @@ exports.postCreditCardPayment = function(request, reply) {
   var role = request.auth.credentials.role
   var charge = null
 
-  getCreditCard(request, true).then(function(creditCard) {
+  CreditCard.findOneByRole(role, id, function (err, creditCard) {
+    if (err) {
+      return reply(Boom.notFound('The specified credit card could not be found.'))
+    }
+
     // Charge this credit card
     var name = request.payload.name
     var amount = request.payload.amount
@@ -165,10 +151,22 @@ exports.postCreditCards = function(request, reply) {
     })
   }
 
+  var newCardCallback = function (err, creditCard) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database.'))
+    }
+
+    currentUser.creditCards.push(creditCard._id)
+
+    currentUser.save(updateCallback)
+  }
+
   User.findOne({ _id: id }, function(err, user) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
+
+    currentUser = user
 
     if (!user) {
       return reply(Boom.notFound('The specified user could not be found.'))
@@ -209,54 +207,31 @@ exports.postCreditCards = function(request, reply) {
         brand: token.card.brand
       })
 
-      user.creditCards.push(newCreditCard)
-
-      user.save(updateCallback)
+      newCreditCard.save(newCardCallback)
     });
   })
 }
 
 // /user/XX/creditcards DELETE
 exports.deleteCreditCards = function(request, reply) {
-  if(request.params.user !== 'me') {
-    return reply(Boom.unauthorized('Can\'t access other users!'))
-  }
   var id = User.getUserIdFromRequest(request)
 
-  var name = request.params.name
+  var creditCardId = request.params.creditcard
 
-  var updateCallback = function(err, user) {
+  var deleteCallback = function(err, result) {
     if (err) {
-      return reply(Boom.badImplementation('There was a problem with the database.'))
+      return reply(Boom.badImplementation('There was a problem with the database'))
     }
-    reply({message: 'Creditcard successfully removed.'})
+    reply({
+      message: 'Creditcard successfully removed.'
+    })
   }
 
-  User.findOne({ _id: id }, function(err, user) {
+  CreditCard.findById(creditCardId, function(err, card) {
     if (err) {
-      return reply(Boom.badImplementation('There was a problem with the database.'))
+      return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    if (!user) {
-      return reply(Boom.notFound('The specified user could not be found.'))
-    }
-
-
-    if (!user.creditCards) {
-      return reply(Boom.notFound('The creditcard specified could not be found.'))
-    }
-
-    var removed = _.remove(user.creditCards, function(creditcard) {
-      return creditcard.name === name;
-    })
-    removed.forEach(function(item) {
-      item.remove()
-    })
-
-    if (removed.length === 0) {
-      return reply(Boom.notFound('The creditcard specified could not be found.'))
-    }
-
-    user.save(updateCallback)
+    card.delete(deleteCallback)
   })
 }
