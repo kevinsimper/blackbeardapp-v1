@@ -6,6 +6,7 @@ var Promise = require('bluebird')
 var User = require('../models/User')
 var Payment = require('../models/Payment')
 var paymentStatus = require('../models/paymentStatus/')
+var roles = require('../models/roles/')
 
 exports.getCreditCards = function(request, reply) {
   var role = request.auth.credentials.role
@@ -26,7 +27,21 @@ exports.getCreditCard = function(request, reply) {
       return reply(Boom.notFound('The specified credit card could not be found.'))
     }
 
-    return reply(card)
+    if ((role !== roles.ADMIN) && (user !== 'me')) {
+      User.isUsersCard(role, user, card, function (err, result) {
+        if (err) {
+          return reply(Boom.badImplementation('There was a problem with the database.'))
+        }
+
+        if (!result) {
+          return reply(Boom.unauthorized('You are not authorized to view the specified credit card.'))
+        }
+
+        return reply(card)
+      })
+    } else {
+      return reply(card)
+    }
   })
 }
 
