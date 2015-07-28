@@ -1,6 +1,7 @@
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var request = require('request')
+var Promise = require('bluebird')
+var request = Promise.promisify(require('request'))
 var expect = require('unexpected')
 var _ = require('lodash')
 
@@ -13,7 +14,9 @@ server.start(function() {
 })
 
 lab.experiment('/users/{id}/creditcards', function() {
-  var token = null
+  var adminToken = null
+  var userToken = null
+  var adminUserId = null
   var userId = null
   lab.before(function(done) {
     request({
@@ -26,7 +29,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         }
       },
       function(error, response, body) {
-        token = body.token
+        adminToken = body.token
         done()
       })
   })
@@ -43,7 +46,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         method: 'POST',
         uri: appUrl + '/users/me/creditcards',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true,
         body: requestData
@@ -66,7 +69,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         method: 'POST',
         uri: appUrl + '/users/me/creditcards',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true,
         body: requestData
@@ -90,7 +93,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         method: 'POST',
         uri: appUrl + '/users/me/creditcards',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true,
         body: requestData
@@ -101,21 +104,53 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
-  lab.test('GET admins', function(done) {
+  lab.test('GET admins and test users', function(done) {
+    var requestUserLogin = {
+      email: 'user+test@blackbeard.io',
+      password: 'password'
+    }
+
     request({
-        method: 'GET',
-        uri: appUrl + '/users',
-        json: true,
-        headers: {
-          'Authorization': token
-        }
-      },
-      function(error, response, body) {
+      method: 'POST',
+      uri: appUrl + '/users',
+      json: true,
+      body: requestUserLogin
+    })
+      .spread(function (response, body) {
+        expect(response.statusCode, 'to be', 200)
+        return request({
+          method: 'POST',
+          uri: appUrl + '/login',
+          json: true,
+          body: requestUserLogin
+        })
+      })
+      .spread(function (response, body) {
+        userToken = body.token
+        expect(response.statusCode, 'to be', 200)
+        return request({
+          method: 'GET',
+          uri: appUrl + '/users',
+          json: true,
+          headers: {
+            'Authorization': adminToken
+          }
+        })
+      })
+      .spread(function (response, body) {
         var admin = _.filter(body, function(user) {
           return user.email == 'admin+users@blackbeard.io';
         })
-        userId = admin[0]._id
+        var user = _.filter(body, function(user) {
+          return user.email == 'user+test@blackbeard.io';
+        })
+        adminUserId = admin[0]._id
+        userId = user[0]._id
+
         done()
+      })
+      .catch(function (err) {
+        console.log(err)
       })
   })
 
@@ -124,10 +159,10 @@ lab.experiment('/users/{id}/creditcards', function() {
   lab.test('GET admin', function(done) {
     request({
         method: 'GET',
-        uri: appUrl + '/users/'+userId,
+        uri: appUrl + '/users/'+adminUserId,
         json: true,
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         }
       },
       function(error, response, body) {
@@ -142,9 +177,9 @@ lab.experiment('/users/{id}/creditcards', function() {
   lab.test('GET', function(done) {
     request({
         method: 'GET',
-        uri: appUrl + '/users/'+userId+'/creditcards',
+        uri: appUrl + '/users/'+adminUserId+'/creditcards',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true
       },
@@ -157,9 +192,9 @@ lab.experiment('/users/{id}/creditcards', function() {
   lab.test('GET particular credit card', function(done) {
     request({
         method: 'GET',
-        uri: appUrl + '/users/' + userId + '/creditcards/' + creditCardId,
+        uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true
       },
@@ -172,9 +207,9 @@ lab.experiment('/users/{id}/creditcards', function() {
   lab.test('GET particular credit card that does not exist', function(done) {
     request({
         method: 'GET',
-        uri: appUrl + '/users/' + userId + '/creditcards/someIdThatDoesntExist',
+        uri: appUrl + '/users/' + adminUserId + '/creditcards/someIdThatDoesntExist',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true
       },
@@ -191,9 +226,9 @@ lab.experiment('/users/{id}/creditcards', function() {
     }
     request({
         method: 'POST',
-        uri: appUrl + '/users/' + userId + '/creditcards/' + creditCardId + '/charge',
+        uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId + '/charge',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true,
         body: requestData
@@ -211,9 +246,9 @@ lab.experiment('/users/{id}/creditcards', function() {
     }
     request({
         method: 'POST',
-        uri: appUrl + '/users/' + userId + '/creditcards/' + emptyCreditCardId + '/charge',
+        uri: appUrl + '/users/' + adminUserId + '/creditcards/' + emptyCreditCardId + '/charge',
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true,
         body: requestData
@@ -229,12 +264,44 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
+  lab.test("GET someone else's creditcard", function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
+      headers: {
+        'Authorization': userToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.statusCode, 'to be', 401)
+      expect(body.message, 'to be', 'You are not authorized to view the specified credit card.')
+
+      done()
+    })
+  })
+
+  lab.test("GET someone else's creditcards", function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/' + adminUserId + '/creditcards',
+      headers: {
+        'Authorization': userToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.statusCode, 'to be', 401)
+      expect(body.message, 'to be', 'You are not authorized to view other user\'s credit cards.')
+
+      done()
+    })
+  })
+
   lab.test('DELETE', function(done) {
-      request({
+    request({
         method: 'DELETE',
-        uri: appUrl + '/users/' + userId + '/creditcards/' + creditCardId,
+        uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         },
         json: true
       },
