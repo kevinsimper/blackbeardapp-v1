@@ -26,9 +26,9 @@ var server = new Hapi.Server({
       cors: true
     }
   }
-});
+})
 
-var port = 8000;
+var port = 8000
 server.connection({ port: port })
 
 server.register(require('hapi-auth-jwt2'), function(err) {
@@ -55,10 +55,10 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: false,
       handler: function(request, reply) {
-        reply('hello world');
+        reply('hello world')
       }
     }
-  });
+  })
 
   server.route({
     method: 'GET',
@@ -69,7 +69,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
         reply(request.auth)
       }
     }
-  });
+  })
 
   server.route({
     method: 'GET',
@@ -181,7 +181,16 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       auth: false,
       handler: userRoutes.postLogin
     }
-  });
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/payments',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.getUserPayments
+    }
+  })
 
   server.route({
     method: 'POST',
@@ -236,6 +245,8 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: creditcardRoutes.postCreditCardPayment
     }
   })
+
+
 
   server.route({
     method: 'DELETE',

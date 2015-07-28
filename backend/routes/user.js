@@ -4,12 +4,12 @@ var passwordHash = require('password-hash')
 var Boom = require('boom')
 var config = require('../config')
 var User = require('../models/User')
-var Roles = require('../models/roles/')
+var roles = require('../models/roles/')
 var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
-
+var Payment = require('../models/Payment')
 
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
@@ -62,7 +62,7 @@ exports.postUser = function(request, reply) {
         credit: 0,
         timestamp: Math.round(Date.now() / 1000),
         ip: request.info.remoteAddress,
-        role: Roles.USER // Regular user account
+        role: roles.USER // Regular user account
       })
       newUser.save(insertCallback)
     }
@@ -118,5 +118,22 @@ exports.postLogin = function(request, reply) {
     } else {
       reply(Boom.unauthorized('Invalid email and password combination.'))
     }
+  })
+}
+
+exports.getUserPayments = function(request, reply) {
+  var id = User.getUserIdFromRequest(request)
+  var role = request.auth.credentials.role
+
+  if ((role !== roles.ADMIN) && (id !== 'me') && (id !== request.auth.credentials._id)) {
+    return reply(Boom.unauthorized('You are not authorized to view other user\'s payments.'))
+  }
+
+  Payment.findByUserAndRole(id, role, function(err, payments) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    return reply(payments)
   })
 }
