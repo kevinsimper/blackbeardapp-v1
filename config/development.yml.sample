@@ -4,3 +4,7 @@ common:
     - BACKEND_HOST=http://blackbeard.dev:8000
     - ROUTER_HOST=http://blackbeard.dev:9500
     - STRIPE_SECRET=oss6Rtx2CURfwdcgUqsFnFsiYFaYySI0
+    - LOGGLY_TOKEN=d959d33f-c4bb-4cae-beb3-be298166f008
+    - LOGGLY_SUBDOMAIN=blackbeard
+    - LOGGLY_NAME=blackbeard
+    - LOGGLY_HOSTNAME=blackbeard.io
