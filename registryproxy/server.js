@@ -9,6 +9,7 @@ var auth = require('basic-auth')
 var proxy = require('request')
 var request = Promise.promisify(require('request'))
 var debug = require('debug')('proxy')
+var through2 = require('through2')
 
 var port = 9500
 var options = {
@@ -101,7 +102,19 @@ app.all('/v2/*', function(req, res) {
       debug('Answer', response.statusCode, response.headers['content-type'])
     })
 
-    req.pipe(proxyRequest).pipe(res)
+    req.pipe(through2(function(chunck, enc, callback) {
+      this.push(chunck)
+      if(req.method === 'PUT') {
+        console.log('JSON REQUEST', chunck.toString())
+      }
+      callback()
+    })).pipe(proxyRequest).pipe(through2(function(chunck, enc, callback) {
+      this.push(chunck)
+      if(req.method === 'PUT') {
+        console.log('JSON RESPONSE', chunck.toString())
+      }
+      callback()
+    })).pipe(res)
 
   })
 
