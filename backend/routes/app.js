@@ -130,3 +130,13 @@ exports.deleteContainers = function(request, reply) {
     })
   })
 }
+
+exports.getContainer = function(request, reply) {
+  var app = request.params.app
+  var user = User.getUserIdFromRequest(request)
+  var container = request.params.container
+
+  App.findById(app, function(err, result) {
+    reply(result.containers.id(container))
+  })
+}

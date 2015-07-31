@@ -186,6 +186,19 @@ lab.experiment('/app/containers', function() {
       done()
     })
   })
+  lab.test('GET container', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.status, 'to be', 'Starting')
+      done()
+    })
+  })
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',
