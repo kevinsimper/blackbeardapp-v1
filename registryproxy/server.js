@@ -22,14 +22,14 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
 })
 
 var REGISTRY_HOST
-if(process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
+if (process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
   REGISTRY_HOST = process.env.REGISTRY_HOST
 } else {
   REGISTRY_HOST = 'http://' + ip.trim() + ':5000'
 }
 
 var BACKEND_HOST
-if(process.env.BACKEND_HOST && process.env.NODE_ENV === 'production') {
+if (process.env.BACKEND_HOST && process.env.NODE_ENV === 'production') {
   BACKEND_HOST = process.env.BACKEND_HOST
 } else {
   BACKEND_HOST = 'http://' + ip.trim() + ':8000'
@@ -83,14 +83,14 @@ app.all('/v2/*', function(req, res) {
       return res.end('Access denied')
     }
 
-    debug('Url requested', req.method, url)
     var url = REGISTRY_HOST + req.originalUrl
     var host = req.headers['Host']
-    if(process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       host = 'registry.blackbeard.io'
     }
     var proxyRequest = proxy({
       url: url,
+      method: req.method,
       headers: {
         'Host': host
       }
@@ -100,24 +100,16 @@ app.all('/v2/*', function(req, res) {
     })
     proxyRequest.on('response', function(response) {
       debug('Answer', response.statusCode, response.headers['content-type'])
+      if(response.statusCode === 202 && req.method === 'PUT') {
+        var name = req.originalUrl.split('/')[3]
+        // TODO
+        // PING BACKEND - NEW CONTAINER UPLOADED
+        debug('webhook triggered', name)
+      }
     })
 
-    req.pipe(through2(function(chunck, enc, callback) {
-      this.push(chunck)
-      if(req.method === 'PUT') {
-        console.log('JSON REQUEST', chunck.toString())
-      }
-      callback()
-    })).pipe(proxyRequest).pipe(through2(function(chunck, enc, callback) {
-      this.push(chunck)
-      if(req.method === 'PUT') {
-        console.log('JSON RESPONSE', chunck.toString())
-      }
-      callback()
-    })).pipe(res)
-
+    req.pipe(proxyRequest).pipe(res)
   })
-
 })
 
 app.all('/v1/*', function(req, res) {
@@ -128,7 +120,7 @@ app.all('*', function(req, res) {
   res.redirect('https://blackbeard.io')
 })
 
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
   module.exports = http.createServer(app)
 } else {
   module.exports = https.createServer(options, app)
