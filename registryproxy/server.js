@@ -21,14 +21,14 @@ var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'',
 })
 
 var REGISTRY_HOST
-if(process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
+if (process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
   REGISTRY_HOST = process.env.REGISTRY_HOST
 } else {
   REGISTRY_HOST = 'http://' + ip.trim() + ':5000'
 }
 
 var BACKEND_HOST
-if(process.env.BACKEND_HOST && process.env.NODE_ENV === 'production') {
+if (process.env.BACKEND_HOST && process.env.NODE_ENV === 'production') {
   BACKEND_HOST = process.env.BACKEND_HOST
 } else {
   BACKEND_HOST = 'http://' + ip.trim() + ':8000'
@@ -82,14 +82,14 @@ app.all('/v2/*', function(req, res) {
       return res.end('Access denied')
     }
 
-    debug('Url requested', req.method, url)
     var url = REGISTRY_HOST + req.originalUrl
     var host = req.headers['Host']
-    if(process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       host = 'registry.blackbeard.io'
     }
     var proxyRequest = proxy({
       url: url,
+      method: req.method,
       headers: {
         'Host': host
       }
@@ -99,12 +99,26 @@ app.all('/v2/*', function(req, res) {
     })
     proxyRequest.on('response', function(response) {
       debug('Answer', response.statusCode, response.headers['content-type'])
+      if(response.statusCode === 202 && req.method === 'PUT') {
+        var user = req.originalUrl.split('/')[2]
+        var name = req.originalUrl.split('/')[3]
+
+        // PING BACKEND - NEW CONTAINER UPLOADED
+        request({
+          method: 'POST',
+          uri: BACKEND_HOST + '/webhook/notify/image',
+          json: true,
+          body: {
+            user: user,
+            name: name
+          }
+        })
+        debug('webhook triggered', user, name)
+      }
     })
 
     req.pipe(proxyRequest).pipe(res)
-
   })
-
 })
 
 app.all('/v1/*', function(req, res) {
@@ -115,7 +129,7 @@ app.all('*', function(req, res) {
   res.redirect('https://blackbeard.io')
 })
 
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
   module.exports = http.createServer(app)
 } else {
   module.exports = https.createServer(options, app)

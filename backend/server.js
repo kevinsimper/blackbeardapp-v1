@@ -19,6 +19,7 @@ var adminRoutes = require('./routes/admin')
 var appRoutes = require('./routes/app')
 var creditcardRoutes = require('./routes/creditcard')
 var forgotRoutes = require('./routes/forgot')
+var webhookRoutes = require('./routes/webhook')
 
 var server = new Hapi.Server({
   connections: {
@@ -130,6 +131,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: false,
       handler: frontRoutes.getQueue
+    }
+  })
+  server.route({
+    method: 'POST',
+    path: '/webhook/notify/image',
+    config: {
+      auth: false,
+      handler: webhookRoutes.postNotifyImage
     }
   })
 
