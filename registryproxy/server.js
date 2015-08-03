@@ -9,7 +9,6 @@ var auth = require('basic-auth')
 var proxy = require('request')
 var request = Promise.promisify(require('request'))
 var debug = require('debug')('proxy')
-var through2 = require('through2')
 
 var port = 9500
 var options = {
@@ -101,10 +100,20 @@ app.all('/v2/*', function(req, res) {
     proxyRequest.on('response', function(response) {
       debug('Answer', response.statusCode, response.headers['content-type'])
       if(response.statusCode === 202 && req.method === 'PUT') {
+        var user = req.originalUrl.split('/')[2]
         var name = req.originalUrl.split('/')[3]
-        // TODO
+
         // PING BACKEND - NEW CONTAINER UPLOADED
-        debug('webhook triggered', name)
+        request({
+          method: 'POST',
+          uri: BACKEND_HOST + '/webhook/notify/image',
+          json: true,
+          body: {
+            user: user,
+            name: name
+          }
+        })
+        debug('webhook triggered', user, name)
       }
     })
 

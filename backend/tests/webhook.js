@@ -16,7 +16,12 @@ lab.experiment('/webhook', function() {
   lab.test('/notify/image', function(done) {
     request({
       method: 'POST',
-      uri: appUrl + '/webhook/notify/image'
+      uri: appUrl + '/webhook/notify/image',
+      json: true,
+      body: {
+        user: 'kevinsimper',
+        name: 'busybox'
+      }
     })
     .spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
