@@ -5,6 +5,7 @@ var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
 var CreditcardsFormular = require('../../components/CreditcardsFormular/')
 var Creditcards = require('../../components/Creditcards/')
+var PreviousPayments = require('../PreviousPayments/')
 var ProfileActions = require('./actions')
 
 var Profile = React.createClass({
@@ -62,6 +63,7 @@ var Profile = React.createClass({
         </form>
         <Creditcards/>
         <CreditcardsFormular/>
+        <PreviousPayments/>
       </div>
     );
   }
