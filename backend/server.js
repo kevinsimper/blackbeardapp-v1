@@ -333,6 +333,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
   server.route({
+    method: 'GET',
+    path: '/users/{user}/apps/{app}/containers/{container}',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.getContainer
+    }
+  })
+  server.route({
     method: 'DELETE',
     path: '/users/{user}/apps/{app}/containers/{container}',
     config: {
