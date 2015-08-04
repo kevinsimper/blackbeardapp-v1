@@ -7,10 +7,14 @@ var PreviousPaymentsActions = require('./actions')
 var PreviousPaymentsStore = require('./store')
 
 var PreviousPayments = React.createClass({
+  getState: function() {
+    return {
+      payments: PreviousPaymentsStore.getPayments()
+    }
+  },
   getInitialState: function() {
-    return extend(PreviousPaymentsStore.getPayments(), {
-      loading: false,
-      message: ''
+    return extend(this.getState(), {
+      loaded: false
     })
   },
   componentDidMount: function() {

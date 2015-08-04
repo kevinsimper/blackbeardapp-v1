@@ -19,6 +19,7 @@ var store = Reflux.createStore({
   },
   onLoadCompleted: function(payments) {
     _payments = payments
+    // This breaks
     this.trigger(payments)
   }
 })
