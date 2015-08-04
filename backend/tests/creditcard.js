@@ -279,6 +279,25 @@ lab.experiment('/users/{id}/creditcards', function() {
         done()
       })
   })
+  lab.test('GET current users payment history without using /users/me URL', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/' + userId + '/payments',
+        headers: {
+          'Authorization': userToken
+        },
+        json: true
+      },
+      function(error, response, body) {
+        expect(body, 'to equal', {
+          statusCode: 401,
+          error: 'Unauthorized',
+          message: 'Invalid credentials'
+        })
+
+        done()
+      })
+  })
 
   lab.test("GET someone else's creditcard", function(done) {
     request({
