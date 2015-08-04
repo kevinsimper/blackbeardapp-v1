@@ -267,7 +267,7 @@ lab.experiment('/users/{id}/creditcards', function() {
   lab.test('GET users payment history', function(done) {
     request({
         method: 'GET',
-        uri: appUrl + '/users/' + adminUserId + '/payments',
+        uri: appUrl + '/users/me/payments',
         headers: {
           'Authorization': adminToken
         },
@@ -290,7 +290,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       json: true
     }, function(error, response, body) {
       expect(body.statusCode, 'to be', 401)
-      expect(body.message, 'to be', 'You are not authorized to view the specified credit card.')
+      expect(body.message, 'to be', 'Invalid credentials')
 
       done()
     })
@@ -306,7 +306,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       json: true
     }, function(error, response, body) {
       expect(body.statusCode, 'to be', 401)
-      expect(body.message, 'to be', 'You are not authorized to view other user\'s payments.')
+      expect(body.message, 'to be', 'Invalid credentials')
 
       done()
     })
@@ -322,7 +322,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       json: true
     }, function(error, response, body) {
       expect(body.statusCode, 'to be', 401)
-      expect(body.message, 'to be', 'You are not authorized to view other user\'s credit cards.')
+      expect(body.message, 'to be', 'Invalid credentials')
 
       done()
     })
