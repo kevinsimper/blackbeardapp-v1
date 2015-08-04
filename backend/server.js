@@ -12,6 +12,7 @@ mongoose.connect(config.DATABASE_URL, function() {
 })
 
 var User = require('./models/User.js')
+var userRoles = require('./models/roles')
 var preUsersRoutes = require('./routes/preusers')
 var frontRoutes = require('./routes/front')
 var userRoutes = require('./routes/user')
@@ -41,7 +42,11 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     key: config.AUTH_SECRET,
     validateFunc: function(decoded, request, callback) {
       User.findById(decoded, function(err, user) {
-        if(user) {
+        if ((user.role == userRoles.USER) && (request.path) && (request.path.search("\/") != -1) &&
+          (request.path.substr(0, "/users/".length) == "/users/") && (request.path.split("/")[2] != "me")) {
+          // Non admin user trying to access /user/ path
+          callback(null, false)
+        } else if (user) {
           callback(null, true, user)
         } else {
           callback(null, false)

@@ -29,6 +29,7 @@ schema.statics.getUserIdFromRequest = function(request) {
   }
 }
 
+// Potentially remove this
 schema.statics.isUsersCard = function (role, id, card, cb) {
   // As default do not show deleted
   var conditions = {
