@@ -5,11 +5,15 @@ var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
 var CreditcardsFormular = require('../../components/CreditcardsFormular/')
 var Creditcards = require('../../components/Creditcards/')
+var PreviousPayments = require('../PreviousPayments/')
 var ProfileActions = require('./actions')
 
 var Profile = React.createClass({
+  getState: function() {
+    return ProfileStore.getProfile()
+  },
   getInitialState: function() {
-    return extend(ProfileStore.getProfile(), {
+    return extend(this.getState(), {
       loading: false,
       message: ''
     })
@@ -19,7 +23,7 @@ var Profile = React.createClass({
     this.unsubscribe = ProfileStore.listen(this.onChange)
   },
   onChange: function() {
-    this.setState(this.getInitialState())
+    this.setState(this.getState())
   },
   handleNameChange: function(e) {
     this.setState({
@@ -54,6 +58,8 @@ var Profile = React.createClass({
           <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
           <div>E-mail</div>
           <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
+          <div>Current Balance</div>
+          ${this.state.credit/100}
           <div>
             <Button type='submit'>Update</Button>
           </div>
@@ -62,6 +68,7 @@ var Profile = React.createClass({
         </form>
         <Creditcards/>
         <CreditcardsFormular/>
+        <PreviousPayments/>
       </div>
     );
   }
