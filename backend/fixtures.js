@@ -22,6 +22,7 @@ db.creditcards.insert({
   "name" : "Test Creditcard",
   "token" : "tok_6gZ0ryDPjVxQdO",
   "number" : "1234",
+  "active": true,
   "brand" : "Visa",
   "__v" : 0
 })
