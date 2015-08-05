@@ -83,7 +83,7 @@ exports.postCreditCardPayment = function(request, reply) {
       // Now save a Payment entry
       var newPayment = new Payment({
         amount: charge.amount,
-        creditcard: creditCard._id,
+        creditCard: creditCard._id,
         chargeId: charge.id,
         user: user._id,
         timestamp: Math.round(Date.now() / 1000),
@@ -109,7 +109,7 @@ exports.postCreditCardPayment = function(request, reply) {
         if (err) {
           var newPaymentFail = new Payment({
             amount: amount,
-            creditcard: creditCard._id,
+            creditCard: creditCard._id,
             user: user._id,
             timestamp: Math.round(Date.now() / 1000),
             ip: request.info.remoteAddress,

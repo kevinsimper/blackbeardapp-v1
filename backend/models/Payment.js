@@ -15,7 +15,7 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   var fields = []
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('amount', 'timestamp')
+    fields.push('amount', 'timestamp', 'status')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
