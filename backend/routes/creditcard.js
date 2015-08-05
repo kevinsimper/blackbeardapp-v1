@@ -1,9 +1,9 @@
 var Boom = require('boom')
-var CreditCard = require('../models/CreditCard')
+var Promise = require('bluebird')
+var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
+var User = Promise.promisifyAll(require('../models/User'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET);
 var _ = require('lodash')
-var Promise = require('bluebird')
-var User = require('../models/User')
 var Payment = require('../models/Payment')
 var paymentStatus = require('../models/paymentStatus/')
 var roles = require('../models/roles/')
@@ -47,6 +47,51 @@ exports.getCreditCard = function(request, reply) {
       return reply(card)
     }
   })
+}
+
+exports.postCreditCardActivate = function(request, reply) {
+  var userId = User.getUserIdFromRequest(request)
+  var id = request.params.creditcard
+  var role = request.auth.credentials.role
+
+  var findCreditCards = User.findOneAsync({_id: userId})
+  .then(function (user) {
+      var foundCard = _.find(user.creditCards, function(card) {
+        return card == id
+      })
+
+      if (!foundCard) {
+        reply(Boom.notFound('The specified credit card could not be found.'))
+      } else {
+        return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
+      }
+  })
+
+  var savingCreditCards = findCreditCards.then(function (creditCards) {
+      return _.map(creditCards, function(creditCard) {
+        return new Promise(function (resolve, reject) {
+          creditCard.active = (creditCard.id == id)
+          creditCard.save(function (err, value) {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(value)
+            }
+          })
+        })
+      })
+    })
+
+    Promise.all(savingCreditCards)
+    .then(function(a) {
+      reply({
+        message: 'Credit card set to active.',
+      })
+    })
+  .catch(function(err) {
+        console.log(err)
+      return reply(Boom.badImplementation('There was a problem with the database.'))
+    })
 }
 
 exports.postCreditCardPayment = function(request, reply) {
@@ -223,7 +268,8 @@ exports.postCreditCards = function(request, reply) {
         name: creditcard.name,
         token: token.id,
         number: token.card.last4,
-        brand: token.card.brand
+        brand: token.card.brand,
+        active: (user.creditCards.length === 0)
       })
 
       newCreditCard.save(newCardCallback)

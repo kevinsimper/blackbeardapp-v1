@@ -255,7 +255,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
 
-
+  server.route({
+    method: 'POST',
+    path: '/users/{user}/creditcards/{creditcard}/activate',
+    config: {
+      auth: 'jwt',
+      handler: creditcardRoutes.postCreditCardActivate
+    }
+  })
 
   server.route({
     method: 'DELETE',

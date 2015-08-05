@@ -312,6 +312,49 @@ lab.experiment('/users/{id}/creditcards', function() {
     })
   })
 
+  lab.test("POST activate credit card", function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/users/me/creditcards/' + creditCardId + '/activate',
+      headers: {
+        'Authorization': adminToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.message, 'to be', 'Credit card set to active.')
+
+      done()
+    })
+  })
+
+  lab.test('GET check activation of cards', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/me/creditcards',
+        headers: {
+          'Authorization': adminToken
+        },
+        json: true
+      },
+      function(error, response, body) {
+        var activeCard = _.find(body, function(card) {
+          return card._id == creditCardId
+        })
+
+        expect(activeCard.active, 'to be', true)
+
+        var inactiveCards = _.filter(body, function(card) {
+          return card._id != creditCardId
+        })
+
+        _.each(inactiveCards, function (inactive) {
+          expect(inactive.active, 'to be', false)
+        })
+
+        done()
+      })
+  })
+
   lab.test("GET someone else's creditcards", function(done) {
     request({
       method: 'GET',
