@@ -20,7 +20,7 @@ var PreviousPayments = React.createClass({
     })
   },
   onChange: function() {
-    this.setState(this.getInitialState())
+    this.setState(this.getState())
   },
   componentDidMount: function() {
     PreviousPaymentsActions.load()

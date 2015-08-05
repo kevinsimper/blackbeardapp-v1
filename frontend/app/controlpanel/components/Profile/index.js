@@ -9,8 +9,11 @@ var PreviousPayments = require('../PreviousPayments/')
 var ProfileActions = require('./actions')
 
 var Profile = React.createClass({
+  getState: function() {
+    return ProfileStore.getProfile()
+  },
   getInitialState: function() {
-    return extend(ProfileStore.getProfile(), {
+    return extend(this.getState(), {
       loading: false,
       message: ''
     })
@@ -20,7 +23,7 @@ var Profile = React.createClass({
     this.unsubscribe = ProfileStore.listen(this.onChange)
   },
   onChange: function() {
-    this.setState(this.getInitialState())
+    this.setState(this.getState())
   },
   handleNameChange: function(e) {
     this.setState({
