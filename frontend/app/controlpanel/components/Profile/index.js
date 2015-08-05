@@ -55,6 +55,8 @@ var Profile = React.createClass({
           <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
           <div>E-mail</div>
           <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
+          <div>Current Balance</div>
+          ${this.state.credit/100}
           <div>
             <Button type='submit'>Update</Button>
           </div>
