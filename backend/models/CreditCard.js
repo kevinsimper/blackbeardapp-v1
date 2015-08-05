@@ -8,7 +8,7 @@ var schema = new mongoose.Schema({
   brand: String,
   expiryYear: String,
   token: String,
-  active: Boolean,
+  active:  { type: Boolean, default: false },
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
