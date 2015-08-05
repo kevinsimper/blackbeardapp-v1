@@ -7,6 +7,7 @@ var CreditCard = require('./CreditCard')
 var schema = new mongoose.Schema({
   email: String,
   name: String,
+  username: String,
   credit: Number,
   timestamp: String,
   resetToken: String,
@@ -53,7 +54,7 @@ schema.statics.findOneByRole = function (role, id, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role')
+    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
@@ -69,13 +70,8 @@ schema.statics.findOneByRole = function (role, id, cb) {
 
     if (result && result.creditCards && result.creditCards.length) {
       CreditCard.findByIdsAndRole(result.creditCards, role, function (err, creditCards) {
-        var newRes = {}
-        _.each(fields, function (f) {
-          newRes[f] = result[f]
-        })
-        newRes.creditCards = creditCards
-
-        return cb(null, newRes)
+        result.creditCards = creditCards
+        return cb(null, result)
       })
     } else {
       return cb(null, result)
