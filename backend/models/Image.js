@@ -1,4 +1,5 @@
 var mongoose = require('mongoose')
+var roles = require('./roles/')
 
 var schema = new mongoose.Schema({
   name: String,
