@@ -1,9 +1,10 @@
+var Promise = require('bluebird')
+Promise.longStackTraces()
 var Boom = require('boom')
-var CreditCard = require('../models/CreditCard')
+var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET);
 var _ = require('lodash')
-var Promise = require('bluebird')
-var User = require('../models/User')
+var User = Promise.promisifyAll(require('../models/User'))
 var Payment = require('../models/Payment')
 var paymentStatus = require('../models/paymentStatus/')
 var roles = require('../models/roles/')
@@ -12,12 +13,18 @@ exports.getCreditCards = function(request, reply) {
   var role = request.auth.credentials.role
   var userId = User.getUserIdFromRequest(request)
 
-  if ((role !== roles.ADMIN) && (request.auth.credentials._id !== userId)) {
-    return reply(Boom.unauthorized('You are not authorized to view other user\'s credit cards.'))
-  }
-
-  User.findOneByRole(role, userId, function(err, user) {
-    return reply(user.creditCards)
+  User.findOneByRoleAsync(role, userId)
+  .then(function(user) {
+    console.log('simper', user)
+    return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
+  })
+  .then(function(creditCards) {
+    console.log('kevin', creditCards)
+    return reply(creditCards)
+  })
+  .catch(function(e) {
+    console.log(e)
+    reply(Boom.badImplementation())
   })
 }
 
@@ -26,26 +33,13 @@ exports.getCreditCard = function(request, reply) {
   var id = request.params.creditcard
   var role = request.auth.credentials.role
 
-  CreditCard.findOneByRole(role, id, function (err, card) {
-    if (err) {
-      return reply(Boom.notFound('The specified credit card could not be found.'))
-    }
-
-    if ((role !== roles.ADMIN) && (user !== 'me')) {
-      User.isUsersCard(role, user, card, function (err, result) {
-        if (err) {
-          return reply(Boom.badImplementation('There was a problem with the database.'))
-        }
-
-        if (!result) {
-          return reply(Boom.unauthorized('You are not authorized to view the specified credit card.'))
-        }
-
-        return reply(card)
-      })
-    } else {
-      return reply(card)
-    }
+  CreditCard.findOneByRoleAsync(id, role).then(function(card) {
+    return reply(card)
+  }).catch(function(CastError, e) {
+    reply(Boom.notFound())
+  }).catch(function(e) {
+    console.log(e)
+    reply(Boom.badImplementation())
   })
 }
 
@@ -55,7 +49,7 @@ exports.postCreditCardPayment = function(request, reply) {
   var role = request.auth.credentials.role
   var charge = null
 
-  CreditCard.findOneByRole(role, id, function (err, creditCard) {
+  CreditCard.findOneByRole(id, role, function (err, creditCard) {
     if (err) {
       return reply(Boom.notFound('The specified credit card could not be found.'))
     }

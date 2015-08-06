@@ -12,7 +12,7 @@ var schema = new mongoose.Schema({
   timestamp: String,
   resetToken: String,
   resetExpiry: String,
-  creditCards: [{type: mongoose.Schema.Types.ObjectId, ref: 'CreditCard'}],
+  creditCards: [{type: mongoose.Schema.Types.ObjectId, ref: 'creditcard'}],
   role: String,
   ip: String,
   password: String,
@@ -68,14 +68,7 @@ schema.statics.findOneByRole = function (role, id, cb) {
       return cb(error, null)
     }
 
-    if (result && result.creditCards && result.creditCards.length) {
-      CreditCard.findByIdsAndRole(result.creditCards, role, function (err, creditCards) {
-        result.creditCards = creditCards
-        return cb(null, result)
-      })
-    } else {
-      return cb(null, result)
-    }
+    return cb(null, result)
   })
 }
 
