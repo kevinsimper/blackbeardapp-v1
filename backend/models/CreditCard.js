@@ -14,7 +14,7 @@ var schema = new mongoose.Schema({
 
 schema.plugin(mongooseDelete)
 
-schema.statics.findOneByRole = function (role, id, cb) {
+schema.statics.findOneByRole = function (id, role, cb) {
   var fields = []
   // As default do not show deleted
   var conditions = {

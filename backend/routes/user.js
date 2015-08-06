@@ -1,9 +1,8 @@
-var MongoClient = require('mongodb').MongoClient
-var ObjectID = require('mongodb').ObjectID
+var Promise = require('bluebird')
 var passwordHash = require('password-hash')
 var Boom = require('boom')
 var config = require('../config')
-var User = require('../models/User')
+var User = Promise.promisifyAll(require('../models/User'))
 var roles = require('../models/roles/')
 var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
@@ -31,6 +30,50 @@ exports.getOneUser = function(request, reply) {
     }
     reply(user)
   })
+}
+
+exports.postUserUsername = function(request, reply) {
+  var id = User.getUserIdFromRequest(request)
+  var role = request.auth.credentials.role
+  var username = request.payload.username
+
+  var user = User.findOneByRoleAsync(role, id)
+
+  var existing = user.then(function(user) {
+    if(user.username) {
+      reply({
+        message: 'You already have a username'
+      })
+    } else {
+      return User.findOneAsync({ username: username })
+    }
+  })
+  .then(function(existing) {
+    if(existing) {
+      reply({
+        message: 'Username already taken!'
+      })
+      return true
+    } else {
+      return false
+    }
+  })
+
+  Promise.all([user, existing]).spread(function(user, existing) {
+    if(!existing) {
+      user.username = username
+      user.save(function() {
+        reply({
+          message: 'Username saved!'
+        })
+      })
+    }
+  })
+  .catch(function(e) {
+    console.log(e)
+    reply(Boom.badImplementation())
+  })
+
 }
 
 // /user
