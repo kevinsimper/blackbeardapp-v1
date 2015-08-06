@@ -52,7 +52,6 @@ exports.postNotifyImage = function(request, reply) {
     reply("ok")
   }).catch(function(e) {
     if (e === "User not found") {
-      console.log(e)
       reply("ok")
     } else {
       console.log(e)
