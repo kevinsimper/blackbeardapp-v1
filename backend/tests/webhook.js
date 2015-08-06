@@ -13,19 +13,37 @@ server.start(function() {
 })
 
 lab.experiment('/webhook', function() {
-  lab.test('/notify/image', function(done) {
+  //lab.test('/notify/image', function(done) {
+  //  request({
+  //    method: 'POST',
+  //    uri: appUrl + '/webhook/notify/image',
+  //    json: true,
+  //    body: {
+  //      user: 'blackbeard',
+  //      name: 'busybox'
+  //    }
+  //  })
+  //    .spread(function(response, body) {
+  //      expect(response.statusCode, 'to be', 200)
+  //      done()
+  //    })
+  //})
+  // ABOVE COMMENTED
+
+  lab.test('/notify/image unknown user', function(done) {
     request({
       method: 'POST',
       uri: appUrl + '/webhook/notify/image',
       json: true,
       body: {
-        user: 'kevinsimper',
+        user: 'unknown',
         name: 'busybox'
       }
     })
-    .spread(function(response, body) {
-      expect(response.statusCode, 'to be', 200)
-      done()
-    })
+      .spread(function(response, body) {
+        expect(response.statusCode, 'to be', 404)
+        done()
+      })
   })
+
 })
