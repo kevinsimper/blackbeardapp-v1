@@ -15,15 +15,12 @@ exports.getCreditCards = function(request, reply) {
 
   User.findOneByRoleAsync(role, userId)
   .then(function(user) {
-    console.log('simper', user)
     return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
   })
   .then(function(creditCards) {
-    console.log('kevin', creditCards)
     return reply(creditCards)
   })
   .catch(function(e) {
-    console.log(e)
     reply(Boom.badImplementation())
   })
 }

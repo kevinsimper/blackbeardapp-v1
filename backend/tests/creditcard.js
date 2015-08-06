@@ -182,9 +182,9 @@ lab.experiment('/users/{id}/creditcards', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
-        expect(body.creditCards[0].number, 'to be', '1234')
-        creditCardId = body.creditCards[1]._id
-        emptyCreditCardId = body.creditCards[2]._id
+        expect(body[0].number, 'to be', '1234')
+        creditCardId = body[1]._id
+        emptyCreditCardId = body[2]._id
         done()
       })
   })
