@@ -41,7 +41,7 @@ lab.experiment('/webhook', function() {
       }
     })
       .spread(function(response, body) {
-        expect(response.statusCode, 'to be', 404)
+        expect(response.statusCode, 'to be', 200)
         done()
       })
   })

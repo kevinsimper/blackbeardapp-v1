@@ -10,17 +10,12 @@ exports.postNotifyImage = function(request, reply) {
   var user = User.findOneAsync({username: username})
 
   user.then(function(foundUser) {
-    console.log({foundUser: foundUser, user: user})
-
     if (!foundUser) {
-      console.log("after not found")
-      reply("Not found")
+      throw "User not found"
     } else {
       return Image.findOneAsync({ name: name })
     }
   }).then(function(image) {
-    console.log("after not found 2")
-
     if (!image) {
      // Create image
       var newImage = new Image({
@@ -56,7 +51,7 @@ exports.postNotifyImage = function(request, reply) {
   }).then(function(image) {
     reply("ok")
   }).catch(function(e) {
-    if (e === "Not found") {
+    if (e === "User not found") {
       console.log(e)
       reply("ok")
     } else {
