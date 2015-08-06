@@ -8,7 +8,7 @@ var Payment = require('../models/Payment')
 var paymentStatus = require('../models/paymentStatus/')
 var roles = require('../models/roles/')
 
-exports.getCreditCards = function(request, reply) {
+exports.getCreditCards = function (request, reply) {
   var role = request.auth.credentials.role
   var userId = User.getUserIdFromRequest(request)
 
@@ -16,12 +16,12 @@ exports.getCreditCards = function(request, reply) {
     return reply(Boom.unauthorized('You are not authorized to view other user\'s credit cards.'))
   }
 
-  User.findOneByRole(role, userId, function(err, user) {
+  User.findOneByRole(role, userId, function (err, user) {
     return reply(user.creditCards)
   })
 }
 
-exports.getCreditCard = function(request, reply) {
+exports.getCreditCard = function (request, reply) {
   var user = User.getUserIdFromRequest(request)
   var id = request.params.creditcard
   var role = request.auth.credentials.role
@@ -49,52 +49,49 @@ exports.getCreditCard = function(request, reply) {
   })
 }
 
-exports.postCreditCardActivate = function(request, reply) {
+exports.postCreditCardActivate = function (request, reply) {
   var userId = User.getUserIdFromRequest(request)
   var id = request.params.creditcard
   var role = request.auth.credentials.role
 
-  var findCreditCards = User.findOneAsync({_id: userId})
-  .then(function (user) {
-      var foundCard = _.find(user.creditCards, function(card) {
-        return card == id
-      })
+  var findCreditCards = User.findOneAsync({_id: userId}).then(function (user) {
+    var foundCard = _.find(user.creditCards, function (card) {
+      return card == id
+    })
 
-      if (!foundCard) {
-        reply(Boom.notFound('The specified credit card could not be found.'))
-      } else {
-        return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
-      }
+    if (!foundCard) {
+      reply(Boom.notFound('The specified credit card could not be found.'))
+    } else {
+      return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
+    }
   })
 
   var savingCreditCards = findCreditCards.then(function (creditCards) {
-      return _.map(creditCards, function(creditCard) {
-        return new Promise(function (resolve, reject) {
-          creditCard.active = (creditCard.id == id)
-          creditCard.save(function (err, value) {
-            if (err) {
-              reject(err)
-            } else {
-              resolve(value)
-            }
-          })
+    return _.map(creditCards, function (creditCard) {
+      return new Promise(function (resolve, reject) {
+        creditCard.active = (creditCard.id == id)
+        creditCard.save(function (err, value) {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(value)
+          }
         })
       })
     })
+  })
 
-    Promise.all(savingCreditCards)
-    .then(function(a) {
-      reply({
-        message: 'Credit card set to active.',
-      })
+  Promise.all(savingCreditCards).then(function (a) {
+    reply({
+      message: 'Credit card set to active.',
     })
-  .catch(function(err) {
-        console.log(err)
-      return reply(Boom.badImplementation('There was a problem with the database.'))
-    })
+  }).catch(function (err) {
+    console.log(err)
+    return reply(Boom.badImplementation('There was a problem with the database.'))
+  })
 }
 
-exports.postCreditCardPayment = function(request, reply) {
+exports.postCreditCardPayment = function (request, reply) {
   var user = User.getUserIdFromRequest(request)
   var id = request.params.creditcard
   var role = request.auth.credentials.role
@@ -109,7 +106,7 @@ exports.postCreditCardPayment = function(request, reply) {
     var name = request.payload.name
     var amount = request.payload.amount
 
-    var paymentSaveCallback = function(err, payment) {
+    var paymentSaveCallback = function (err, payment) {
       if (err) {
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
@@ -120,7 +117,7 @@ exports.postCreditCardPayment = function(request, reply) {
       })
     }
 
-    var userSaveCallback = function(err, user) {
+    var userSaveCallback = function (err, user) {
       if (err) {
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
@@ -150,7 +147,7 @@ exports.postCreditCardPayment = function(request, reply) {
         currency: "usd",
         source: creditCard.token,
         description: name
-      }, function(err, newCharge) {
+      }, function (err, newCharge) {
         if (err) {
           var newPaymentFail = new Payment({
             amount: amount,
@@ -187,11 +184,11 @@ exports.postCreditCardPayment = function(request, reply) {
 }
 
 // /user/XX/creditcards POST
-exports.postCreditCards = function(request, reply) {
+exports.postCreditCards = function (request, reply) {
   var newCreditCard = null
   var currentUser = null
 
-  if(request.params.user !== 'me') {
+  if (request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
   }
   var id = User.getUserIdFromRequest(request)
@@ -204,7 +201,7 @@ exports.postCreditCards = function(request, reply) {
     cvv: request.payload.cvv
   }
 
-  var updateCallback = function(err, user) {
+  var updateCallback = function (err, user) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
@@ -225,7 +222,7 @@ exports.postCreditCards = function(request, reply) {
     currentUser.save(updateCallback)
   }
 
-  User.findOne({ _id: id }, function(err, user) {
+  User.findOne({_id: id}, function (err, user) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
@@ -249,7 +246,7 @@ exports.postCreditCards = function(request, reply) {
         exp_year: creditcard.expiryYear,
         cvc: creditcard.cvv
       }
-    }, function(err, token) {
+    }, function (err, token) {
       if (err) {
         if ('code' in err) {
           //return reply(Boom.badRequest(err.message, {
@@ -278,12 +275,12 @@ exports.postCreditCards = function(request, reply) {
 }
 
 // /user/XX/creditcards DELETE
-exports.deleteCreditCards = function(request, reply) {
+exports.deleteCreditCards = function (request, reply) {
   var id = User.getUserIdFromRequest(request)
 
   var creditCardId = request.params.creditcard
 
-  var deleteCallback = function(err, result) {
+  var deleteCallback = function (err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
@@ -292,7 +289,7 @@ exports.deleteCreditCards = function(request, reply) {
     })
   }
 
-  CreditCard.findById(creditCardId, function(err, card) {
+  CreditCard.findById(creditCardId, function (err, card) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }

@@ -10,6 +10,11 @@ var CreditcardsItem = React.createClass({
     CreditcardsActions.activate(this.props.item._id)
   },
   render: function() {
+    var styles = {
+      buttonRight: {
+        marginLeft: '1em'
+      }
+    }
     return (
       <div className="CreditcardsItem">
         <div>{this.props.item.active ?
@@ -21,10 +26,7 @@ var CreditcardsItem = React.createClass({
         <div>
           <Button onClick={this.onClickDelete}>Delete</Button>
           {!this.props.item.active ?
-            <span>
-              &nbsp;
-              <Button onClick={this.onClickActivate}>Activate</Button>
-            </span>
+            <Button className='Button' style={styles.buttonRight} onClick={this.onClickActivate}>Activate</Button>
             :
             <span></span>
           }
