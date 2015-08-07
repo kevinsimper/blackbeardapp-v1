@@ -41,7 +41,7 @@ gulp.task('browserify', function() {
     return b.bundle();
   });
 
-  return gulp.src(['./app/index.js'])
+  return gulp.src(['./app/frontpage/index.js'])
     .pipe(browserified)
     .pipe(rename('bundle.js'))
     .pipe(gulpif(production, uglify()))
