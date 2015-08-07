@@ -19,13 +19,27 @@ lab.experiment('/webhook', function() {
       uri: appUrl + '/webhook/notify/image',
       json: true,
       body: {
-        user: 'kevinsimper',
+        user: 'blackbeard',
         name: 'busybox'
       }
-    })
-    .spread(function(response, body) {
+    }).spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
       done()
     })
   })
+  lab.test('/notify/image unknown user', function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/webhook/notify/image',
+      json: true,
+      body: {
+        user: 'unknown',
+        name: 'busybox'
+      }
+    }).spread(function(response, body) {
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
+  })
+
 })
