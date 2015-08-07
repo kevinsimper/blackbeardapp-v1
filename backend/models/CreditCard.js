@@ -38,7 +38,7 @@ var getFieldsAndConditions = function (role) {
   }
 }
 
-schema.statics.findOneByRole = function (role, id, cb) {
+schema.statics.findOneByRole = function (id, role, cb) {
   var fieldsAndConditions = getFieldsAndConditions(role)
 
   return this.where('_id', id).where(fieldsAndConditions.conditions).select(fieldsAndConditions.fields.join(' ')).findOne(cb)
