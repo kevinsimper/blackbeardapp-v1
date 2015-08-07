@@ -1,7 +1,7 @@
 var React = require('react')
 var classNames = require('classnames')
 var request = require('superagent')
-var queue = require('./queue')
+var queue = require('../../queue')
 
 
 var BACKEND_HOST = process.env.BACKEND_HOST;
