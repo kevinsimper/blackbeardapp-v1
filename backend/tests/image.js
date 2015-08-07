@@ -8,48 +8,62 @@ var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
 
 var server = require('../server')
-server.start(function() {
+server.start(function () {
   console.log('Server running at:', server.info.uri)
 })
 
-lab.experiment('/users', function() {
+lab.experiment('/users', function () {
   var token
   var testUserEmail = 'user+test+creation@blackbeard.io'
   var userId
 
-/*
-  lab.before(function(done) {
-    var requestData = {
-      email: testUserEmail,
-      password: 'password'
-    }
-
+  lab.before(function (done) {
     request({
-      method: 'POST',
-      uri: appUrl + '/users',
-      json: true,
-      body: requestData
-    })
-      .spread(function(response, body) {
-        expect(response.statusCode, 'to be', 200)
-        return request({
-          method: 'POST',
-          uri: appUrl + '/login',
-          json: true,
-          body: requestData
-        })
-      })
-      .spread(function(response, body) {
-        expect(response.statusCode, 'to be', 200)
+        method: 'POST',
+        uri: appUrl + '/login',
+        json: true,
+        body: {
+          email: 'admin+users@blackbeard.io',
+          password: 'password'
+        }
+      },
+      function (error, response, body) {
         token = body.token
         done()
       })
-      .catch(function(err) {
-        console.log(err)
-      })
   })
 
-  lab.test('GET /me/images', function(done) {
+  lab.test('/notify/image', function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/webhook/notify/image',
+      json: true,
+      body: {
+        user: 'blackbeard',
+        name: 'busybox'
+      }
+    }).spread(function(response, body) {
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
+  })
+
+  lab.test('/notify/image unknown user', function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/webhook/notify/image',
+      json: true,
+      body: {
+        user: 'unknown',
+        name: 'busybox'
+      }
+    }).spread(function(response, body) {
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
+  })
+
+  lab.test('GET /me/images', function (done) {
     request({
         method: 'GET',
         uri: appUrl + '/users/me/images',
@@ -58,13 +72,10 @@ lab.experiment('/users', function() {
           'Authorization': token
         }
       },
-      function(error, response, body) {
-        //expect(response.statusCode, 'to be', 200)
-        //// User should not have creditcard details attached as we are querying not as ADMIN but USER
-        //expect(response.creditCards, 'to be', undefined)
-        //userId = body._id
+      function (error, response, body) {
+        expect(body[1], 'to satisfy', {name: 'busybox'})
+
         done()
       })
   })
-*/
 })
