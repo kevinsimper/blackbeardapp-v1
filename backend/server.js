@@ -18,6 +18,7 @@ var frontRoutes = require('./routes/front')
 var userRoutes = require('./routes/user')
 var adminRoutes = require('./routes/admin')
 var appRoutes = require('./routes/app')
+var imageRoutes = require('./routes/image')
 var creditcardRoutes = require('./routes/creditcard')
 var forgotRoutes = require('./routes/forgot')
 var webhookRoutes = require('./routes/webhook')
@@ -359,6 +360,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: 'jwt',
       handler: appRoutes.deleteContainers
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/images',
+    config: {
+      auth: 'jwt',
+      handler: imageRoutes.getImages
     }
   })
 })
