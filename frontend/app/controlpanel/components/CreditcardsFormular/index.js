@@ -46,7 +46,7 @@ var CreditcardsFormular = React.createClass({
   render: function() {
     return (
       <form className='Payment' onSubmit={this.onSubmit}>
-        <h2>Payment</h2>
+        <h2>New Credit Card</h2>
         <Label>Name</Label>
         <Input placeholder='Master Department Mastercard' valueLink={this.linkState('name')}/>
         <Label>Card Number</Label>

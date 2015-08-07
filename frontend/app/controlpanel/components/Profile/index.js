@@ -7,6 +7,7 @@ var CreditcardsFormular = require('../../components/CreditcardsFormular/')
 var Creditcards = require('../../components/Creditcards/')
 var PreviousPayments = require('../PreviousPayments/')
 var ProfileActions = require('./actions')
+var moment = require('moment')
 
 var Profile = React.createClass({
   getState: function() {
@@ -54,18 +55,22 @@ var Profile = React.createClass({
       <div>
         <form onSubmit={this.onSubmit}>
           <h1>Profile</h1>
+          <h2>Personal</h2>
           <div>Name</div>
           <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
           <div>E-mail</div>
           <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
-          <div>Current Balance</div>
-          ${this.state.credit/100}
           <div>
             <Button type='submit'>Update</Button>
           </div>
           {this.state.loading && <div>Loading...</div>}
           {this.state.message}
         </form>
+        <h2>Information</h2>
+          <div>Current Balance</div>
+          ${this.state.credit/100}
+          <div>Registration Date</div>
+          {moment.unix(this.state.timestamp).format()}
         <Creditcards/>
         <CreditcardsFormular/>
         <PreviousPayments/>

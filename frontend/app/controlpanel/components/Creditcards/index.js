@@ -25,7 +25,7 @@ var Creditcards = React.createClass({
   render: function() {
     return (
       <div className='Creditcards'>
-        <h2>Creditcards</h2>
+        <h2>Credit Cards</h2>
         {this.state.creditCards.map(function(item) {
           return <CreditcardsItem item={item}/>
         })}

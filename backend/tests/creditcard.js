@@ -9,16 +9,16 @@ var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
 
 var server = require('../server')
-server.start(function() {
+server.start(function () {
   console.log('Server running at:', server.info.uri)
 })
 
-lab.experiment('/users/{id}/creditcards', function() {
+lab.experiment('/users/{id}/creditcards', function () {
   var adminToken = null
   var userToken = null
   var adminUserId = null
   var userId = null
-  lab.before(function(done) {
+  lab.before(function (done) {
     request({
         method: 'POST',
         uri: appUrl + '/login',
@@ -28,21 +28,21 @@ lab.experiment('/users/{id}/creditcards', function() {
           password: 'password'
         }
       },
-      function(error, response, body) {
+      function (error, response, body) {
         adminToken = body.token
         done()
       })
   })
 
-  lab.test('POST', function(done) {
-      var requestData = {
-        name: 'New Card',
-        creditcard: '4111111111111111',
-        expiryMonth: '06',
-        expiryYear: '2018',
-        cvv: '123'
-      }
-      request({
+  lab.test('POST', function (done) {
+    var requestData = {
+      name: 'New Card',
+      creditcard: '4111111111111111',
+      expiryMonth: '06',
+      expiryYear: '2018',
+      cvv: '123'
+    }
+    request({
         method: 'POST',
         uri: appUrl + '/users/me/creditcards',
         headers: {
@@ -51,21 +51,21 @@ lab.experiment('/users/{id}/creditcards', function() {
         json: true,
         body: requestData
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
         done()
       })
   })
 
-  lab.test('POST invalid', function(done) {
-      var requestData = {
-        name: 'New Card',
-        creditcard: '12',
-        expiryMonth: '06',
-        expiryYear: '2018',
-        cvv: '123'
-      }
-      request({
+  lab.test('POST invalid', function (done) {
+    var requestData = {
+      name: 'New Card',
+      creditcard: '12',
+      expiryMonth: '06',
+      expiryYear: '2018',
+      cvv: '123'
+    }
+    request({
         method: 'POST',
         uri: appUrl + '/users/me/creditcards',
         headers: {
@@ -74,14 +74,14 @@ lab.experiment('/users/{id}/creditcards', function() {
         json: true,
         body: requestData
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(body.statusCode, 'to be', 400)
         expect(body.message, 'to be', 'This card number looks invalid.')
         done()
       })
   })
 
-  lab.test('POST test card 2', function(done) {
+  lab.test('POST test card 2', function (done) {
     var requestData = {
       name: 'Special empty card',
       creditcard: '4000000000000002',
@@ -98,13 +98,13 @@ lab.experiment('/users/{id}/creditcards', function() {
         json: true,
         body: requestData
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
         done()
       })
   })
 
-  lab.test('GET admins and test users', function(done) {
+  lab.test('GET admins and test users', function (done) {
     var requestUserLogin = {
       email: 'user+test@blackbeard.io',
       password: 'password'
@@ -138,10 +138,10 @@ lab.experiment('/users/{id}/creditcards', function() {
         })
       })
       .spread(function (response, body) {
-        var admin = _.filter(body, function(user) {
+        var admin = _.filter(body, function (user) {
           return user.email == 'admin+users@blackbeard.io';
         })
-        var user = _.filter(body, function(user) {
+        var user = _.filter(body, function (user) {
           return user.email == 'user+test@blackbeard.io';
         })
         adminUserId = admin[0]._id
@@ -156,7 +156,7 @@ lab.experiment('/users/{id}/creditcards', function() {
 
   var creditCardId = null
   var emptyCreditCardId = null
-  lab.test('GET admin', function(done) {
+  lab.test('GET admin', function (done) {
     request({
         method: 'GET',
         uri: appUrl + '/users/' + adminUserId,
@@ -165,13 +165,13 @@ lab.experiment('/users/{id}/creditcards', function() {
           'Authorization': adminToken
         }
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
         done()
       })
   })
 
-  lab.test('GET', function(done) {
+  lab.test('GET', function (done) {
     request({
         method: 'GET',
         uri: appUrl + '/users/' + adminUserId + '/creditcards',
@@ -180,7 +180,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         },
         json: true
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
         expect(body[0].number, 'to be', '1234')
         creditCardId = body[1]._id
@@ -189,7 +189,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
-  lab.test('GET particular credit card', function(done) {
+  lab.test('GET particular credit card', function (done) {
     request({
         method: 'GET',
         uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
@@ -198,13 +198,13 @@ lab.experiment('/users/{id}/creditcards', function() {
         },
         json: true
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(body.number, 'to be', '1111')
         done()
       })
   })
 
-  lab.test('GET particular credit card that does not exist', function(done) {
+  lab.test('GET particular credit card that does not exist', function (done) {
     request({
         method: 'GET',
         uri: appUrl + '/users/' + adminUserId + '/creditcards/someIdThatDoesntExist',
@@ -213,13 +213,13 @@ lab.experiment('/users/{id}/creditcards', function() {
         },
         json: true
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 404)
         done()
       })
   })
 
-  lab.test('POST charge user', function(done) {
+  lab.test('POST charge user', function (done) {
     var requestData = {
       name: 'New Charge',
       amount: 50 // 50 cent charge
@@ -233,13 +233,13 @@ lab.experiment('/users/{id}/creditcards', function() {
         json: true,
         body: requestData
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(body.message, 'to be', 'Payment successfully made.')
         done()
       })
   })
 
-  lab.test('POST charge user with empty card', function(done) {
+  lab.test('POST charge user with empty card', function (done) {
     var requestData = {
       name: 'New Charge',
       amount: 50 // 50 cent charge
@@ -253,7 +253,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         json: true,
         body: requestData
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(body, 'to equal', {
           statusCode: 400,
           error: 'Bad Request',
@@ -264,7 +264,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
-  lab.test('GET users payment history', function(done) {
+  lab.test('GET users payment history', function (done) {
     request({
         method: 'GET',
         uri: appUrl + '/users/me/payments',
@@ -273,7 +273,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         },
         json: true
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(body.length, 'to be', 2)
 
         done()
@@ -299,7 +299,7 @@ lab.experiment('/users/{id}/creditcards', function() {
       })
   })
 
-  lab.test("GET someone else's creditcard", function(done) {
+  lab.test("GET someone else's creditcard", function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
@@ -307,7 +307,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         'Authorization': userToken
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(body.statusCode, 'to be', 401)
       expect(body.message, 'to be', 'Invalid credentials')
 
@@ -315,7 +315,7 @@ lab.experiment('/users/{id}/creditcards', function() {
     })
   })
 
-  lab.test("GET someone else's payment history", function(done) {
+  lab.test("GET someone else's payment history", function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/' + adminUserId + '/payments',
@@ -323,7 +323,7 @@ lab.experiment('/users/{id}/creditcards', function() {
         'Authorization': userToken
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(body.statusCode, 'to be', 401)
       expect(body.message, 'to be', 'Invalid credentials')
 
@@ -331,7 +331,49 @@ lab.experiment('/users/{id}/creditcards', function() {
     })
   })
 
-  lab.test("GET someone else's creditcards", function(done) {
+  lab.test("POST activate credit card", function (done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/users/me/creditcards/' + creditCardId + '/activate',
+      headers: {
+        'Authorization': adminToken
+      },
+      json: true
+    }, function (error, response, body) {
+      expect(body.message, 'to be', 'Credit card set to active.')
+      done()
+    })
+  })
+
+  lab.test('GET check activation of cards', function (done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/me/creditcards',
+        headers: {
+          'Authorization': adminToken
+        },
+        json: true
+      },
+      function (error, response, body) {
+        var activeCard = _.find(body, function (card) {
+          return card._id == creditCardId
+        })
+
+        expect(activeCard.active, 'to be', true)
+
+        var inactiveCards = _.filter(body, function (card) {
+          return card._id != creditCardId
+        })
+
+        _.each(inactiveCards, function (inactive) {
+          expect(inactive.active, 'to be', false)
+        })
+
+        done()
+      })
+  })
+
+  lab.test("GET someone else's creditcards", function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/' + adminUserId + '/creditcards',
@@ -339,26 +381,25 @@ lab.experiment('/users/{id}/creditcards', function() {
         'Authorization': userToken
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(body.statusCode, 'to be', 401)
-      expect(body.message, 'to be', 'Invalid credentials')
+      expect(body.message, 'to be', 'You are not authorized to view other user\'s credit cards.')
 
       done()
     })
   })
 
-  lab.test('DELETE', function(done) {
+  lab.test('DELETE', function (done) {
     request({
-        method: 'DELETE',
-        uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
-        headers: {
-          'Authorization': adminToken
-        },
-        json: true
+      method: 'DELETE',
+      uri: appUrl + '/users/' + adminUserId + '/creditcards/' + creditCardId,
+      headers: {
+        'Authorization': adminToken
       },
-      function(error, response, body) {
-        expect(response.statusCode, 'to be', 200)
-        done()
-      })
+      json: true
+    }, function (error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
   })
 })
