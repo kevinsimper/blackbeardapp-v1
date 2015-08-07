@@ -17,6 +17,7 @@ lab.experiment('/users', function() {
   var testUserEmail = 'user+test+creation@blackbeard.io'
   var userId
 
+/*
   lab.before(function(done) {
     var requestData = {
       email: testUserEmail,
@@ -49,9 +50,6 @@ lab.experiment('/users', function() {
   })
 
   lab.test('GET /me/images', function(done) {
-    console.log("TOKEN")
-    console.log(token)
-
     request({
         method: 'GET',
         uri: appUrl + '/users/me/images',
@@ -65,8 +63,8 @@ lab.experiment('/users', function() {
         //// User should not have creditcard details attached as we are querying not as ADMIN but USER
         //expect(response.creditCards, 'to be', undefined)
         //userId = body._id
-        console.log([error, body])
         done()
       })
   })
+*/
 })
