@@ -7,8 +7,8 @@ var schema = new mongoose.Schema({
   modifiedAt: String,
   logs: [{
     timestamp: String
-  }]
-  user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  }],
+  user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 })
 
 schema.statics.findByUserAndRole = function (user, role, cb) {
