@@ -1,6 +1,7 @@
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var request = require('request')
+var Promise = require('bluebird')
+var request = Promise.promisify(require('request'))
 var expect = require('unexpected')
 
 var helpers = require('./helpers/')
@@ -11,36 +12,61 @@ server.start(function() {
   console.log('Server running at:', server.info.uri)
 })
 
-var token = null
-lab.experiment('/app', function() {
-  var appId = null
+lab.experiment('/users', function() {
+  var token
+  var testUserEmail = 'user+test+creation@blackbeard.io'
+  var userId
+
   lab.before(function(done) {
+    var requestData = {
+      email: testUserEmail,
+      password: 'password'
+    }
+
     request({
-        method: 'POST',
-        uri: appUrl + '/login',
-        json: true,
-        body: {
-          email: 'admin+users@blackbeard.io',
-          password: 'password'
-        }
-      },
-      function(error, response, body) {
+      method: 'POST',
+      uri: appUrl + '/users',
+      json: true,
+      body: requestData
+    })
+      .spread(function(response, body) {
+        expect(response.statusCode, 'to be', 200)
+        return request({
+          method: 'POST',
+          uri: appUrl + '/login',
+          json: true,
+          body: requestData
+        })
+      })
+      .spread(function(response, body) {
+        expect(response.statusCode, 'to be', 200)
         token = body.token
         done()
       })
+      .catch(function(err) {
+        console.log(err)
+      })
   })
-  lab.test('GET', function(done) {
+
+  lab.test('GET /me/images', function(done) {
+    console.log("TOKEN")
+    console.log(token)
+
     request({
-      method: 'GET',
-      uri: appUrl + '/users/me/images',
-      headers: {
-        'Authorization': token
+        method: 'GET',
+        uri: appUrl + '/users/me/images',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
       },
-      json: true
-    }, function(error, response, body) {
-      expect(body, 'to be non-empty')
-      expect(body[0].name, 'to be', 'Example Image')
-      done()
-    })
+      function(error, response, body) {
+        //expect(response.statusCode, 'to be', 200)
+        //// User should not have creditcard details attached as we are querying not as ADMIN but USER
+        //expect(response.creditCards, 'to be', undefined)
+        //userId = body._id
+        console.log([error, body])
+        done()
+      })
   })
 })

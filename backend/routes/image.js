@@ -1,8 +1,4 @@
 var Image = require('../models/Image')
-
-var MongoClient = require('mongodb').MongoClient
-var ObjectID = require('mongodb').ObjectID
-var _ = require('lodash')
 var User = require('../models/User')
 var Boom = require('boom')
 
