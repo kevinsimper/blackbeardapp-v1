@@ -22,6 +22,7 @@ var imageRoutes = require('./routes/image')
 var creditcardRoutes = require('./routes/creditcard')
 var forgotRoutes = require('./routes/forgot')
 var webhookRoutes = require('./routes/webhook')
+var imageRoutes = require('./routes/image')
 
 var server = new Hapi.Server({
   connections: {
@@ -137,14 +138,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: false,
       handler: frontRoutes.getQueue
-    }
-  })
-  server.route({
-    method: 'POST',
-    path: '/webhook/notify/image',
-    config: {
-      auth: false,
-      handler: webhookRoutes.postNotifyImage
     }
   })
 
@@ -369,6 +362,8 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: appRoutes.deleteContainers
     }
   })
+
+  // Images
   server.route({
     method: 'GET',
     path: '/users/{user}/images',
@@ -377,6 +372,17 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: imageRoutes.getImages
     }
   })
+
+  // Webhook (associated with images)
+  server.route({
+    method: 'POST',
+    path: '/webhook/notify/image',
+    config: {
+      auth: false,
+      handler: webhookRoutes.postNotifyImage
+    }
+  })
+
 })
 
 module.exports = server

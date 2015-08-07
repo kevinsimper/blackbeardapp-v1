@@ -54,29 +54,6 @@ var AppStore = Reflux.createStore({
         actions.del.completed()
       })
   },
-  onNewContainer: function(id, container) {
-    request
-      .post(config.BACKEND_HOST + '/users/me/apps/' + id + '/containers')
-      .set('Authorization', localStorage.token)
-      .send({
-        region: container.region
-      })
-      .end(function(err, res) {
-        if(err) {
-          return actions.newContainer.failed(err)
-        }
-        actions.newContainer.completed(id, res.body)
-      })
-  },
-  onNewContainerCompleted: function(id, container) {
-    var app = this.getOneApp(id)
-    if(app.containers) {
-      app.containers.push(container)
-    } else {
-      app.containers = [container]
-    }
-    this.trigger(container)
-  },
   onStopContainer: function(id, containerId) {
     request
       .del(config.BACKEND_HOST + '/users/me/apps/' + id + '/containers/' + containerId)
