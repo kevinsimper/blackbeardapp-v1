@@ -9,14 +9,16 @@ exports.postNotifyImage = function(request, reply) {
 
   var user = User.findOneAsync({username: username})
 
-  user.then(function(foundUser) {
+  var findImage = user.then(function(foundUser) {
     if (!foundUser) {
       throw new Promise.OperationalError("User not found")
     } else {
       return Image.findOneAsync({ name: name })
     }
-  }).then(function(image) {
-    if (!image) {
+  })
+
+    Promise.all([user, findImage]).spread(function(user, image) {
+      if (!image) {
      // Create image
       var newImage = new Image({
         user: user,
@@ -24,6 +26,7 @@ exports.postNotifyImage = function(request, reply) {
         createdAt: Math.round(Date.now() / 1000),
         modifiedAt: Math.round(Date.now() / 1000)
       })
+
       return new Promise(function (resolve, reject) {
         newImage.save(function (err, savedImage) {
           if (err) {
@@ -37,6 +40,7 @@ exports.postNotifyImage = function(request, reply) {
       var modifiedTime = Math.round(Date.now() / 1000)
       image.modifiedAt = modifiedTime
       image.logs.push({timestamp: modifiedTime})
+      image.user = user
 
       return new Promise(function (resolve, reject) {
         image.save(function (err, savedImage) {
