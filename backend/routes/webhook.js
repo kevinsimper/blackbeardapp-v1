@@ -11,7 +11,7 @@ exports.postNotifyImage = function(request, reply) {
 
   user.then(function(foundUser) {
     if (!foundUser) {
-      throw "User not found"
+      throw new Promise.OperationalError("User not found")
     } else {
       return Image.findOneAsync({ name: name })
     }
@@ -50,12 +50,12 @@ exports.postNotifyImage = function(request, reply) {
     }
   }).then(function(image) {
     reply("ok")
+  }).catch(Promise.OperationalError, function (e) {
+    // Not outputting error on purpose to stop people hitting the API
+    // to find active usernames
+    reply("ok")
   }).catch(function(e) {
-    if (e === "User not found") {
-      reply("ok")
-    } else {
-      console.log(e)
-      reply(Boom.badImplementation())
-    }
+    console.log(e)
+    reply(Boom.badImplementation())
   })
 }
