@@ -29,6 +29,9 @@
     "password-hash": "1.2.2",
     "request": "2.55.0",
     "stripe": "3.6.0",
-    "unexpected": "9.2.1"
+    "unexpected": "9.2.1",
+    "good": "6.3.0",
+    "good-loggly": "1.0.1",
+    "good-console": "5.0.2"
   }
 }
