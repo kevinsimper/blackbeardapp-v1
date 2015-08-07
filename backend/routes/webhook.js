@@ -19,7 +19,7 @@ exports.postNotifyImage = function(request, reply) {
     if (!image) {
      // Create image
       var newImage = new Image({
-        user: user,
+        user: user._id,
         name: name,
         createdAt: Math.round(Date.now() / 1000),
         modifiedAt: Math.round(Date.now() / 1000)
@@ -37,6 +37,7 @@ exports.postNotifyImage = function(request, reply) {
       var modifiedTime = Math.round(Date.now() / 1000)
       image.modifiedAt = modifiedTime
       image.logs.push({timestamp: modifiedTime})
+      image.user = user._id
 
       return new Promise(function (resolve, reject) {
         image.save(function (err, savedImage) {
