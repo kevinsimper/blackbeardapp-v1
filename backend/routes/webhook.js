@@ -21,7 +21,7 @@ exports.postNotifyImage = function(request, reply) {
       if (!image) {
      // Create image
       var newImage = new Image({
-        user: user,
+        user: user._id,
         name: name,
         createdAt: Math.round(Date.now() / 1000),
         modifiedAt: Math.round(Date.now() / 1000)
