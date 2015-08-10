@@ -67,6 +67,56 @@ block content
 
             #[span EXPOSE] 9000
 
+  .terminal
+    .container.terminal-container
+      .terminal__window
+        .terminal__window__header
+          .terminal__window__header__icon
+        pre.terminal__window__content.
+          $ docker build -t username/image .
+          Building username/image...
+          Step 0 : FROM node:0.12
+           ---> c03077d1e6a0
+          ...
+
+          $ docker login registry.blackbeard.io
+          Username: blackbeard
+          Password: *******
+          E-mail: me@blackbeard.io
+
+          Login succeed!
+
+          $ docker push registry.blackbeard.io/username/image
+
+      .terminal__desc
+        h2.headline Deploying
+
+        p.
+          Then we need to build our docker image and push it to 
+          blackbeard's registry.
+
+        p.
+          That is done by first building the image and tagging it
+          with your username and an image name you can remember.
+
+  .webpage
+    .container.webpage-container
+      .webpage__desc
+        h2.headline Ready and scaled
+
+        p.
+          Done! Your website is online and ready for visitors. All done without 
+          you needing to worry about anything, other than just your website. 
+          Sorry, that we can't help you with that! ;-)
+      .webpage__window
+        .webpage__window__header
+          .webpage__window__header__icon.webpage__window__header__icon--red
+          .webpage__window__header__icon.webpage__window__header__icon--yellow
+          .webpage__window__header__icon.webpage__window__header__icon--green
+          .webpage__window__addressbar
+            input(type='text', value='https://mywebsite.dk')
+        .webpage__window__content.
+          It works!
 
   .works
     .container.works-container

@@ -1,0 +1,57 @@
+.terminal {
+  padding: 20px 0 30px;
+  background: $lightbg;
+  color: $mediumblue;
+}
+
+.terminal .headline {
+  font-size: 2em;
+  margin: 0 0 0.5em;
+}
+.terminal-container {
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  @media(min-width: 850px) {
+    padding: 40px;
+    flex-direction: row;
+  }
+}
+
+.terminal__desc {
+  flex: 2;
+  line-height: 30px;
+  @media(min-width: 850px) {
+    padding: 0 0 0 30px;
+  }
+}
+.terminal__window {
+  flex: 3;
+  background-color: #111;
+  color: white;
+  border-radius: 4px;
+}
+
+.terminal__window__header {
+  height: 24px;
+  background-color: rgba(255,255,255, 0.25);
+  padding: 0 10px;
+}
+
+.terminal__window__header__icon {
+  height: 10px;
+  width: 10px;
+  border-radius: 20px;
+  display: inline-block;
+  background-color: #F8F8FF;
+  &:hover {
+    background-color: #f35e5a;
+    cursor: pointer;
+  }
+}
+
+.terminal__window__content {
+  padding: 20px 20px 60px;
+  margin: 0;
+  white-space: pre-line;
+}
