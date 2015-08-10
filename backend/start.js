@@ -9,8 +9,8 @@ if(process.env.NODE_ENV === 'production') {
       reporter: require('good-loggly'),
       events: { log: '*', request: '*'},
       config: {
-        token     : process.env.LOGLY_ENV_TOKEN,
-        subdomain : process.env.LOGLY_ENV_SUBDOMAIN
+        token     : process.env.LOGGLY_TOKEN,
+        subdomain : process.env.LOGGLY_SUBDOMAIN
       }
     }]
   }
