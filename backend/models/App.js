@@ -7,7 +7,7 @@ var schema = new mongoose.Schema({
   name: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
   timestamp: String,
-  containers: [Container.schema],
+  containers: [{type: mongoose.Schema.Types.ObjectId, ref: 'container'}],
   image: {type: mongoose.Schema.Types.ObjectId, ref: 'image'},
   deleted: { type: Boolean, default: false },
   deletedAt: String

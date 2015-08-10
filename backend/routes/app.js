@@ -3,6 +3,8 @@ var ObjectID = require('mongodb').ObjectID
 var _ = require('lodash')
 var User = require('../models/User')
 var App = require('../models/App')
+var Container = require('./Container')
+
 var Boom = require('boom')
 
 var config = require('../config')
@@ -95,18 +97,21 @@ exports.postContainers = function(request, reply) {
   var app = request.params.app
   var user = User.getUserIdFromRequest(request)
 
-  var container = {
+  var container = new Container({
     region: request.payload.region,
     status: 'Starting'
-  }
+  })
 
+  reply()
+/*
   App.findById(app, function(err, result) {
+
     result.containers = result.containers || []
     result.containers.push(container)
     result.save(function(err, app) {
       reply(app.containers[app.containers.length - 1])
     })
-  })
+  })*/
 }
 
 exports.getContainers = function(request, reply) {
