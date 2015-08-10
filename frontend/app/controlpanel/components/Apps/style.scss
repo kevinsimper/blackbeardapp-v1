@@ -1,5 +1,5 @@
-.AppsList {}
-.AppsList__Item {
+.Apps {}
+.Apps__Item {
   line-height: 35px;
   padding: 0 5px;
   border-bottom: 1px solid #CCC;
@@ -10,7 +10,7 @@
     background-color: #ECECEC;
   }
 }
-.AppsList__Link {
+.Apps__Link {
   display: block;
   text-decoration: none;
 }
