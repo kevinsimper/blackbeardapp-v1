@@ -7,7 +7,7 @@ $editorbg: #00658B;
 }
 
 .dockerfile .headline {
-  font-size: 2.5em;
+  font-size: 2em;
   margin: 0 0 0.5em;
 }
 .dockerfile-container {
@@ -50,6 +50,10 @@ $editorbg: #00658B;
   border-radius: 20px;
   display: inline-block;
   background-color: #F8F8FF;
+  &:hover {
+    background-color: #f35e5a;
+    cursor: pointer;
+  }
 }
 
 .dockerfile__editor__content {

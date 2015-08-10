@@ -67,6 +67,37 @@ block content
 
             #[span EXPOSE] 9000
 
+  .terminal
+    .container.terminal-container
+      .terminal__window
+        .terminal__window__header
+          .terminal__window__header__icon
+        pre.terminal__window__content.
+          $ docker build -t username/image .
+          Building username/image...
+          Step 0 : FROM node:0.12
+           ---> c03077d1e6a0
+          ...
+
+          $ docker login registry.blackbeard.io
+          Username: blackbeard
+          Password: *******
+          E-mail: me@blackbeard.io
+
+          Login succeed!
+
+          $ docker push registry.blackbeard.io/username/image
+
+      .terminal__desc
+        h2.headline Deploying
+
+        p.
+          Then we need to build our docker image and push it to 
+          blackbeard's registry.
+
+        p.
+          That is done by first building the images and tagging it
+          with your username and a image name you can remember.
 
   .works
     .container.works-container
