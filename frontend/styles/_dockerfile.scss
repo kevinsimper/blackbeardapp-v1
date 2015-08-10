@@ -1,0 +1,62 @@
+$editorbg: #00658B;
+
+.dockerfile {
+  padding: 40px;
+  background-color: #00A9E8;
+  color: white
+}
+
+.dockerfile .headline {
+  font-size: 2.5em;
+  margin: 0 0 0.5em;
+}
+.dockerfile-container {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  @media(min-width: 850px) {
+    flex-direction: row;
+  }
+}
+
+.dockerfile__desc {
+  flex: 2;
+  padding: 0 30px 0 0;
+  line-height: 30px;
+}
+
+.dockerfile__editorcontainer {
+  flex: 3;
+}
+
+.dockerfile__editor {
+  background-color: $editorbg;
+  border-radius: 3px;
+  margin-top: 50px;
+  @media(min-width: 850px) {
+    margin-top: 0px;
+  }
+}
+
+.dockerfile__editor__header {
+  height: 24px;
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 0 10px;
+}
+
+.dockerfile__editor__header__icon {
+  height: 10px;
+  width: 10px;
+  border-radius: 20px;
+  display: inline-block;
+  background-color: #F8F8FF;
+}
+
+.dockerfile__editor__content {
+  padding: 0px 15px 15px;
+  font-size: 15px;
+  span {
+    color: #EDA4FF;
+    font-weight: bold;
+  }
+}

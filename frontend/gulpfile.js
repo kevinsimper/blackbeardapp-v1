@@ -74,7 +74,7 @@ gulp.task('browserify-controlpanel', function() {
 });
 
 gulp.task('sass', function() {
-  return gulp.src(['./app/controlpanel/controlpanel.scss', './public/styles/main.scss'])
+  return gulp.src(['./app/controlpanel/controlpanel.scss', './styles/main.scss'])
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('./public/build'))
 })
@@ -83,5 +83,5 @@ gulp.task('build', ['browserify', 'browserify-controlpanel', 'sass']);
 gulp.task('default', ['browserify', 'browserify-controlpanel', 'sass'], function() {
   gulp.watch(['./app/*.js', './app/*.jsx'], ['browserify']);
   gulp.watch(['./app/controlpanel/**/*.js', './app/controlpanel/**/*.jsx'], ['browserify-controlpanel']);
-  gulp.watch(['./app/controlpanel/**/*.scss', './public/styles/**/*.scss'], ['sass']);
+  gulp.watch(['./app/controlpanel/**/*.scss', './styles/**/*.scss'], ['sass']);
 });
