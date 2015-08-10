@@ -69,6 +69,8 @@ var AppShow = React.createClass({
             <div>No running containers</div>
           }
         </div>
+        <Button onClick={this.onClickStart}>Start containers</Button>
+        <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>
     );
   }

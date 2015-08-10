@@ -12,6 +12,9 @@ var actions = Reflux.createActions({
   },
   stopContainer: {
     asyncResult: true
+  },
+  newContainer: {
+      asyncResult: true
   }
 })
 
