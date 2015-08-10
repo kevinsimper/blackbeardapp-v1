@@ -17,6 +17,9 @@ var Sidebar = React.createClass({
             <a className='Sidebar__Link' href="#/profile">My Profile</a>
           </div>
           <div className='Sidebar__Item'>
+            <a className='Sidebar__Link' href="#/images">Images</a>
+          </div>
+          <div className='Sidebar__Item'>
             <a className='Sidebar__Link' href="#/preusers">PreUsers</a>
           </div>
           <div className='Sidebar__Item'>

@@ -5,6 +5,9 @@ var extend = require('lodash/object/extend')
 var AppActions = require('../Apps/actions')
 var AppStore = require('../Apps/store')
 
+var ImageActions = require('../Images/actions')
+var ImageStore = require('../Images/store')
+
 var Navigation = require('react-router').Navigation;
 var Input = require('../Input/')
 var Label= require('../Label/')
