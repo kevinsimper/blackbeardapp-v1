@@ -12,7 +12,6 @@ var PreUsersShow = require('./Routes/PreUsers/Show.jsx')
 var Login = require('./components/Login/')
 var ForgotPassword = require('./components/ForgotPassword/')
 var Users = require('./components/Users')
-var ContainerFormular = require('./components/ContainerFormular/')
 var UserShow = require('./components/UserShow/')
 
 var routes = (
@@ -25,7 +24,6 @@ var routes = (
     <Route name='app' path='/apps'>
       <Route path='create' handler={AppCreate}/>
       <Route name="AppShow" path=':id' handler={AppShow}/>
-      <Route path=':id/containers' handler={ContainerFormular}/>
     </Route>
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
