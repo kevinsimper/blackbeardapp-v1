@@ -41,7 +41,7 @@ gulp.task('browserify', function() {
     return b.bundle();
   });
 
-  return gulp.src(['./app/index.js'])
+  return gulp.src(['./app/frontpage/index.js'])
     .pipe(browserified)
     .pipe(rename('bundle.js'))
     .pipe(gulpif(production, uglify()))
@@ -83,5 +83,5 @@ gulp.task('build', ['browserify', 'browserify-controlpanel', 'sass']);
 gulp.task('default', ['browserify', 'browserify-controlpanel', 'sass'], function() {
   gulp.watch(['./app/*.js', './app/*.jsx'], ['browserify']);
   gulp.watch(['./app/controlpanel/**/*.js', './app/controlpanel/**/*.jsx'], ['browserify-controlpanel']);
-  gulp.watch(['./app/controlpanel/**/*.scss'], ['sass']);
+  gulp.watch(['./app/controlpanel/**/*.scss', './public/styles/**/*.scss'], ['sass']);
 });

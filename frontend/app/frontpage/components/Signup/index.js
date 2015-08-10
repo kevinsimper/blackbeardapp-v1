@@ -1,7 +1,7 @@
 var React = require('react');
-var SignupPopup = require('./SignupPopup.jsx')
+var SignupPopup = require('../SignupPopup/')
 var request = require('superagent')
-var queue = require('./queue')
+var queue = require('../../queue')
 
 var Signup = React.createClass({
   getInitialState: function() {
