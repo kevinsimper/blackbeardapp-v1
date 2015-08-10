@@ -1,6 +1,6 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
-var AppsList = require('../AppsList/')
+var Apps = require('../Apps/')
 var Authentication = require('../../mixins/authentication')
 var Onboarding = require('../Onboarding/')
 var ProfileActions = require('../Profile/actions')
@@ -43,7 +43,7 @@ var Dashboard = React.createClass({
         {!this.state.profile.username &&  <Onboarding/>}
         <h1>Dashboard</h1>
         <div>Hi there! How are you doing?</div>
-        <AppsList/>
+        <Apps/>
       </div>
     );
   }

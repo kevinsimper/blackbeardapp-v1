@@ -1,5 +1,5 @@
 var Reflux = require('reflux')
-var actions = require('./Actions')
+var actions = require('./actions')
 var request = require('superagent')
 var config = require('../../config')
 var findWhere = require('lodash/collection/findWhere')
@@ -7,7 +7,7 @@ var remove = require('lodash/array/remove')
 
 var _apps = []
   
-var AppStore = Reflux.createStore({
+var store = Reflux.createStore({
   listenables: actions,
   init: function() {
     actions.load()
@@ -74,4 +74,4 @@ var AppStore = Reflux.createStore({
   }
 })
 
-module.exports = AppStore
+module.exports = store

@@ -1,17 +1,17 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
-var AppStore = require('../../Routes/App/Store')
-var Actions = require('../../Routes/App/Actions')
+var AppsStore = require('../Apps/store')
+var AppsActions = require('../Apps/actions')
 var moment = require('moment')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
 
-var Show = React.createClass({
+var AppShow = React.createClass({
   mixins: [Navigation],
   getState: function() {
     return {
-      app: AppStore.getOneApp(this.props.params.id)
+      app: AppsStore.getOneApp(this.props.params.id)
     }
   },
   getInitialState: function() {
@@ -21,13 +21,13 @@ var Show = React.createClass({
   },
   componentDidMount: function() {
     var self = this
-    Actions.load()
+    AppsActions.load()
     .then(function() {
       self.setState({
         loaded: true
       })
     })
-    this.unsubscribe = AppStore.listen(this.onChange)
+    this.unsubscribe = AppsStore.listen(this.onChange)
   },
   componentWillUnmount: function() {
     this.unsubscribe()
@@ -40,7 +40,7 @@ var Show = React.createClass({
     if(!confirm('Are you sure?')) {
       return false
     }
-    Actions.del(this.state.app._id)
+    AppsActions.del(this.state.app._id)
       .then(function() {
         self.replaceWith('/')
       })
@@ -49,7 +49,7 @@ var Show = React.createClass({
     this.transitionTo('/apps/' + this.props.params.id + '/containers')
   },
   onClickStopContainer: function(item) {
-    Actions.stopContainer(this.props.params.id, item._id)
+    AppsActions.stopContainer(this.props.params.id, item._id)
   },
   render: function() {
     var self = this
@@ -76,4 +76,4 @@ var Show = React.createClass({
   }
 })
 
-module.exports = Show
+module.exports = AppShow

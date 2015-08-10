@@ -1,8 +1,8 @@
 var React = require('react')
-var AppActions = require('./Actions')
+var actions = require('../Apps/actions')
 var Navigation = require('react-router').Navigation;
-var Input = require('../../components/Input/')
-var Button = require('../../components/Button/')
+var Input = require('../Input/')
+var Button = require('../Button/')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
@@ -19,7 +19,7 @@ var AppCreate = React.createClass({
   },
   onClickCreate: function() {
     var self = this
-    AppActions.new({
+    actions.new({
       name: this.state.name
     })
     this.setState({
