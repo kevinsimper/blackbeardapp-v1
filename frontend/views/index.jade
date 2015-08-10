@@ -122,18 +122,18 @@ block content
     .container.works-container
       h2.typo__headline.typo__headline--mediumblue How it works behind the scenes
       .works__banner
-        | We have a docker registry,
+        | Store your application image securely
         br
-        | where we store your docker image securely.
+        | in our private Docker Registry.
       p
         span Once a Docker container is uploaded a 
-        span(title='A CNAME record is a DNS record that acts as an alias of another record') CNAME
+        span(style='font-style: italic;' title='A CNAME record is a DNS record that acts as an alias of another record') CNAME
         span  will be provided that points to your running application.
       p
-        | We use powerful servers and, due to the nature of containers, we run many of them together on custom server cluster. We employ multiple load balancers to tunnel traffic to your containers in an intelligent manner. Multiple redundancy layers are provided by ensuring that at least two containers are running at any point in time.
+        | We use powerful servers and, due to the nature of containers, we run many of them together on our custom server cluster. We employ multiple load balancers to tunnel traffic to your containers in an intelligent manner. To ensure at least two containers are running at any one time multiple redundancy layers are provided.
       p
         span
-          | Due to the large number of logging services available Blackbeard.io does not provide the facility to do this. Our recommendation is to use a more dedicated service, such as 
+          | Due to the large number of logging services available blackbeard.io does not provide the facility to do this. Our recommendation is to use a more dedicated service, such as 
         a(href='https://www.loggly.com/') loggly.com
         span  and 
         a(href='https://www.papertrailapp.com/') papertrailapp.com
