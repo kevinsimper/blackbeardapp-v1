@@ -1,44 +1,77 @@
 var React = require('react')
-var actions = require('../Apps/actions')
+
+var extend = require('lodash/object/extend')
+
+var AppActions = require('../Apps/actions')
+var AppStore = require('../Apps/store')
+
 var Navigation = require('react-router').Navigation;
 var Input = require('../Input/')
+var Label= require('../Label/')
 var Button = require('../Button/')
+
+var ImagesSelect = require('../ImagesSelect/index')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
-  getInitialState: function() {
+  getState: function() {
     return {
+      images: AppStore.getImages()
+    }
+  },
+  getInitialState: function() {
+    return extend(this.getState(), {
+      loaded: false,
       name: '',
-      status: ''
-    };
+      image: ''
+    })
+  },
+  onChange: function() {
+    this.setState(this.getState())
+  },
+  componentDidMount: function() {
+    AppActions.load()
+    this.unsubscribe = AppStore.listen(this.onChange)
+  },
+  componentWillUnmount: function() {
+    this.unsubscribe()
   },
   onChangeName: function(e) {
     this.setState({
       name: e.target.value
     })
   },
-  onClickCreate: function() {
-    var self = this
-    actions.new({
-      name: this.state.name
-    })
+  onChangeImage: function(image) {
     this.setState({
-      status: 'App created'
+      image: image
     })
-    setTimeout(function() {
-      self.transitionTo('/')
-    }, 1000)
+  },
+  onSubmit: function(e) {
+    e.preventDefault()
+    var self = this
+    this.setState({
+      loading: true
+    })
+    AppActions.new(this.state)
+      .then(function() {
+        self.setState({
+          loading: false
+        })
+      })
   },
   render: function() {
     return (
-      <div>
+      <form className="App" onSubmit={this.onSubmit}>
         <h1>Create app</h1>
+        <Label>Name</Label>
         <Input type="text" value={this.state.name} onChange={this.onChangeName} />
+        <Label>Image</Label>
+        <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
         <div>
-          <Button onClick={this.onClickCreate}>Create app</Button>
+          <Button>Create app</Button>
         </div>
         <div>{this.state.status}</div>
-      </div>
+      </form>
     );
   }
 })
