@@ -1,9 +1,11 @@
 $editorbg: #00658B;
 
 .dockerfile {
-  padding: 40px;
   background-color: #00A9E8;
-  color: white
+  color: white;
+  @media(min-width: 850px) {
+    padding: 40px;
+  }
 }
 
 .dockerfile .headline {
@@ -11,10 +13,11 @@ $editorbg: #00658B;
   margin: 0 0 0.5em;
 }
 .dockerfile-container {
-  padding: 40px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   @media(min-width: 850px) {
+    padding: 40px;
     flex-direction: row;
   }
 }
@@ -59,6 +62,7 @@ $editorbg: #00658B;
 .dockerfile__editor__content {
   padding: 0px 15px 15px;
   font-size: 15px;
+  white-space: pre-line;
   span {
     color: #EDA4FF;
     font-weight: bold;

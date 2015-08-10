@@ -7,10 +7,11 @@
   margin: 0 0 0.5em;
 }
 .terminal-container {
-  padding: 40px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column-reverse;
   @media(min-width: 850px) {
+    padding: 40px;
     flex-direction: row;
   }
 }
@@ -50,4 +51,5 @@
 .terminal__window__content {
   padding: 20px 20px 60px;
   margin: 0;
+  white-space: pre-line;
 }
