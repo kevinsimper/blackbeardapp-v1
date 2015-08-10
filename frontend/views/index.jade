@@ -30,6 +30,44 @@ block content
           .step__number 3
           div.step__text We host it for you, with automatic scaling, load-balancing, etc.
 
+  .dockerfile
+    .container.dockerfile-container
+      .dockerfile__desc
+        h2.headline Dockerfile
+
+        p.
+         A dockerfile is a description on how your service is going to work.
+         In this example you can see we have a node.js machine image and the command the will
+         run when the container is started is '$ npm start'.
+
+        p This dockerfile is actually what runs this website.
+
+
+      .dockerfile__editorcontainer
+        .dockerfile__editor
+          .dockerfile__editor__header
+            .dockerfile__editor__header__icon
+          pre.dockerfile__editor__content.
+            #[span FROM] node:0.12
+
+            #[span RUN] apt-get update -y --force-yes && \
+                apt-get upgrade -y --force-yes
+
+            #[span WORKDIR] /app
+
+            #[span COPY] . /app
+
+            #[span RUN] npm install
+
+            #[span ENV] NODE_ENV production
+
+            #[span RUN] npm run build
+
+            #[span CMD] npm start
+
+            #[span EXPOSE] 9000
+
+
   .works
     .container.works-container
       h2.typo__headline.typo__headline--mediumblue How it works behind the scenes
