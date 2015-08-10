@@ -5,10 +5,10 @@ var Container = require('./Container')
 
 var schema = new mongoose.Schema({
   name: String,
-  cname: String,
-  user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
   timestamp: String,
   containers: [Container.schema],
+  image: {type: mongoose.Schema.Types.ObjectId, ref: 'image'},
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
@@ -24,11 +24,11 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'cname', 'timestamp')
+    fields.push('name', 'timestamp')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('user', 'containers', 'deleted')
+    fields.push('user', 'containers', 'deleted', 'image')
     // Show deleted and not deleted to admins
     conditions = {}
   }

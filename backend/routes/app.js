@@ -20,10 +20,10 @@ exports.getApps = function(request, reply) {
 }
 
 exports.search = function(request, reply) {
-  var cname = request.payload.cname
+  var name = request.payload.name
 
   App.find({
-    cname: cname
+    name: name
   }, function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
@@ -34,7 +34,7 @@ exports.search = function(request, reply) {
 
 exports.postApp = function(request, reply) {
   var name = request.payload.name
-  var cname = request.payload.cname
+  var image = request.payload.image
 
   var insertCallback = function(err, app) {
     if (err) {
@@ -45,7 +45,7 @@ exports.postApp = function(request, reply) {
 
   var newApp = new App({
     name: name,
-    cname: cname,
+    image: image,
     user: request.auth.credentials,
     timestamp: Math.round(Date.now() / 1000)
   })

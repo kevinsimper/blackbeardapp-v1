@@ -30,10 +30,27 @@ lab.experiment('/app', function() {
       })
   })
 
+  var imageId
+  lab.test('GET /me/images', function (done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/me/images',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function (error, response, body) {
+        imageId = body[0]._id
+
+        done()
+      })
+  })
+
   lab.test('POST', function(done) {
     var requestData = {
-      name: 'Test App',
-      cname: 'testapp'
+      name: 'testapp',
+      image: imageId
     }
     request({
         method: 'POST',
@@ -53,8 +70,7 @@ lab.experiment('/app', function() {
   })
   lab.test('PUT', function(done) {
     var requestData = {
-      name: 'Test App Updated',
-      cname: 'testapp'
+      name: 'testapp'
     }
     request({
       method: 'PUT',
@@ -86,7 +102,7 @@ lab.experiment('/app', function() {
   })
   lab.test('Search POST', function(done) {
     var requestData = {
-      cname: 'testapp'
+      name: 'testapp'
     }
     request({
       method: 'POST',
