@@ -234,6 +234,32 @@ lab.experiment('/app/containers', function() {
       done()
     })
   })
+  lab.test('GET logs with invalid id', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps/invalid_id/logs',
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.message, 'to be', 'Application id provided is invalid.')
+      done()
+    })
+  })
+  lab.test('GET logs', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps/' + appId + '/logs',
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body, 'to equal', [])
+      done()
+    })
+  })
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',

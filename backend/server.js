@@ -79,6 +79,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
           if (err) {
             return console.log(err);
           }
+
           reply('<pre>'+data+'</pre>')
         });
       }
@@ -377,6 +378,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: 'jwt',
       handler: appRoutes.deleteContainers
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/apps/{app}/logs',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.getAppLogs
     }
   })
 

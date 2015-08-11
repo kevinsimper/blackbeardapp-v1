@@ -1,8 +1,9 @@
-var MongoClient = require('mongodb').MongoClient
-var ObjectID = require('mongodb').ObjectID
+var Promise = require('bluebird')
+var ObjectId = require('mongodb').ObjectID
 var _ = require('lodash')
 var User = require('../models/User')
-var App = require('../models/App')
+var App = Promise.promisifyAll(require('../models/App'))
+var Image = Promise.promisifyAll(require('../models/Image'))
 var Container = require('../models/Container')
 
 var Boom = require('boom')
@@ -152,9 +153,35 @@ exports.postContainers = function(request, reply) {
   })
 }
 
+exports.getAppLogs = function(request, reply) {
+  var id = request.params.app
+
+  try {
+    ObjectId(id)
+  } catch (e) {
+    return reply(Boom.badRequest("Application id provided is invalid."))
+  }
+
+  var app = App.findByIdAsync(id)
+
+  app.then(function(foundApp) {
+    if (!foundApp) {
+      throw new Promise.OperationalError("App not found")
+    } else {
+      return Image.findByIdAsync(foundApp.image)
+    }
+  }).then(function(image) {
+    reply(image.logs)
+  }).catch(Promise.OperationalError, function (e) {
+    reply(Boom.notFound("Application could not be found."))
+  }).catch(function(e) {
+    console.log(e)
+    reply(Boom.badImplementation())
+  })
+}
+
 exports.getContainers = function(request, reply) {
   var app = request.params.app
-  var user = User.getUserIdFromRequest(request)
   var role = request.auth.credentials.role
 
   App.findById(app, function(err, result) {
@@ -181,7 +208,6 @@ exports.getContainers = function(request, reply) {
 exports.deleteContainers = function(request, reply) {
   var app = request.params.app
   var containerId = request.params.container
-  var user = User.getUserIdFromRequest(request)
   var role = request.auth.credentials.role
 
   var deleteCallback = function (err, result) {
