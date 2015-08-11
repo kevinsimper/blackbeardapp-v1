@@ -14,6 +14,7 @@ var ForgotPassword = require('./components/ForgotPassword/')
 var Users = require('./components/Users')
 var UserShow = require('./components/UserShow/')
 var Images = require('./components/Images/')
+var ContainerFormular = require('./components/ContainersFormular/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -25,6 +26,7 @@ var routes = (
     <Route name='app' path='/apps'>
       <Route path='create' handler={AppCreate}/>
       <Route name="AppShow" path=':id' handler={AppShow}/>
+      <Route path=':id/containers' handler={ContainerFormular}/>
     </Route>
     <Route path='/images' handler={Images}/>
     <Route path='/preusers' handler={PreUsersList}/>
