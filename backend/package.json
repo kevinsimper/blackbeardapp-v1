@@ -34,5 +34,8 @@
     "good-loggly": "1.0.1",
     "good-console": "5.0.2",
     "good-file": "5.0.1"
+  },
+  "devDependencies": {
+    "migrate": "0.2.2"
   }
 }
