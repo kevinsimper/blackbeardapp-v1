@@ -12,9 +12,9 @@ exports.getCreditCards = function (request, reply) {
   var role = request.auth.credentials.role
   var userId = User.getUserIdFromRequest(request)
 
-  User.findOneByRoleAsync(role, userId)
+  User.findOneByRoleAsync(userId, role)
   .then(function(user) {
-    return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
+      return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
   })
   .then(function(creditCards) {
     return reply(creditCards)
