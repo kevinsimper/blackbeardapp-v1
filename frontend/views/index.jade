@@ -121,25 +121,23 @@ block content
   .works
     .container.works-container
       h2.typo__headline.typo__headline--mediumblue How it works behind the scenes
-      .works__banner
-        | Store your application image securely
-        br
-        | in our private Docker Registry.
-      p
-        span Once a Docker container is uploaded a 
-        span(style='font-style: italic;' title='A CNAME record is a DNS record that acts as an alias of another record') CNAME
-        span  will be provided that points to your running application.
-      p
-        | We use powerful servers and, due to the nature of containers, we run many of them together on our custom server cluster. We employ multiple load balancers to tunnel traffic to your containers in an intelligent manner. To ensure at least two containers are running at any one time multiple redundancy layers are provided.
-      p
-        span
-          | Due to the large number of logging services available blackbeard.io does not provide the facility to do this. Our recommendation is to use a more dedicated service, such as 
-        a(href='https://www.loggly.com/') loggly.com
-        span  and 
-        a(href='https://www.papertrailapp.com/') papertrailapp.com
-        | .
-      p
-        | Our servers will host your web application in a secure environment. Two-factor authentication can be enabled to ensure any changes to your hosting arrangement will be by a trusted person.
+      .works__banner.
+        Store your application image securely #[br] in our private Docker Registry.
+      p.
+        Once a Docker container is uploaded a 
+        #[span(style='font-style: italic;' title='A CNAME record is a DNS record that acts as an alias of another record') CNAME] 
+        will be provided that points to your running application.
+      p.
+        We use powerful servers and, due to the nature of containers, 
+        we run many of them together on our custom server cluster.
+        We have multiple load balancers to tunnel traffic to your containers in an intelligent manner. 
+        We deploy by default two containers so at any one time redundancy is available.
+      p.
+        There is already so many good services that provide logging, so we have decided only to focus on deployment.
+        Our recommendation is to use a dedicated service, and we can recommend #[a(href='https://www.loggly.com/') loggly.com] 
+        and #[a(href='https://www.papertrailapp.com/') papertrailapp.com].
+      p.
+        Our servers will host your web application in a secure environment. Two-factor authentication can be enabled to ensure any changes to your hosting arrangement will be by a trusted person.
 
 
   #features.features
@@ -147,11 +145,19 @@ block content
     h2.typo__headline.typo__headline--mediumblue Features
 
     .features__list
-      .features__item CLI for scaling containers
+      .features__item Continues Deployment
+      p.features__item__desc.
+       Deploying a new version is as easy as pushing a new image, and it will automatic be deployed. 
+       That means if you want to rollback, you push a older image and then that is the active image.
+
       .features__spacer
       .features__item Automatic load-balancing
+      p.features__item__desc.
+        We provide fast and scaled load-balancers that distribute the traffic to your application.
       .features__spacer
-      .features__item Free SSL on subdomain
+      .features__item Free Docker image hosting
+      p.features__item__desc.
+        You don't pay for storing your docker image on our service, when you deploy your website on blackbeard.
 
   #pricing.pricing
     .container

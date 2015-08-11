@@ -14,6 +14,11 @@
   font-size: 2em;
   color: $lightblue;
 }
+.features__item__desc {
+  max-width: 400px;
+  margin: 20px auto;
+  color: $mediumblue;
+}
 .features__spacer {
   background-image: url(/images/features-spacer.png);
   width: 348px;
