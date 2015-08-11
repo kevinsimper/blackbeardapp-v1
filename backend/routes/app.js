@@ -40,6 +40,21 @@ exports.postApp = function(request, reply) {
   var name = request.payload.name
   var image = request.payload.image
 
+  if (!name) {
+    return reply(Boom.badRequest('You must supply an application name.'))
+  }
+
+  if (!image) {
+    return reply(Boom.badRequest('You must supply an image to base your application on.'))
+  }
+
+  var insertCallback = function(err, app) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    reply(app)
+  }
+
   var newApp = new App({
     name: name,
     image: image,
@@ -72,6 +87,7 @@ exports.putApp = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     app.name = request.payload.name;
+    // Explicitly leaving out image here - I'm not entirely sure if you should be able to change this once the app is made
     app.save(updateCallback)
   })
 }

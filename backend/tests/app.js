@@ -152,9 +152,26 @@ lab.experiment('/app', function() {
 lab.experiment('/app/containers', function() {
   var appId = null
   var containerId = null
+  var imageId
+  lab.before('GET /me/images', function (done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/users/me/images',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      },
+      function (error, response, body) {
+        imageId = body[0]._id
+
+        done()
+      })
+  })
   lab.before(function(done) {
     var requestData = {
-      name: 'Test App Container'
+      name: 'Test App Container',
+      image: imageId
     }
     request({
         method: 'POST',
