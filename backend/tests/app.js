@@ -65,6 +65,7 @@ lab.experiment('/app', function() {
         expect(response.statusCode, 'to be', 200)
         expect(body.name, 'to be', requestData.name)
         appId = body._id
+
         done()
       })
   })
@@ -113,6 +114,7 @@ lab.experiment('/app', function() {
       },
       json: true
     }, function(error, response, body) {
+
       expect(response.statusCode, 'to be', 200)
       expect(body, 'to be non-empty', 'name')
       done()
@@ -184,8 +186,8 @@ lab.experiment('/app/containers', function() {
       body: requestData
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body, 'to have keys', 'region', 'status')
-      containerId = body._id
+      expect(body.message, 'to be', 'Container successfully created.')
+      containerId = body.id
       done()
     })
   })
