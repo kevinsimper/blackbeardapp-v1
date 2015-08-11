@@ -70,6 +70,23 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'GET',
+    path: '/3rr0rs',
+    config: {
+      auth: false,
+      handler: function(request, reply) {
+        fs = require('fs');
+        fs.readFile('/var/log/blackbeard_backend.log', 'utf8', function (err,data) {
+          if (err) {
+            return console.log(err);
+          }
+          reply('<pre>'+data+'</pre>')
+        });
+      }
+    }
+  })
+
+  server.route({
+    method: 'GET',
     path: '/secure',
     config: {
       auth: 'jwt',
