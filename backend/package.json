@@ -32,6 +32,7 @@
     "unexpected": "9.2.1",
     "good": "6.3.0",
     "good-loggly": "1.0.1",
-    "good-console": "5.0.2"
+    "good-console": "5.0.2",
+    "good-file": "5.0.1"
   }
 }
