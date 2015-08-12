@@ -18,6 +18,7 @@ exports.inviteUser = function(request, reply) {
 
   var updateCallback = function(err, user) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 

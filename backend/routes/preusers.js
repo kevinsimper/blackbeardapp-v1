@@ -6,6 +6,7 @@ var PreUsers = require('../models/PreUsers')
 exports.getPreUsers = function(request, reply) {
   PreUsers.find(function(err, preUsers) {
     if(err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation())
     }  
     reply(preUsers)
@@ -15,6 +16,10 @@ exports.getPreUsers = function(request, reply) {
 exports.postPreUsers = function(request, reply) {
   var email = request.payload.email
   PreUsers.findOne({email: email}, function(err, preUser) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     if(preUser) {
       return reply(Boom.badRequest('Email already exists'))
     }

@@ -9,11 +9,13 @@ exports.getImages = function(request, reply) {
 
   User.findById(userId, function(err, user) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
     Image.find({ user: userId }, function(err, result) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database'))
       }
       reply(result)

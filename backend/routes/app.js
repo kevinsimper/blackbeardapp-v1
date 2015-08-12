@@ -15,6 +15,7 @@ exports.getApps = function(request, reply) {
 
   App.findByUserAndRole(user, role, function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply(result)
@@ -28,6 +29,7 @@ exports.search = function(request, reply) {
     name: name
   }, function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply(result)
@@ -38,20 +40,19 @@ exports.postApp = function(request, reply) {
   var name = request.payload.name
   var image = request.payload.image
 
-  var insertCallback = function(err, app) {
-    if (err) {
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    reply(app)
-  }
-
   var newApp = new App({
     name: name,
     image: image,
     user: request.auth.credentials,
     timestamp: Math.round(Date.now() / 1000)
   })
-  newApp.save(insertCallback)
+  newApp.save(function(err, app) {
+    if (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    reply(app)
+  })
 }
 
 exports.putApp = function(request, reply) {
@@ -59,6 +60,7 @@ exports.putApp = function(request, reply) {
 
   var updateCallback = function(err, app) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply(app)
@@ -66,6 +68,7 @@ exports.putApp = function(request, reply) {
 
   App.findById(id, function(err, app) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     app.name = request.payload.name;
@@ -78,6 +81,7 @@ exports.deleteApp = function(request, reply) {
 
   var deleteCallback = function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
@@ -89,6 +93,7 @@ exports.deleteApp = function(request, reply) {
 
   App.findById(id, function(err, app) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     app.delete(deleteCallback)
@@ -106,16 +111,22 @@ exports.postContainers = function(request, reply) {
 
   App.findById(app, function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
     container.save(function(err, container) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database'))
       }
 
       result.containers.push(container)
       result.save(function(err, app) {
+        if(err) {
+          request.log(['mongo'], err)
+          return reply(Boom.badImplementation('There was a problem with the database'))
+        }
         reply({
           message: 'Container successfully created.',
           id: container._id
@@ -132,12 +143,14 @@ exports.getContainers = function(request, reply) {
 
   App.findById(app, function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
     if (result.containers.length) {
       Container.findByIds(result.containers, role, function(err, containers) {
         if (err) {
+          request.log(['mongo'], err)
           return reply(Boom.badImplementation('There was a problem with the database'))
         }
 
@@ -157,6 +170,7 @@ exports.deleteContainers = function(request, reply) {
 
   var deleteCallback = function (err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
@@ -165,6 +179,10 @@ exports.deleteContainers = function(request, reply) {
         return n === containerId
       });
       result.save(function(err) {
+        if(err) {
+          request.log(['mongo'], err)
+          reply(Boom.badImplementation())
+        }
         reply({
           message: 'Container successfully removed.'
         })
@@ -174,6 +192,7 @@ exports.deleteContainers = function(request, reply) {
 
   Container.findByIdAndRole(containerId, role, function(err, container) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
@@ -188,6 +207,7 @@ exports.getContainer = function(request, reply) {
 
   App.findById(app, function(err, app) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
@@ -197,7 +217,7 @@ exports.getContainer = function(request, reply) {
 
     Container.findByIdAndRole(container, role, function(err, container) {
       if (err) {
-        console.log([container, role])
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database'))
       }
 
