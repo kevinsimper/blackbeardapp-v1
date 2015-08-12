@@ -17,9 +17,9 @@ exports.postNotifyImage = function(request, reply) {
     }
   })
 
-    Promise.all([user, findImage]).spread(function(user, image) {
-      if (!image) {
-     // Create image
+  Promise.all([user, findImage]).spread(function(user, image) {
+    if (!image) {
+      // Create image
       var newImage = new Image({
         user: user._id,
         name: name,

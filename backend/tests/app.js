@@ -7,14 +7,14 @@ var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
 
 var server = require('../server')
-server.start(function() {
+server.start(function () {
   console.log('Server running at:', server.info.uri)
 })
 
 var token = null
-lab.experiment('/app', function() {
+lab.experiment('/app', function () {
   var appId = null
-  lab.before(function(done) {
+  lab.before(function (done) {
     request({
         method: 'POST',
         uri: appUrl + '/login',
@@ -24,7 +24,7 @@ lab.experiment('/app', function() {
           password: 'password'
         }
       },
-      function(error, response, body) {
+      function (error, response, body) {
         token = body.token
         done()
       })
@@ -47,7 +47,7 @@ lab.experiment('/app', function() {
       })
   })
 
-  lab.test('POST', function(done) {
+  lab.test('POST', function (done) {
     var requestData = {
       name: 'testapp',
       image: imageId
@@ -61,7 +61,7 @@ lab.experiment('/app', function() {
         body: requestData,
         json: true
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
         expect(body.name, 'to be', requestData.name)
         appId = body._id
@@ -69,7 +69,7 @@ lab.experiment('/app', function() {
         done()
       })
   })
-  lab.test('PUT', function(done) {
+  lab.test('PUT', function (done) {
     var requestData = {
       name: 'testapp'
     }
@@ -81,13 +81,13 @@ lab.experiment('/app', function() {
       },
       body: requestData,
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body.name, 'to be', requestData.name)
       done()
     })
   })
-  lab.test('GET', function(done) {
+  lab.test('GET', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps',
@@ -95,13 +95,13 @@ lab.experiment('/app', function() {
         'Authorization': token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body, 'to be non-empty')
       done()
     })
   })
-  lab.test('Search POST', function(done) {
+  lab.test('Search POST', function (done) {
     var requestData = {
       name: 'testapp'
     }
@@ -113,14 +113,14 @@ lab.experiment('/app', function() {
         'Authorization': token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
 
       expect(response.statusCode, 'to be', 200)
       expect(body, 'to be non-empty', 'name')
       done()
     })
   })
-  lab.test('DELETE', function(done) {
+  lab.test('DELETE', function (done) {
     request({
       method: 'DELETE',
       uri: appUrl + '/users/me/apps/' + appId,
@@ -128,12 +128,12 @@ lab.experiment('/app', function() {
         'Authorization': token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(response.statusCode, 'to be', 200)
       done()
     })
   })
-  lab.test('GET with deleted', function(done) {
+  lab.test('GET with deleted', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps',
@@ -141,7 +141,7 @@ lab.experiment('/app', function() {
         'Authorization': token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body.pop().deleted, 'to be', true)
       done()
@@ -149,7 +149,7 @@ lab.experiment('/app', function() {
   })
 })
 
-lab.experiment('/app/containers', function() {
+lab.experiment('/app/containers', function () {
   var appId = null
   var containerId = null
   var imageId
@@ -168,7 +168,7 @@ lab.experiment('/app/containers', function() {
         done()
       })
   })
-  lab.before(function(done) {
+  lab.before(function (done) {
     var requestData = {
       name: 'Test App Container',
       image: imageId
@@ -182,14 +182,14 @@ lab.experiment('/app/containers', function() {
         body: requestData,
         json: true
       },
-      function(error, response, body) {
+      function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
         expect(body.name, 'to be', requestData.name)
         appId = body._id
         done()
       })
   })
-  lab.test('POST', function(done) {
+  lab.test('POST', function (done) {
     var requestData = {
       region: 'eu'
     }
@@ -201,14 +201,14 @@ lab.experiment('/app/containers', function() {
       },
       json: true,
       body: requestData
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body.message, 'to be', 'Container successfully created.')
       containerId = body.id
       done()
     })
   })
-  lab.test('GET', function(done) {
+  lab.test('GET', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps/' + appId + '/containers',
@@ -216,12 +216,12 @@ lab.experiment('/app/containers', function() {
         Authorization: token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(body, 'to be non-empty')
       done()
     })
   })
-  lab.test('GET container', function(done) {
+  lab.test('GET container', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
@@ -229,12 +229,12 @@ lab.experiment('/app/containers', function() {
         Authorization: token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(body.status, 'to be', 'Starting')
       done()
     })
   })
-  lab.test('GET logs with invalid id', function(done) {
+  lab.test('GET logs with invalid id', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps/invalid_id/logs',
@@ -242,12 +242,12 @@ lab.experiment('/app/containers', function() {
         Authorization: token
       },
       json: true
-    }, function(error, response, body) {
+    }, function (error, response, body) {
       expect(body.message, 'to be', 'Application id provided is invalid.')
       done()
     })
   })
-  lab.test('GET logs', function(done) {
+  lab.test('GET logs', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps/' + appId + '/logs',
@@ -255,8 +255,8 @@ lab.experiment('/app/containers', function() {
         Authorization: token
       },
       json: true
-    }, function(error, response, body) {
-      expect(body, 'to equal', [])
+    }, function (error, response, body) {
+      expect(body, 'to equal', [{timestamp: '1435735743'}])
       done()
     })
   })

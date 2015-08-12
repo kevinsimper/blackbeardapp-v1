@@ -1,10 +1,11 @@
 use blackbeard;
 db.apps.insert({
   "_id": ObjectId("559396bf05974b0c00b6b284"),
-  "name": "Test App",
-  "cname": "testapp",
+  "name": "testapp",
   "user": ObjectId("559396be05974b0c00b6b281"),
   "timestamp": "1435735744",
+  "containers": [],
+  "image": ObjectId("555cb1e2fc27fe6f5f543901"),
   "deleted": false,
   "__v": 0
 });
@@ -55,5 +56,6 @@ db.images.insert({
   "createdAt": "1432138210",
   "modifiedAt": "1432138211",
   "user": ObjectId("559396be05974b0c00b6b281"),
+  "logs": [{timestamp: "1435735743"}],
   "__v": 0
 });

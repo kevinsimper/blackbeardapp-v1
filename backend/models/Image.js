@@ -20,11 +20,11 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'createdAt', 'modifiedAt')
+    fields.push('name', 'createdAt', 'modifiedAt', 'logs')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('user', 'logs')
+    fields.push('user')
     // Show deleted and not deleted to admins
     conditions = {}
   }
