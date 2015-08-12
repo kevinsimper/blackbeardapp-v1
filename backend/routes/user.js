@@ -23,7 +23,7 @@ exports.getOneUser = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
   var role = request.auth.credentials.role
 
-  User.findOneByRole(role, id, function(err, user) {
+  User.findOneByRole(id, role, function(err, user) {
     // Get properties of user for current logged in user role
     if(!user) {
       return reply(Boom.notFound('User not found!'))

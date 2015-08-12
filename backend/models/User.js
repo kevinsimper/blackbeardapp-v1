@@ -30,23 +30,7 @@ schema.statics.getUserIdFromRequest = function(request) {
   }
 }
 
-// Potentially remove this
-schema.statics.isUsersCard = function (role, id, card, cb) {
-  // As default do not show deleted
-  var conditions = {
-    deleted: false
-  }
-
-  if (roles.isAllowed(roles.ADMIN, role)) {
-    conditions = {}
-  }
-
-  return this.where('_id', id).where(conditions).findOne(function(error, result) {
-    return cb(null, (!error && _.includes(result.creditCards, card)))
-  })
-}
-
-schema.statics.findOneByRole = function (role, id, cb) {
+schema.statics.findOneByRole = function (id, role, cb) {
   var fields = []
   // As default do not show deleted
   var conditions = {

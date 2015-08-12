@@ -3,15 +3,17 @@ var ObjectID = require('mongodb').ObjectID
 var _ = require('lodash')
 var User = require('../models/User')
 var App = require('../models/App')
+var Container = require('../models/Container')
+
 var Boom = require('boom')
 
 var config = require('../config')
 
-// /app
 exports.getApps = function(request, reply) {
-  var user = request.auth.credentials
+  var user = User.getUserIdFromRequest(request)
+  var role = request.auth.credentials.role
 
-  App.findByUserAndRole(user._id, user.role, function(err, result) {
+  App.findByUserAndRole(user, role, function(err, result) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
@@ -51,6 +53,7 @@ exports.postApp = function(request, reply) {
   })
   newApp.save(insertCallback)
 }
+
 exports.putApp = function(request, reply) {
   var id = request.params.app
 
@@ -82,7 +85,8 @@ exports.deleteApp = function(request, reply) {
     })
   }
 
-  var user = request.auth.credentials
+  var user = User.getUserIdFromRequest(request)
+
   App.findById(id, function(err, app) {
     if (err) {
       return reply(Boom.badImplementation('There was a problem with the database'))
@@ -95,16 +99,28 @@ exports.postContainers = function(request, reply) {
   var app = request.params.app
   var user = User.getUserIdFromRequest(request)
 
-  var container = {
+  var container = new Container({
     region: request.payload.region,
     status: 'Starting'
-  }
+  })
 
   App.findById(app, function(err, result) {
-    result.containers = result.containers || []
-    result.containers.push(container)
-    result.save(function(err, app) {
-      reply(app.containers[app.containers.length - 1])
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    container.save(function(err, container) {
+      if (err) {
+        return reply(Boom.badImplementation('There was a problem with the database'))
+      }
+
+      result.containers.push(container)
+      result.save(function(err, app) {
+        reply({
+          message: 'Container successfully created.',
+          id: container._id
+        })
+      })
     })
   })
 }
@@ -112,31 +128,84 @@ exports.postContainers = function(request, reply) {
 exports.getContainers = function(request, reply) {
   var app = request.params.app
   var user = User.getUserIdFromRequest(request)
+  var role = request.auth.credentials.role
 
   App.findById(app, function(err, result) {
-    reply(result.containers)
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    if (result.containers.length) {
+      Container.findByIds(result.containers, role, function(err, containers) {
+        if (err) {
+          return reply(Boom.badImplementation('There was a problem with the database'))
+        }
+
+        reply(containers)
+      })
+    } else {
+      reply([])
+    }
   })
 }
 
 exports.deleteContainers = function(request, reply) {
   var app = request.params.app
-  var container = request.params.container
+  var containerId = request.params.container
   var user = User.getUserIdFromRequest(request)
+  var role = request.auth.credentials.role
 
-  App.findById(app, function(err, result) {
-    result.containers.id(container).remove()
-    result.save(function(err) {
-      reply()
+  var deleteCallback = function (err, result) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    App.findById(app, function(err, result) {
+      result.containers = _.remove(result.containers, function(n) {
+        return n === containerId
+      });
+      result.save(function(err) {
+        reply({
+          message: 'Container successfully removed.'
+        })
+      })
     })
+  }
+
+  Container.findByIdAndRole(containerId, role, function(err, container) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    container.remove(deleteCallback)
   })
 }
 
 exports.getContainer = function(request, reply) {
   var app = request.params.app
-  var user = User.getUserIdFromRequest(request)
   var container = request.params.container
+  var role = request.auth.credentials.role
 
-  App.findById(app, function(err, result) {
-    reply(result.containers.id(container))
+  App.findById(app, function(err, app) {
+    if (err) {
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+
+    if (!app) {
+      return reply(Boom.notFound('The specified app could not be found.'))
+    }
+
+    Container.findByIdAndRole(container, role, function(err, container) {
+      if (err) {
+        console.log([container, role])
+        return reply(Boom.badImplementation('There was a problem with the database'))
+      }
+
+      if (!container) {
+        return reply(Boom.notFound('The specified container could not be found.'))
+      }
+
+      reply(container)
+    })
   })
 }
