@@ -51,6 +51,7 @@ exports.postApp = function(request, reply) {
 
   var insertCallback = function(err, app) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply(app)
@@ -175,7 +176,7 @@ exports.getAppLogs = function(request, reply) {
   }).catch(Promise.OperationalError, function (e) {
     reply(Boom.notFound("Application could not be found."))
   }).catch(function(e) {
-    console.log(e)
+    request.log(['mongo'], e)
     reply(Boom.badImplementation())
   })
 }
