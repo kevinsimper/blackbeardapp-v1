@@ -1,11 +1,18 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
+
 var AppsStore = require('../Apps/store')
 var AppsActions = require('../Apps/actions')
+
+var AppLogs = require('../AppLogs/')
+
 var moment = require('moment')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
+
+var request = require('superagent')
+var config = require('../../config')
 
 var AppShow = React.createClass({
   mixins: [Navigation],
@@ -22,11 +29,12 @@ var AppShow = React.createClass({
   componentDidMount: function() {
     var self = this
     AppsActions.load()
-    .then(function() {
-      self.setState({
-        loaded: true
+      .then(function() {
+        self.setState({
+          loaded: true
+        })
       })
-    })
+
     this.unsubscribe = AppsStore.listen(this.onChange)
   },
   componentWillUnmount: function() {
@@ -56,19 +64,46 @@ var AppShow = React.createClass({
     if(!this.state.loaded) {
       return <div>Loading ...</div>
     }
+
+    // get container
+    var ContainerItem = React.createClass({
+      render: function() {
+        //var clickFunction = self.onClickStopContainer.bind(self, item)
+        //return <div>{item.region} <Button onClick={clickFunction}>Stop</Button></div>
+
+        return (
+          <div>
+            Container {this.props.container}
+            <Button>Stop</Button>
+          </div>
+        );
+      }
+    })
+
+    var Containers = React.createClass({
+      render: function() {
+        var containers = []
+        this.props.containers.forEach(function(container) {
+          containers.push(<ContainerItem container={container} />)
+        }.bind(this));
+
+        return (
+          <div>
+            <h2>Containers</h2>
+            {containers}
+          </div>
+        );
+      }
+    });
+
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
-        <div className='AppShow__Containers'>
-          {this.state.app.containers.map(function(item) {
-            var clickFunction = self.onClickStopContainer.bind(self, item)
-            return <div>{item.region} <Button onClick={clickFunction}>Stop</Button></div>
-          })}
-          {this.state.app.containers.length === 0 && 
-            <div>No running containers</div>
-          }
-        </div>
+
+        <Containers containers={this.state.app.containers} />
+        <AppLogs app={this.state.app._id} />
+
         <Button onClick={this.onClickStart}>Start containers</Button>
         <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>

@@ -6,7 +6,6 @@ var findWhere = require('lodash/collection/findWhere')
 var remove = require('lodash/array/remove')
 
 var _apps = []
-var _images = []
 
 var store = Reflux.createStore({
   listenables: actions,
@@ -19,17 +18,11 @@ var store = Reflux.createStore({
       .get(config.BACKEND_HOST + '/users/me/apps')
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
-        request
-          .get(config.BACKEND_HOST + '/users/me/images')
-          .set('Authorization', localStorage.token)
-          .end(function(err, res2) {
-            actions.load.completed({apps: res.body, images: res2.body})
-          })
+        actions.load.completed(res.body)
       })
   },
   onLoadCompleted: function(data) {
-    _apps = data.apps
-    _images = data.images
+    _apps = data
 
     this.trigger(data)
   },
@@ -51,9 +44,6 @@ var store = Reflux.createStore({
   },
   getApps: function() {
     return _apps;
-  },
-  getImages: function() {
-    return _images;
   },
   getOneApp: function(id) {
     return findWhere(_apps, {_id: id})
