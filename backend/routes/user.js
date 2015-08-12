@@ -37,7 +37,7 @@ exports.postUserUsername = function(request, reply) {
   var role = request.auth.credentials.role
   var username = request.payload.username
 
-  var user = User.findOneByRoleAsync(role, id)
+  var user = User.findOneByRoleAsync(id, role)
 
   var existing = user.then(function(user) {
     if(user.username) {
