@@ -2,14 +2,18 @@ var options = {
   opsInterval: 1000,
   reporters: [
     {
-      reporter: require('good-console'),
-      events: {log: '*', response: '*', request: '*'}
-    },
-    {
       reporter: require('good-file'),
       events: {log: '*', response: '*', request: '*'},
       config: '/var/log/blackbeard_backend.log'
-    }]
+    }
+  ]
+}
+
+if(process.env.NODE_ENV === 'development') {
+  options.reporters.push({
+    reporter: require('good-console'),
+    events: {log: '*', response: '*', request: '*'}
+  })
 }
 
 if (process.env.NODE_ENV === 'production') {

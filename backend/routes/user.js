@@ -13,6 +13,7 @@ var Payment = require('../models/Payment')
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
     if(err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation())
     }
     reply(users)
@@ -24,7 +25,10 @@ exports.getOneUser = function(request, reply) {
   var role = request.auth.credentials.role
 
   User.findOneByRole(id, role, function(err, user) {
-    // Get properties of user for current logged in user role
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     if(!user) {
       return reply(Boom.notFound('User not found!'))
     }
@@ -69,8 +73,8 @@ exports.postUserUsername = function(request, reply) {
       })
     }
   })
-  .catch(function(e) {
-    console.log(e)
+  .catch(function(err) {
+    request.log(err)
     reply(Boom.badImplementation())
   })
 
@@ -84,6 +88,7 @@ exports.postUser = function(request, reply) {
 
   var insertCallback = function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
@@ -94,6 +99,7 @@ exports.postUser = function(request, reply) {
 
   var resultCallback = function(err, user) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     if (user) {
@@ -119,10 +125,15 @@ exports.postUser = function(request, reply) {
 exports.putUsers = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
   User.findById(id, function(err, user) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     user.email = request.payload.email
     user.name = request.payload.name
     user.save(function(err, updated) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database'))
       }
       reply(updated)
@@ -133,6 +144,10 @@ exports.putUsers = function(request, reply) {
 exports.delUsers = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
   User.findById(id, function(err, user) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     user.delete(function(err, savedUser) {
       reply()
     })
@@ -145,6 +160,10 @@ exports.postLogin = function(request, reply) {
   var password = request.payload.password
 
   User.findOne({ email: email }, function(err, user) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     if (user) {
       if (passwordHash.verify(password, user.password)) {
         var token = jwt.sign(user._id, config.AUTH_SECRET, {
@@ -174,6 +193,7 @@ exports.getUserPayments = function(request, reply) {
 
   Payment.findByUserAndRole(id, role, function(err, payments) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 

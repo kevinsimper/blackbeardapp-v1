@@ -20,6 +20,7 @@ exports.postContact = function(request, reply) {
 
   newSupport.save(function(err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation())
     }
     reply({
@@ -34,6 +35,10 @@ exports.postSignup = function(request, reply) {
   PreUsers.findOne({
     email: email
   }, function(err, result) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
 
     if(result === null) {
       insertEmail()
@@ -53,6 +58,7 @@ exports.postSignup = function(request, reply) {
     })
     newPreUser.save(function(err, result) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation())
       }
       reply({

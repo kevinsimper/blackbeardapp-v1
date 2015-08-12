@@ -19,7 +19,8 @@ exports.getCreditCards = function (request, reply) {
   .then(function(creditCards) {
     return reply(creditCards)
   })
-  .catch(function(e) {
+  .catch(function(err) {
+    request.log(err)
     reply(Boom.badImplementation())
   })
 }
@@ -33,8 +34,8 @@ exports.getCreditCard = function (request, reply) {
     return reply(card)
   }).catch(function(CastError, e) {
     reply(Boom.notFound())
-  }).catch(function(e) {
-    console.log(e)
+  }).catch(function(err) {
+    request.log(err)
     reply(Boom.badImplementation())
   })
 }
@@ -76,7 +77,7 @@ exports.postCreditCardActivate = function (request, reply) {
       message: 'Credit card set to active.',
     })
   }).catch(function (err) {
-    console.log(err)
+    request.log(err)
     return reply(Boom.badImplementation('There was a problem with the database.'))
   })
 }
@@ -98,6 +99,7 @@ exports.postCreditCardPayment = function (request, reply) {
 
     var paymentSaveCallback = function (err, payment) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
 
@@ -109,6 +111,7 @@ exports.postCreditCardPayment = function (request, reply) {
 
     var userSaveCallback = function (err, user) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
 
@@ -129,6 +132,7 @@ exports.postCreditCardPayment = function (request, reply) {
     // Increase users credit
     User.findOne({_id: user}, function (err, user) {
       if (err) {
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
 
@@ -160,6 +164,7 @@ exports.postCreditCardPayment = function (request, reply) {
             // Because Boom is crap the data sent with this exception is ignored so
             return reply(Boom.badRequest(err.message))
           } else {
+            request.log(['mongo'], err)
             return reply(Boom.badImplementation('There was a problem with the database.'))
           }
         }
@@ -193,6 +198,7 @@ exports.postCreditCards = function (request, reply) {
 
   var updateCallback = function (err, user) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
     reply({
@@ -204,6 +210,7 @@ exports.postCreditCards = function (request, reply) {
 
   var newCardCallback = function (err, creditCard) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
 
@@ -214,6 +221,7 @@ exports.postCreditCards = function (request, reply) {
 
   User.findOne({_id: id}, function (err, user) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database.'))
     }
 
@@ -247,7 +255,7 @@ exports.postCreditCards = function (request, reply) {
           // Because Boom is crap the data sent with this exception is ignored so
           return reply(Boom.badRequest(err.message))
         }
-
+        request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
 
@@ -272,6 +280,7 @@ exports.deleteCreditCards = function (request, reply) {
 
   var deleteCallback = function (err, result) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     reply({
@@ -281,6 +290,7 @@ exports.deleteCreditCards = function (request, reply) {
 
   CreditCard.findById(creditCardId, function (err, card) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 

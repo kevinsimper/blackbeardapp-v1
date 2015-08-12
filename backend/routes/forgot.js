@@ -11,6 +11,7 @@ exports.postForgot = function(request, reply) {
 
   var updateCallback = function(err, user) {
      if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
@@ -25,6 +26,7 @@ exports.postForgot = function(request, reply) {
 
     Mail.send(data, function (error, body) {
       if (error) {
+        request.log(['mail'], err)
         return reply(Boom.badRequest('Error sending password reset email.'))
       }
 
@@ -35,6 +37,10 @@ exports.postForgot = function(request, reply) {
   }
 
   User.findOne({ email: email }, function(err, user) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     if (user) {
       crypto.randomBytes(20, function(err, buf) {
         if (err) {
@@ -67,6 +73,7 @@ exports.postForgotReset = function(request, reply) {
 
   var updateCallback = function(err, user) {
     if (err) {
+      request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
@@ -82,6 +89,10 @@ exports.postForgotReset = function(request, reply) {
   }
 
   User.findOne({ resetToken: token }, function(err, user) {
+    if(err) {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    }
     if(!user) {
       return reply(Boom.notFound())
     }
