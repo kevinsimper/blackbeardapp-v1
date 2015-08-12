@@ -5,6 +5,7 @@ var AppsStore = require('../Apps/store')
 var AppsActions = require('../Apps/actions')
 
 var AppLogs = require('../AppLogs/')
+var Containers = require('../Containers/')
 
 var moment = require('moment')
 var Button = require('../Button/')
@@ -56,52 +57,18 @@ var AppShow = React.createClass({
   onClickStart: function() {
     this.transitionTo('/apps/' + this.props.params.id + '/containers')
   },
-  onClickStopContainer: function(item) {
-    AppsActions.stopContainer(this.props.params.id, item._id)
-  },
   render: function() {
     var self = this
     if(!this.state.loaded) {
       return <div>Loading ...</div>
     }
 
-    // get container
-    var ContainerItem = React.createClass({
-      render: function() {
-        //var clickFunction = self.onClickStopContainer.bind(self, item)
-        //return <div>{item.region} <Button onClick={clickFunction}>Stop</Button></div>
-
-        return (
-          <div>
-            Container {this.props.container}
-            <Button>Stop</Button>
-          </div>
-        );
-      }
-    })
-
-    var Containers = React.createClass({
-      render: function() {
-        var containers = []
-        this.props.containers.forEach(function(container) {
-          containers.push(<ContainerItem container={container} />)
-        }.bind(this));
-
-        return (
-          <div>
-            <h2>Containers</h2>
-            {containers}
-          </div>
-        );
-      }
-    });
-
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
 
-        <Containers containers={this.state.app.containers} />
+        <Containers app={this.state.app._id} />
         <AppLogs app={this.state.app._id} />
 
         <Button onClick={this.onClickStart}>Start containers</Button>

@@ -78,24 +78,6 @@ var store = Reflux.createStore({
       app.containers = [container]
     }
     this.trigger(container)
-  },
-  onStopContainer: function(id, containerId) {
-    request
-      .del(config.BACKEND_HOST + '/users/me/apps/' + id + '/containers/' + containerId)
-      .set('Authorization', localStorage.token)
-      .end(function(err, res) {
-        if(err) {
-          return actions.stopContainer.failed(err)
-        }
-        actions.stopContainer.completed(id, containerId)
-      })
-  },
-  onStopContainerCompleted: function(id, containerId) {
-    var app = this.getOneApp(id)
-    remove(app.containers, function(item) {
-      return item._id === containerId
-    })
-    this.trigger()
   }
 })
 
