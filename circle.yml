@@ -38,6 +38,7 @@ deployment:
       - docker push tutum.co/kevinsimper/blackbeardapp_backend
       - docker tag blackbeardapp_registryproxy tutum.co/kevinsimper/blackbeardapp_registryproxy
       - docker push tutum.co/kevinsimper/blackbeardapp_registryproxy
+      - ./docker-compose run -e NODE_ENV=production backend node migrate.js
 experimental:
   notify:
     branches:

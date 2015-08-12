@@ -8,7 +8,7 @@ exports.up = function(next) {
       role: {
         $exists: false
       }
-    }, [['_id','asc']], {$set: {role: 'user'}}, {new:true}, function(err, results) {
+    }, [['_id','asc']], {$set: {role: 'USER'}}, {new:true}, function(err, results) {
       if(err) {
         console.log(err)
       } else {
