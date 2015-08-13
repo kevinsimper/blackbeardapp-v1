@@ -231,6 +231,7 @@ lab.experiment('/app/containers', function () {
       json: true
     }, function (error, response, body) {
       expect(body.status, 'to be', 'Starting')
+      expect(body.deleted, 'to be', false)
       done()
     })
   })
@@ -270,6 +271,20 @@ lab.experiment('/app/containers', function () {
       json: true
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
+      done()
+    })
+  })
+  lab.test('GET container', function (done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function (error, response, body) {
+      expect(body.deleted, 'to be', true)
+
       done()
     })
   })

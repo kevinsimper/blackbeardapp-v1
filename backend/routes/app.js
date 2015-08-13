@@ -239,7 +239,8 @@ exports.deleteContainers = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    container.remove(deleteCallback)
+    // Set container to deleted
+    container.delete(deleteCallback)
   })
 }
 

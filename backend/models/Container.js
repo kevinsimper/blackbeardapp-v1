@@ -1,11 +1,16 @@
 var mongoose = require('mongoose')
 var roles = require('./roles/')
+var mongooseDelete = require('mongoose-delete')
 
 var schema = new mongoose.Schema({
   status: String,
   region: String,
-  ip: String
+  ip: String,
+  deleted: { type: Boolean, default: false },
+  deletedAt: String
 })
+
+schema.plugin(mongooseDelete)
 
 schema.statics.findByIds = function (ids, role, cb) {
   // As default do not show deleted
