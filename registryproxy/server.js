@@ -51,6 +51,9 @@ var checkCredentials = function(credentials) {
         method: 'POST',
         uri: BACKEND_HOST + '/login',
         json: true,
+        headers: {
+          'x-login-from': 'registry'
+        },
         body: {
           email: credentials.name,
           password: credentials.pass
@@ -62,9 +65,9 @@ var checkCredentials = function(credentials) {
           resolve(false)
         }
       })
-        .catch(function(err) {
-          console.log(err)
-        })
+      .catch(function(err) {
+        console.log(err)
+      })
     }
   })
 }
@@ -123,6 +126,12 @@ app.all('/v2/*', function(req, res) {
 
 app.all('/v1/*', function(req, res) {
   res.sendStatus(404)
+})
+
+app.get('/status', function (req, res) {
+  res.send({
+    status: 'OK'
+  })
 })
 
 app.all('*', function(req, res) {

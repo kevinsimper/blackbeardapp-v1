@@ -1,8 +1,8 @@
 var Hapi = require('hapi')
-var MongoClient = require('mongodb').MongoClient
-var ObjectID = require('mongodb').ObjectID
 var passwordHash = require('password-hash')
 var mongoose = require('mongoose')
+var Promise = require('bluebird')
+Promise.promisifyAll(require("mongoose"))
 
 var config = require('./config')
 
@@ -23,6 +23,7 @@ var creditcardRoutes = require('./routes/creditcard')
 var forgotRoutes = require('./routes/forgot')
 var webhookRoutes = require('./routes/webhook')
 var imageRoutes = require('./routes/image')
+var logRoutes = require('./routes/log')
 
 var server = new Hapi.Server({
   connections: {
@@ -406,6 +407,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: false,
       handler: webhookRoutes.postNotifyImage
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/logs',
+    config: {
+      auth: 'jwt',
+      handler: logRoutes.getLogs
     }
   })
 
