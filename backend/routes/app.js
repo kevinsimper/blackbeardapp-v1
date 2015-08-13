@@ -125,7 +125,8 @@ exports.postContainers = function(request, reply) {
 
   var container = new Container({
     region: request.payload.region,
-    status: 'Starting'
+    status: 'Starting',
+    app: app
   })
 
   App.findById(app, function(err, result) {

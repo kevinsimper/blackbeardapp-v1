@@ -246,6 +246,7 @@ lab.experiment('/app/containers', function () {
     }, function (error, response, body) {
       expect(body.status, 'to be', 'Starting')
       expect(body.deleted, 'to be', false)
+      expect(body.app, 'to be', appId)
       done()
     })
   })
