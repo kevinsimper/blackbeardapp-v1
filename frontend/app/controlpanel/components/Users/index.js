@@ -4,6 +4,7 @@ var Store = require('./store')
 var Table = require('../Table')
 var Button = require('../Button')
 var Navigation = require('react-router').Navigation
+var moment = require('moment')
 
 var Users = React.createClass({
   mixins: [Navigation],
@@ -48,7 +49,11 @@ var Users = React.createClass({
                 <tr>
                   <td>{item.email}</td>
                   <td>{item.credit}</td>
-                  <td>{item.timestamp}</td>
+                  <td>
+                    <span title={moment.unix(item.timestamp).format()}>
+                      {moment.unix(item.timestamp).fromNow()}
+                    </span>
+                  </td>
                   <td>{item.deleted && <span>Yes</span>}</td>
                   <td>
                     <Button size='small' onClick={handler}>View</Button>
