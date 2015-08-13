@@ -110,7 +110,7 @@ exports.postUser = function(request, reply) {
         password: hashedPassword,
         credit: 0,
         timestamp: Math.round(Date.now() / 1000),
-        ip: request.info.remoteAddress,
+        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         role: roles.USER // Regular user account
       })
       newUser.save(insertCallback)
