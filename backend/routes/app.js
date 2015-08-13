@@ -194,15 +194,11 @@ exports.getContainers = function(request, reply) {
     }
 
     if (result.containers.length) {
-      console.log(result.containers, "leads to")
-
       Container.findByIds(result.containers, role, function(err, containers) {
         if (err) {
           request.log(['mongo'], err)
           return reply(Boom.badImplementation('There was a problem with the database'))
         }
-
-        console.log(containers, "LED")
 
         reply(containers)
       })
