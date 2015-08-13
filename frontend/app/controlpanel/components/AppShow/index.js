@@ -1,11 +1,19 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
+
 var AppsStore = require('../Apps/store')
 var AppsActions = require('../Apps/actions')
+
+var AppLogs = require('../AppLogs/')
+var Containers = require('../Containers/')
+
 var moment = require('moment')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
+
+var request = require('superagent')
+var config = require('../../config')
 
 var AppShow = React.createClass({
   mixins: [Navigation],
@@ -22,11 +30,12 @@ var AppShow = React.createClass({
   componentDidMount: function() {
     var self = this
     AppsActions.load()
-    .then(function() {
-      self.setState({
-        loaded: true
+      .then(function() {
+        self.setState({
+          loaded: true
+        })
       })
-    })
+
     this.unsubscribe = AppsStore.listen(this.onChange)
   },
   componentWillUnmount: function() {
@@ -48,27 +57,20 @@ var AppShow = React.createClass({
   onClickStart: function() {
     this.transitionTo('/apps/' + this.props.params.id + '/containers')
   },
-  onClickStopContainer: function(item) {
-    AppsActions.stopContainer(this.props.params.id, item._id)
-  },
   render: function() {
     var self = this
     if(!this.state.loaded) {
       return <div>Loading ...</div>
     }
+
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
-        <div className='AppShow__Containers'>
-          {this.state.app.containers.map(function(item) {
-            var clickFunction = self.onClickStopContainer.bind(self, item)
-            return <div>{item.region} <Button onClick={clickFunction}>Stop</Button></div>
-          })}
-          {this.state.app.containers.length === 0 && 
-            <div>No running containers</div>
-          }
-        </div>
+
+        <Containers app={this.state.app._id} />
+        <AppLogs app={this.state.app._id} />
+
         <Button onClick={this.onClickStart}>Start containers</Button>
         <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>

@@ -1,18 +1,12 @@
 var Reflux = require('reflux')
 
 var actions = Reflux.createActions({
-  load: {
+  loadOne: {
     asyncResult: true
   },
-  new: {
+  stopOne: {
     asyncResult: true
   },
-  del: {
-    asyncResult: true
-  },
-  newContainer: {
-    asyncResult: true
-  }
 })
 
 module.exports = actions

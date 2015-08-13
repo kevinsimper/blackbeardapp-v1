@@ -1,8 +1,9 @@
-var MongoClient = require('mongodb').MongoClient
-var ObjectID = require('mongodb').ObjectID
+var Promise = require('bluebird')
+var ObjectId = require('mongodb').ObjectID
 var _ = require('lodash')
 var User = require('../models/User')
-var App = require('../models/App')
+var App = Promise.promisifyAll(require('../models/App'))
+var Image = Promise.promisifyAll(require('../models/Image'))
 var Container = require('../models/Container')
 
 var Boom = require('boom')
@@ -40,6 +41,22 @@ exports.postApp = function(request, reply) {
   var name = request.payload.name
   var image = request.payload.image
 
+  if (!name) {
+    return reply(Boom.badRequest('You must supply an application name.'))
+  }
+
+  if (!image) {
+    return reply(Boom.badRequest('You must supply an image to base your application on.'))
+  }
+
+  var insertCallback = function(err, app) {
+    if (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation('There was a problem with the database'))
+    }
+    reply(app)
+  }
+
   var newApp = new App({
     name: name,
     image: image,
@@ -72,6 +89,7 @@ exports.putApp = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
     app.name = request.payload.name;
+    // Explicitly leaving out image here - I'm not entirely sure if you should be able to change this once the app is made
     app.save(updateCallback)
   })
 }
@@ -136,9 +154,35 @@ exports.postContainers = function(request, reply) {
   })
 }
 
+exports.getAppLogs = function(request, reply) {
+  var id = request.params.app
+
+  try {
+    ObjectId(id)
+  } catch (e) {
+    return reply(Boom.badRequest("Application id provided is invalid."))
+  }
+
+  var app = App.findByIdAsync(id)
+
+  app.then(function(foundApp) {
+    if (!foundApp) {
+      throw new Promise.OperationalError("App not found")
+    } else {
+      return Image.findByIdAsync(foundApp.image)
+    }
+  }).then(function(image) {
+    reply(image.logs)
+  }).catch(Promise.OperationalError, function (e) {
+    reply(Boom.notFound("Application could not be found."))
+  }).catch(function(e) {
+    request.log(['mongo'], e)
+    reply(Boom.badImplementation())
+  })
+}
+
 exports.getContainers = function(request, reply) {
   var app = request.params.app
-  var user = User.getUserIdFromRequest(request)
   var role = request.auth.credentials.role
 
   App.findById(app, function(err, result) {
@@ -165,7 +209,6 @@ exports.getContainers = function(request, reply) {
 exports.deleteContainers = function(request, reply) {
   var app = request.params.app
   var containerId = request.params.container
-  var user = User.getUserIdFromRequest(request)
   var role = request.auth.credentials.role
 
   var deleteCallback = function (err, result) {
