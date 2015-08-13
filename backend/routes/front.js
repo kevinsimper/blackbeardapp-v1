@@ -15,7 +15,7 @@ exports.postContact = function(request, reply) {
     email: email,
     message: message,
     timestamp: Math.round(Date.now() / 1000),
-    ip: request.info.remoteAddress
+    ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress
   })
 
   newSupport.save(function(err, result) {
@@ -54,7 +54,7 @@ exports.postSignup = function(request, reply) {
       email: email,
       active: false,
       timestamp: Math.round(Date.now() / 1000),
-      ip: request.info.remoteAddress
+      ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress
     })
     newPreUser.save(function(err, result) {
       if (err) {

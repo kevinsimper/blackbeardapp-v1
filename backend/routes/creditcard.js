@@ -122,7 +122,7 @@ exports.postCreditCardPayment = function (request, reply) {
         chargeId: charge.id,
         user: user._id,
         timestamp: Math.round(Date.now() / 1000),
-        ip: request.info.remoteAddress,
+        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         status: paymentStatus.SUCCESS
       })
 
@@ -148,7 +148,7 @@ exports.postCreditCardPayment = function (request, reply) {
             creditCard: creditCard._id,
             user: user._id,
             timestamp: Math.round(Date.now() / 1000),
-            ip: request.info.remoteAddress,
+            ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
             status: paymentStatus.FAIL
           })
 
