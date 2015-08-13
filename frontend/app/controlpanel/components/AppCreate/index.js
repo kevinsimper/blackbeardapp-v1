@@ -1,25 +1,20 @@
 var React = require('react')
-
 var extend = require('lodash/object/extend')
-
 var AppActions = require('../Apps/actions')
 var AppStore = require('../Apps/store')
-
 var ImageActions = require('../Images/actions')
 var ImageStore = require('../Images/store')
-
 var Navigation = require('react-router').Navigation;
 var Input = require('../Input/')
 var Label= require('../Label/')
 var Button = require('../Button/')
-
 var ImagesSelect = require('../ImagesSelect/index')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
   getState: function() {
     return {
-      images: AppStore.getImages()
+      images: ImageStore.getImages()
     }
   },
   getInitialState: function() {
@@ -33,11 +28,14 @@ var AppCreate = React.createClass({
     this.setState(this.getState())
   },
   componentDidMount: function() {
+    ImageActions.load()
     AppActions.load()
     this.unsubscribe = AppStore.listen(this.onChange)
+    this.unsubscribeImage = ImageStore.listen(this.onChange)
   },
   componentWillUnmount: function() {
     this.unsubscribe()
+    this.unsubscribeImage()
   },
   onChangeName: function(e) {
     this.setState({
