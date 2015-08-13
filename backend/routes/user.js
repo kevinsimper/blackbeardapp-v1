@@ -175,13 +175,16 @@ exports.postLogin = function(request, reply) {
           user: user,
           timestamp: Math.round(Date.now() / 1000),
           ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-          type: 'Login'
+          type: 'Login',
         })
-        log.saveAsync().then(function() {
-          reply({
-            message: 'Login successful.',
-            token: token
-          })
+        if(request.headers['x-login-from']) {
+          log.data.push('Logged in from ' + request.headers['x-login-from'])
+        }
+        log.saveAsync()
+
+        reply({
+          message: 'Login successful.',
+          token: token
         })
 
       } else {
