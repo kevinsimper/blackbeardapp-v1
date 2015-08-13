@@ -9,6 +9,7 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
+var Log = require('../models/Log')
 
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
@@ -170,10 +171,19 @@ exports.postLogin = function(request, reply) {
           expiresInMinutes: 1440 // 24h
         });
 
-        reply({
-          message: 'Login successful.',
-          token: token
+        var log = new Log({
+          user: user,
+          timestamp: Math.round(Date.now() / 1000),
+          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+          type: 'Login'
         })
+        log.saveAsync().then(function() {
+          reply({
+            message: 'Login successful.',
+            token: token
+          })
+        })
+
       } else {
         reply(Boom.unauthorized('Invalid email and password combination.'))
       }
