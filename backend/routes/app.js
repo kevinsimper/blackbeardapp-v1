@@ -194,11 +194,15 @@ exports.getContainers = function(request, reply) {
     }
 
     if (result.containers.length) {
+      console.log(result.containers, "leads to")
+
       Container.findByIds(result.containers, role, function(err, containers) {
         if (err) {
           request.log(['mongo'], err)
           return reply(Boom.badImplementation('There was a problem with the database'))
         }
+
+        console.log(containers, "LED")
 
         reply(containers)
       })
@@ -219,19 +223,8 @@ exports.deleteContainers = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    App.findById(app, function(err, result) {
-      result.containers = _.remove(result.containers, function(n) {
-        return n === containerId
-      });
-      result.save(function(err) {
-        if(err) {
-          request.log(['mongo'], err)
-          reply(Boom.badImplementation())
-        }
-        reply({
-          message: 'Container successfully removed.'
-        })
-      })
+    reply({
+      message: 'Container successfully removed.'
     })
   }
 

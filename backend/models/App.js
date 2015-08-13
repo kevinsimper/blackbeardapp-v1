@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
 var roles = require('./roles/')
 var mongooseDelete = require('mongoose-delete')
+var Container = require('./Container')
 
 var schema = new mongoose.Schema({
   name: String,

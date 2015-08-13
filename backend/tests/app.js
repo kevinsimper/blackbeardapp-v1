@@ -12,6 +12,7 @@ server.start(function () {
 })
 
 var token = null
+var adminToken = null
 lab.experiment('/app', function () {
   var appId = null
   lab.before(function (done) {
@@ -26,6 +27,21 @@ lab.experiment('/app', function () {
       },
       function (error, response, body) {
         token = body.token
+        done()
+      })
+  })
+  lab.before(function (done) {
+    request({
+        method: 'POST',
+        uri: appUrl + '/login',
+        json: true,
+        body: {
+          email: 'admin+users@blackbeard.io',
+          password: 'password'
+        }
+      },
+      function (error, response, body) {
+        adminToken = body.token
         done()
       })
   })
@@ -300,6 +316,20 @@ lab.experiment('/app/containers', function () {
     }, function (error, response, body) {
       expect(body.statusCode, 'to be', 404)
 
+      done()
+    })
+  })
+  lab.test('GET container', function (done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/',
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function (error, response, body) {
+
+      console.log(body)
       done()
     })
   })
