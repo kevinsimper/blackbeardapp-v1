@@ -20,7 +20,7 @@ lab.experiment('/app', function () {
         uri: appUrl + '/login',
         json: true,
         body: {
-          email: 'admin+users@blackbeard.io',
+          email: 'user@blackbeard.io',
           password: 'password'
         }
       },
@@ -120,6 +120,20 @@ lab.experiment('/app', function () {
       done()
     })
   })
+  lab.test('GET', function (done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps',
+      headers: {
+        'Authorization': token
+      },
+      json: true
+    }, function (error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body.length, 'to be', 2)
+      done()
+    })
+  })
   lab.test('DELETE', function (done) {
     request({
       method: 'DELETE',
@@ -133,7 +147,7 @@ lab.experiment('/app', function () {
       done()
     })
   })
-  lab.test('GET with deleted', function (done) {
+  lab.test('GET', function (done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps',
@@ -143,7 +157,7 @@ lab.experiment('/app', function () {
       json: true
     }, function (error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body.pop().deleted, 'to be', true)
+      expect(body.length, 'to be', 1)
       done()
     })
   })
@@ -283,7 +297,7 @@ lab.experiment('/app/containers', function () {
       },
       json: true
     }, function (error, response, body) {
-      expect(body.deleted, 'to be', true)
+      expect(body.statusCode, 'to be', 404)
 
       done()
     })

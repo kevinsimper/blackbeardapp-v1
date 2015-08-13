@@ -40,6 +40,7 @@ exports.search = function(request, reply) {
 exports.postApp = function(request, reply) {
   var name = request.payload.name
   var image = request.payload.image
+  var user = User.getUserIdFromRequest(request)
 
   if (!name) {
     return reply(Boom.badRequest('You must supply an application name.'))
@@ -60,7 +61,7 @@ exports.postApp = function(request, reply) {
   var newApp = new App({
     name: name,
     image: image,
-    user: request.auth.credentials,
+    user: user,
     timestamp: Math.round(Date.now() / 1000)
   })
   newApp.save(function(err, app) {
