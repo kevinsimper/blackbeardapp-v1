@@ -1,7 +1,7 @@
 .terminal {
   padding: 20px 0 30px;
-  background: $lightbg;
-  color: $mediumblue;
+  background-color: #00A9E8;
+  color: white;
 }
 
 .terminal .headline {
@@ -26,7 +26,7 @@
   }
 }
 .terminal__window {
-  flex: 3;
+  flex: 2;
   background-color: #111;
   color: white;
   border-radius: 4px;

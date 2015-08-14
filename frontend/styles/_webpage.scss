@@ -1,8 +1,7 @@
 .webpage {
-  padding: 20px 0 30px;
   color: rgba(0, 0, 0, 0.8);
   @media(min-width: 850px) {
-    padding: 40px;
+    padding: 20px 0 30px;
   }
 }
 .webpage-container {
@@ -23,7 +22,7 @@
   line-height: 30px;
 }
 .webpage__window {
-  flex: 3;
+  flex: 2;
   border: 2px rgba(0, 0, 0, 0.10) solid;
   border-radius: 4px;
   min-height: 300px;

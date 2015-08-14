@@ -1,10 +1,10 @@
 $editorbg: #00658B;
 
 .dockerfile {
-  background-color: #00A9E8;
-  color: white;
+  background: $lightbg;
+  color: $mediumblue;
   @media(min-width: 850px) {
-    padding: 40px;
+    padding: 20px 0 30px;
   }
 }
 
@@ -29,16 +29,13 @@ $editorbg: #00658B;
 }
 
 .dockerfile__editorcontainer {
-  flex: 3;
+  flex: 2;
 }
 
 .dockerfile__editor {
   background-color: $editorbg;
   border-radius: 3px;
-  margin-top: 50px;
-  @media(min-width: 850px) {
-    margin-top: 0px;
-  }
+  color: white;
 }
 
 .dockerfile__editor__header {
