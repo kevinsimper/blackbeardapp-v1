@@ -4,8 +4,8 @@ var moment = require('moment')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
-
-ContainerItem = require('../ContainerItem/')
+var Table = require('../Table/')
+var ContainerItem = require('../ContainerItem/')
 
 var store = require('./store')
 var actions = require('./actions')
@@ -40,18 +40,25 @@ var Containers = React.createClass({
   },
   render: function() {
     var self = this
-    var containers = []
-
-    if (this.state.containers) {
-      this.state.containers.forEach(function(container) {
-        containers.push(<ContainerItem app={self.props.app} container={container} />)
-      }.bind(this));
-    }
 
     return (
       <div>
         <h2>Containers</h2>
-        {containers}
+        <Table>
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th>Status</th>
+              <th>IP</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.containers.map(function(container) {
+              return <ContainerItem app={self.props.app} container={container} />
+            })}
+          </tbody>
+        </Table>
       </div>
     );
   }

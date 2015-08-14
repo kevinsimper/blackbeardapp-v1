@@ -1,8 +1,6 @@
 var React = require('react')
 var Button = require('../Button/')
 var ContainerActions = require('../Containers/actions')
-var Label = require('../Label/')
-
 var AppsActions = require('../Apps/actions')
 
 var ContainerItem = React.createClass({
@@ -18,16 +16,12 @@ var ContainerItem = React.createClass({
     }
 
     return (
-      <div>
-        <Label>Region: </Label>
-        {this.props.container.region}
-        <Label>Status: </Label>
-        {this.props.container.status}
-        <Label>IP: </Label>
-        {this.props.container.ip}
-
-        {containerButton}
-      </div>
+      <tr>
+        <td>{this.props.container.region}</td>
+        <td>{this.props.container.status}</td>
+        <td>{this.props.container.ip}</td>
+        <td>{containerButton}</td>
+      </tr>
     );
   }
 })
