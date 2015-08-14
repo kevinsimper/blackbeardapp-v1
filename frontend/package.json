@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/kevinsimper/blackbeardapp",
   "dependencies": {
+    "bluebird": "2.9.34",
     "browserify": "9.0.3",
     "classnames": "1.2.0",
     "envify": "3.4.0",
