@@ -1,19 +1,15 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
-
+var request = require('superagent')
+var moment = require('moment')
+var Navigation = require('react-router').Navigation
+var config = require('../../config')
 var AppsStore = require('../Apps/store')
 var AppsActions = require('../Apps/actions')
-
 var AppLogs = require('../AppLogs/')
 var Containers = require('../Containers/')
-
-var moment = require('moment')
 var Button = require('../Button/')
-var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
-
-var request = require('superagent')
-var config = require('../../config')
 
 var AppShow = React.createClass({
   mixins: [Navigation],
@@ -66,13 +62,13 @@ var AppShow = React.createClass({
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
-        <div>Created: {moment(parseInt(this.state.app.timestamp) * 1000).format()}</div>
-
+        <div>Created: {moment.unix(this.state.app.timestamp).format()}</div>
         <Containers app={this.state.app._id} />
+        <div>
+          <Button onClick={this.onClickStart}>Start containers</Button>
+          <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
+        </div>
         <AppLogs app={this.state.app._id} />
-
-        <Button onClick={this.onClickStart}>Start containers</Button>
-        <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
       </div>
     );
   }

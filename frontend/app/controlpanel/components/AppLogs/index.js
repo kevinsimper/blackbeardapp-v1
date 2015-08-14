@@ -4,6 +4,7 @@ var moment = require('moment')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
+var Table = require('../Table/')
 
 var store = require('./store')
 var actions = require('./actions')
@@ -37,17 +38,20 @@ var AppLogs = React.createClass({
     this.setState(this.getState())
   },
   render: function() {
-    var logs = []
-    this.state.logs.forEach(function(log) {
-      logs.push(<li>Image pushes at {moment(parseInt(log.timestamp) * 1000).format()}</li>)
-    }.bind(this));
-
     return (
       <div>
         <h2>Logs</h2>
-        <ul>
-          {logs}
-        </ul>
+        <Table>
+          <tbody>
+            {this.state.logs.map(function(log) {
+              return (
+                <tr>
+                  <td>Image pushes at {moment.unix(log.timestamp).format()}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </Table>
       </div>
     );
   }
