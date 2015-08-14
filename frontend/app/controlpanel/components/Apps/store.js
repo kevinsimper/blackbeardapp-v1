@@ -9,9 +9,6 @@ var _apps = []
 
 var store = Reflux.createStore({
   listenables: actions,
-  init: function() {
-    actions.load()
-  },
   onLoad: function() {
     var self = this
     request

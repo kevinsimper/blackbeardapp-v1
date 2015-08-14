@@ -400,6 +400,15 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
 
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/logs',
+    config: {
+      auth: 'jwt',
+      handler: userRoutes.getUserLogs
+    }
+  })
+
   // Webhook (associated with images)
   server.route({
     method: 'POST',

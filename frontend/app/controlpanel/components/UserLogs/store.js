@@ -1,27 +1,27 @@
 var Reflux = require('reflux')
 var request = require('superagent')
-var config = require('../../config')
 var actions = require('./actions')
-var _images = []
+var config = require('../../config')
+
+var _logs = []
 
 var store = Reflux.createStore({
   listenables: actions,
-  onLoad: function() {
+  onLoad: function(userId) {
     var self = this
     request
-      .get(config.BACKEND_HOST + '/users/me/images')
+      .get(config.BACKEND_HOST + '/users/' + userId + '/logs')
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
         actions.load.completed(res.body)
       })
   },
-  onLoadCompleted: function(data) {
-    _images = data
-
-    this.trigger(data)
+  onLoadCompleted: function(logs) {
+    _logs = logs
+    this.trigger(logs)
   },
-  getImages: function() {
-    return _images
+  getAll: function () {
+    return _logs
   }
 })
 

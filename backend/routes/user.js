@@ -213,3 +213,16 @@ exports.getUserPayments = function(request, reply) {
     return reply(payments)
   })
 }
+
+exports.getUserLogs = function (request, reply) {
+  var id = User.getUserIdFromRequest(request)
+
+  var logs = Log.find({
+    user: id
+  }).then(function (logs) {
+    reply(logs)
+  }).catch(function () {
+    request.log(['mongo'], err)
+    return reply(Boom.badImplementation())
+  })
+}
