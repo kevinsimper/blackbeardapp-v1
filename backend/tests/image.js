@@ -23,7 +23,7 @@ lab.experiment('/users', function () {
         uri: appUrl + '/login',
         json: true,
         body: {
-          email: 'admin+users@blackbeard.io',
+          email: 'admin@blackbeard.io',
           password: 'password'
         }
       },
@@ -73,7 +73,7 @@ lab.experiment('/users', function () {
         }
       },
       function (error, response, body) {
-        expect(body[1], 'to satisfy', {name: 'busybox'})
+        expect(body[0], 'to satisfy', {name: 'busybox'})
 
         done()
       })

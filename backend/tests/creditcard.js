@@ -24,7 +24,7 @@ lab.experiment('/users/{id}/creditcards', function () {
         uri: appUrl + '/login',
         json: true,
         body: {
-          email: 'admin+users@blackbeard.io',
+          email: 'admin@blackbeard.io',
           password: 'password'
         }
       },
@@ -139,7 +139,7 @@ lab.experiment('/users/{id}/creditcards', function () {
       })
       .spread(function (response, body) {
         var admin = _.filter(body, function (user) {
-          return user.email == 'admin+users@blackbeard.io';
+          return user.email == 'admin@blackbeard.io';
         })
         var user = _.filter(body, function (user) {
           return user.email == 'user+test@blackbeard.io';

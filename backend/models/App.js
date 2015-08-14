@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
 var roles = require('./roles/')
 var mongooseDelete = require('mongoose-delete')
+var Container = require('./Container')
 
 var schema = new mongoose.Schema({
   name: String,
@@ -23,11 +24,11 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'timestamp')
+    fields.push('name', 'timestamp', 'containers', 'image')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('user', 'containers', 'deleted', 'image')
+    fields.push('user', 'deleted', 'deletedAt')
     // Show deleted and not deleted to admins
     conditions = {}
   }

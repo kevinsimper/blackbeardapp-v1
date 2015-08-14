@@ -40,6 +40,7 @@ exports.search = function(request, reply) {
 exports.postApp = function(request, reply) {
   var name = request.payload.name
   var image = request.payload.image
+  var user = User.getUserIdFromRequest(request)
 
   if (!name) {
     return reply(Boom.badRequest('You must supply an application name.'))
@@ -60,7 +61,7 @@ exports.postApp = function(request, reply) {
   var newApp = new App({
     name: name,
     image: image,
-    user: request.auth.credentials,
+    user: user,
     timestamp: Math.round(Date.now() / 1000)
   })
   newApp.save(function(err, app) {
@@ -124,7 +125,8 @@ exports.postContainers = function(request, reply) {
 
   var container = new Container({
     region: request.payload.region,
-    status: 'Starting'
+    status: 'Starting',
+    app: app
   })
 
   App.findById(app, function(err, result) {
@@ -217,19 +219,8 @@ exports.deleteContainers = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    App.findById(app, function(err, result) {
-      result.containers = _.remove(result.containers, function(n) {
-        return n === containerId
-      });
-      result.save(function(err) {
-        if(err) {
-          request.log(['mongo'], err)
-          reply(Boom.badImplementation())
-        }
-        reply({
-          message: 'Container successfully removed.'
-        })
-      })
+    reply({
+      message: 'Container successfully removed.'
     })
   }
 
@@ -239,7 +230,8 @@ exports.deleteContainers = function(request, reply) {
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    container.remove(deleteCallback)
+    // Set container to deleted
+    container.delete(deleteCallback)
   })
 }
 
