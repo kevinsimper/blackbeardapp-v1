@@ -19,7 +19,7 @@ db.creditcards.insert({
 })
 db.users.insert({
   "_id": ObjectId("559396be05974b0c00b6b281"),
-  "email": "admin+users@blackbeard.io",
+  "email": "admin@blackbeard.io",
   "password": "sha1$5474e86b$1$0d184fe27ec8573b8f34cf5b33e9a7a237fe5b27",
   "name": "Blackbeard",
   "username": "blackbeard",

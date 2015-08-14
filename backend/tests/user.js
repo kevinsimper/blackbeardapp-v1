@@ -23,7 +23,7 @@ lab.experiment('/users', function() {
       password: 'password'
     }
     var adminRequestData = {
-      email: 'admin+users@blackbeard.io',
+      email: 'admin@blackbeard.io',
       password: 'password'
     }
 

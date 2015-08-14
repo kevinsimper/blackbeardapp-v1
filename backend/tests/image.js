@@ -23,7 +23,7 @@ lab.experiment('/users', function () {
         uri: appUrl + '/login',
         json: true,
         body: {
-          email: 'admin+users@blackbeard.io',
+          email: 'admin@blackbeard.io',
           password: 'password'
         }
       },

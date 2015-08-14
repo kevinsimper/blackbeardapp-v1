@@ -16,7 +16,7 @@ lab.experiment('/logs', function () {
   var adminToken;
   lab.before(function (done) {
     var adminRequestData = {
-      email: 'admin+users@blackbeard.io',
+      email: 'admin@blackbeard.io',
       password: 'password'
     }
     var adminUser = request({
