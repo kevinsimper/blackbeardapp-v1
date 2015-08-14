@@ -13,6 +13,7 @@ var vinyl = require('vinyl')
 var yaml = require('js-yaml')
 var fs = require('fs')
 var path = require('path')
+var autoprefixer = require('gulp-autoprefixer')
 
 var production = (process.env.NODE_ENV) ? true : false;
 console.log(production)
@@ -76,6 +77,7 @@ gulp.task('browserify-controlpanel', function() {
 gulp.task('sass', function() {
   return gulp.src(['./app/controlpanel/controlpanel.scss', './styles/main.scss'])
     .pipe(sass().on('error', sass.logError))
+    .pipe(gulpif(production, autoprefixer()))
     .pipe(gulp.dest('./public/build'))
 })
 
