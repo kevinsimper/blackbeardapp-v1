@@ -6,6 +6,7 @@ var Button = require('../Button/')
 var Input = require('../Input/')
 var moment = require('moment')
 var Navigation = require('react-router').Navigation
+var UserLogs = require('../UserLogs/')
 
 var UserShow = React.createClass({
   mixins: [React.addons.LinkedStateMixin, Navigation],
@@ -88,6 +89,7 @@ var UserShow = React.createClass({
           <Button variant='danger' onClick={this.onClickDeactivate}>Deactivate</Button>
           <Button onClick={this.onClickSave}>Save</Button>
         </div>
+        <UserLogs user={this.props.params.id}/>
       </div>
     )
   }
