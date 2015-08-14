@@ -23,7 +23,17 @@ app.get('/controlpanel', function(req, res) {
 })
 
 app.get('/blog/', function (req, res) {
-  res.send('ok')
+  var blogSlug = req.params.post
+  fs.readFileAsync('./blog/data.json', 'utf8')
+    .then(JSON.parse)
+    .then(function (content) {
+      res.render('blog/index', {
+        posts: content.posts
+      })
+    })
+    .catch(function (err) {
+      res.send(500)
+    })
 })
 
 app.get('/blog/:post', function (req, res) {

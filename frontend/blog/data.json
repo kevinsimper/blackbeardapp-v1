@@ -1,6 +1,7 @@
 {
   "posts": [{
     "slug": "test",
-    "file": "2015-08-14-test"
+    "file": "2015-08-14-test",
+    "title": "test"
   }]
 }

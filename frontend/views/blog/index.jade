@@ -1,0 +1,8 @@
+extends ./_layout.jade
+
+block content 
+  h1 Blog
+
+  each post in posts
+    div= post.title
+    div= post.slug
