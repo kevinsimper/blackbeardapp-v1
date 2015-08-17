@@ -54,10 +54,8 @@ var AppCreate = React.createClass({
       loading: true
     })
     AppActions.new(this.state)
-      .then(function() {
-        self.setState({
-          loading: false
-        })
+      .then(function(newApp) {
+        self.replaceWith('/apps/' + newApp._id)
       })
   },
   render: function() {
