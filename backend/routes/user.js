@@ -196,6 +196,26 @@ exports.postLogin = function(request, reply) {
   })
 }
 
+exports.postRegistrylogin = function(request, reply) {
+  var username = request.payload.username
+  var password = request.payload.password
+
+  User.findOne({ username: username }).then(function (user) {
+    if (!user) {
+      return reply(Boom.badRequest())
+    }
+
+    if (passwordHash.verify(password, user.password)) {
+      reply('ok')
+    } else {
+      reply(Boom.badRequest())
+    }
+  }).catch(function () {
+    request.log(['mongo'], err)
+    reply(Boom.badImplementation())
+  })
+}
+
 exports.getUserPayments = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
   var role = request.auth.credentials.role
