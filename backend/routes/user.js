@@ -177,9 +177,6 @@ exports.postLogin = function(request, reply) {
           ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
           type: 'Login',
         })
-        if(request.headers['x-login-from']) {
-          log.data.push('Logged in from ' + request.headers['x-login-from'])
-        }
         log.saveAsync()
 
         reply({
@@ -193,6 +190,35 @@ exports.postLogin = function(request, reply) {
     } else {
       reply(Boom.unauthorized('Invalid email and password combination.'))
     }
+  })
+}
+
+exports.postRegistrylogin = function(request, reply) {
+  var username = request.payload.username
+  var password = request.payload.password
+
+  User.findOne({ username: username }).then(function (user) {
+    if (!user) {
+      return reply(Boom.badRequest())
+    }
+
+    if (passwordHash.verify(password, user.password)) {
+      reply('ok')
+
+      var log = new Log({
+        user: user,
+        timestamp: Math.round(Date.now() / 1000),
+        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+        type: 'Registry Login',
+      })
+      log.saveAsync()
+
+    } else {
+      reply(Boom.badRequest())
+    }
+  }).catch(function () {
+    request.log(['mongo'], err)
+    reply(Boom.badImplementation())
   })
 }
 

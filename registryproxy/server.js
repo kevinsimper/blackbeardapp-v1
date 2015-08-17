@@ -40,34 +40,40 @@ var checkCredentials = function(credentials) {
     if (!credentials) {
       return resolve(false)
     }
-    if (process.env.NODE_ENV !== 'production') {
-      if (credentials.name === 'blackbeard' || credentials.pass === 'password') {
+    request({
+      method: 'POST',
+      uri: BACKEND_HOST + '/registrylogin',
+      json: true,
+      headers: {
+        'x-login-from': 'registry'
+      },
+      body: {
+        username: credentials.name,
+        password: credentials.pass
+      }
+    }).spread(function(response, body) {
+      debug('status', response.statusCode)
+      if (response.statusCode === 200) {
         resolve(true)
       } else {
         resolve(false)
       }
+    })
+  })
+}
+
+var checkPath = function (user, path) {
+  return new Promise(function (resolve, reject) {
+    var pathArray = path.split('/')
+    // if this is empty that means that they are trying
+    // to get /v2/ and that is okay!
+    if (pathArray[2].length === 0) {
+      resolve()
+    }
+    if (pathArray[2] === user) {
+      resolve()
     } else {
-      request({
-        method: 'POST',
-        uri: BACKEND_HOST + '/login',
-        json: true,
-        headers: {
-          'x-login-from': 'registry'
-        },
-        body: {
-          email: credentials.name,
-          password: credentials.pass
-        }
-      }).spread(function(response, body) {
-        if (response.statusCode === 200) {
-          resolve(true)
-        } else {
-          resolve(false)
-        }
-      })
-      .catch(function(err) {
-        console.log(err)
-      })
+      reject()
     }
   })
 }
@@ -78,49 +84,58 @@ app.all('/v2/*', function(req, res) {
   var credentials = auth(req)
   res.setHeader('Docker-Distribution-API-Version', 'registry/2.0')
   debug('request started', req.method, req.originalUrl)
-  checkCredentials(credentials).then(function(valid) {
+  checkCredentials(credentials).then(function (valid) {
+    debug('got credentials', credentials, valid)
     if (!credentials || !valid) {
+      throw new Error('Access denied')
+    }
+
+    return checkPath(credentials.name, req.originalUrl).then(function () {
+      var url = REGISTRY_HOST + req.originalUrl
+      var host = req.headers['Host']
+      if (process.env.NODE_ENV === 'production') {
+        host = 'registry.blackbeard.io'
+      }
+      var proxyRequest = proxy({
+        url: url,
+        method: req.method,
+        headers: {
+          'Host': host
+        }
+      })
+      proxyRequest.on('error', function(err) {
+        debug('ERROR', err)
+      })
+      proxyRequest.on('response', function(response) {
+        debug('Answer', response.statusCode, response.headers['content-type'])
+        if(response.statusCode === 202 && req.method === 'PUT') {
+          var user = req.originalUrl.split('/')[2]
+          var name = req.originalUrl.split('/')[3]
+
+          // PING BACKEND - NEW CONTAINER UPLOADED
+          request({
+            method: 'POST',
+            uri: BACKEND_HOST + '/webhook/notify/image',
+            json: true,
+            body: {
+              user: user,
+              name: name
+            }
+          })
+          debug('webhook triggered', user, name)
+        }
+      })
+
+      req.pipe(proxyRequest).pipe(res)
+    }).catch(function (error) {
       res.statusCode = 401
       res.setHeader('WWW-Authenticate', 'Basic realm="Blackbeard"')
-      return res.end('Access denied')
-    }
-
-    var url = REGISTRY_HOST + req.originalUrl
-    var host = req.headers['Host']
-    if (process.env.NODE_ENV === 'production') {
-      host = 'registry.blackbeard.io'
-    }
-    var proxyRequest = proxy({
-      url: url,
-      method: req.method,
-      headers: {
-        'Host': host
-      }
+      res.end('Access denied - You don\'t own the ressource')
     })
-    proxyRequest.on('error', function(err) {
-      debug('ERROR', err)
-    })
-    proxyRequest.on('response', function(response) {
-      debug('Answer', response.statusCode, response.headers['content-type'])
-      if(response.statusCode === 202 && req.method === 'PUT') {
-        var user = req.originalUrl.split('/')[2]
-        var name = req.originalUrl.split('/')[3]
-
-        // PING BACKEND - NEW CONTAINER UPLOADED
-        request({
-          method: 'POST',
-          uri: BACKEND_HOST + '/webhook/notify/image',
-          json: true,
-          body: {
-            user: user,
-            name: name
-          }
-        })
-        debug('webhook triggered', user, name)
-      }
-    })
-
-    req.pipe(proxyRequest).pipe(res)
+  }).catch(function (error) {
+    res.statusCode = 401
+    res.setHeader('WWW-Authenticate', 'Basic realm="Blackbeard"')
+    res.end('Access denied')
   })
 })
 
