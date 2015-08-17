@@ -1,7 +1,10 @@
 body {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Lora', serif;
   margin: 0 auto;
   padding: 0px;
+  max-width: 760px;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 20px;
 }
 
 img {
@@ -13,8 +16,20 @@ img {
 }
 
 a {
-  color: #111111; 
-}
-a:hover {
+  color: rgba(0, 0, 0, 0.8);
   text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+p {
+  line-height: 1.5;
+  margin-bottom: 30px;
+  a {
+    text-decoration: underline;
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }

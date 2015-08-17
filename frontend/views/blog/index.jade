@@ -1,8 +1,15 @@
 extends ./_layout.jade
 
-block content 
-  h1 Blog
+block content
+  h1.headline #[a(href='/blog/' + meta[0].slug) #{meta[0].title}]
+  div= meta[0].date
+  div!= posts[0]
+  div 
+    p #[a(href='/blog/' + meta[0].slug) Permalink]
 
-  each post in posts
-    div= post.title
-    div= post.slug
+  div 
+    h2 List of older blogposts
+    ol
+      each oldPost in olderPosts
+        li
+          h3 #[a(href='/blog/' + oldPost.slug) #{oldPost.title}] - #{oldPost.date}
