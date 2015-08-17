@@ -7,9 +7,10 @@ block content
   div 
     p #[a(href='/blog/' + meta[0].slug) Permalink]
 
-  div 
-    h2 List of older blogposts
-    ol
-      each oldPost in olderPosts
-        li
-          h3 #[a(href='/blog/' + oldPost.slug) #{oldPost.title}] - #{oldPost.date}
+  if olderPosts.length !== 0
+    div 
+      h2 List of older blogposts
+      ol
+        each oldPost in olderPosts
+          li
+            h3 #[a(href='/blog/' + oldPost.slug) #{oldPost.title}] - #{oldPost.date}
