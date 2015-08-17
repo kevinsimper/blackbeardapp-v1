@@ -9,6 +9,7 @@ var Input = require('../Input/')
 var Label= require('../Label/')
 var Button = require('../Button/')
 var ImagesSelect = require('../ImagesSelect/index')
+var ErrorMessage = require('../ErrorMessage/')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
@@ -50,6 +51,18 @@ var AppCreate = React.createClass({
   onSubmit: function(e) {
     e.preventDefault()
     var self = this
+    if(!this.state.name) {
+      this.setState({
+        status: 'You have to put in a name'
+      })
+      return false
+    }
+    if(!this.state.image) {
+      this.setState({
+        status: 'You have to choose a image'
+      })
+      return false
+    }
     this.setState({
       loading: true
     })
@@ -69,7 +82,7 @@ var AppCreate = React.createClass({
         <div>
           <Button>Create app</Button>
         </div>
-        <div>{this.state.status}</div>
+        <ErrorMessage>{this.state.status}</ErrorMessage>
       </form>
     );
   }
