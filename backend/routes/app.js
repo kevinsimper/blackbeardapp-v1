@@ -5,7 +5,6 @@ var User = require('../models/User')
 var App = Promise.promisifyAll(require('../models/App'))
 var Image = Promise.promisifyAll(require('../models/Image'))
 var Container = require('../models/Container')
-
 var Boom = require('boom')
 
 var config = require('../config')
@@ -125,8 +124,9 @@ exports.postContainers = function(request, reply) {
 
   var container = new Container({
     region: request.payload.region,
-    status: 'Starting',
-    app: app
+    status: Container.status.UP,
+    app: app,
+    createdAt: Math.round(Date.now() / 1000)
   })
 
   App.findById(app, function(err, result) {
@@ -194,7 +194,7 @@ exports.getContainers = function(request, reply) {
     }
 
     if (result.containers.length) {
-      Container.findByIds(result.containers, role, function(err, containers) {
+      Container.findByIdsAndRole(result.containers, role, function(err, containers) {
         if (err) {
           request.log(['mongo'], err)
           return reply(Boom.badImplementation('There was a problem with the database'))

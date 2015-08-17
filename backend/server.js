@@ -435,7 +435,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: logRoutes.getLogs
     }
   })
-
 })
 
 module.exports = server

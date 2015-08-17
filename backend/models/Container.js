@@ -7,13 +7,18 @@ var schema = new mongoose.Schema({
   region: String,
   ip: String,
   app: {type: mongoose.Schema.Types.ObjectId, ref: 'container'},
+  createdAt: String,
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
 
 schema.plugin(mongooseDelete)
 
-schema.statics.findByIds = function (ids, role, cb) {
+schema.statics.findByIds = function (ids, cb) {
+  return this.where({'_id': { $in: ids }}).find(cb)
+}
+
+schema.statics.findByIdsAndRole = function (ids, role, cb) {
   // As default do not show deleted
   var conditions = {
     deleted: false
@@ -42,3 +47,8 @@ schema.statics.findByIdAndRole = function (id, role, cb) {
 }
 
 module.exports = mongoose.model('container', schema)
+
+module.exports.status = {
+  UP: 'UP',
+  DOWN: 'DOWN'
+}
