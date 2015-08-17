@@ -1,0 +1,8 @@
+{
+  "posts": [{
+    "slug": "hello",
+    "file": "2015-08-17-hello",
+    "title": "Hello World!",
+    "date": "2015-08-17 14:30"
+  }]
+}

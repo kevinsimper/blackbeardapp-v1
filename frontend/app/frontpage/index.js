@@ -12,6 +12,14 @@ window.addEventListener('load', function() {
       window.scrollTo(0,1)
     }, false);
   });
+
+  document.querySelectorAll('.members__link').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var event = new Event('showSignup');
+      window.dispatchEvent(event);
+      window.scrollTo(0,1)
+    }, false);
+  })
 })
 
 React.render(<Signup/>, document.querySelector('.signup'));
