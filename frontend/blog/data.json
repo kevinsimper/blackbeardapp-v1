@@ -2,6 +2,12 @@
   "posts": [{
     "slug": "test",
     "file": "2015-08-14-test",
-    "title": "test"
+    "title": "Lorum Lipsum",
+    "date": "2015-08-14 14:30"
+  },{
+    "slug": "test2",
+    "file": "2015-08-15-test copy",
+    "title": "Lorum Lipsum 2",
+    "date": "2015-08-15 14:30"
   }]
 }
