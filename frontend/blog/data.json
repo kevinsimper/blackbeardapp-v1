@@ -9,5 +9,10 @@
     "file": "2015-08-15-test copy",
     "title": "Lorum Lipsum 2",
     "date": "2015-08-15 14:30"
+  },{
+    "slug": "hello",
+    "file": "2015-08-17-hello",
+    "title": "Hello World!",
+    "date": "2015-08-17 14:30"
   }]
 }
