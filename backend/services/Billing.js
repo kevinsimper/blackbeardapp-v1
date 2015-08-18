@@ -2,6 +2,9 @@ var Promise = require('bluebird')
 var moment = require('moment')
 
 module.exports = {
+  diffHours: function(a, b) {
+    return Math.ceil(a.diff(b, 'minute')/60.0)
+  },
   getAppBillableHours: function(app, start, end) {
     var self = this
     return new Promise(function (resolve, reject) {
@@ -18,16 +21,16 @@ module.exports = {
           if (deletedAt.isBefore(end)) {
             // Stopped within month
             if (createdDate.isBefore(start)) {
-              hours += deletedAt.diff(start, 'hour')
+              hours += self.diffHours(deletedAt, start)
             } else {
-              hours += deletedAt.diff(createdDate, 'hour')
+              hours += self.diffHours(deletedAt, createdDate)
             }
           } else {
             // Stopped after end of month
             if (createdDate.isBefore(start)) {
-              hours += end.diff(start, 'hour')
+              hours += self.diffHours(end, start)
             } else {
-              hours += end.diff(createdDate, 'hour')
+              hours += self.diffHours(end, createdDate)
             }
           }
         }
