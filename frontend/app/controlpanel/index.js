@@ -14,8 +14,8 @@ var ForgotPassword = require('./components/ForgotPassword/')
 var Users = require('./components/Users')
 var UserShow = require('./components/UserShow/')
 var Images = require('./components/Images/')
+var Billing = require('./components/Billing/')
 var ContainerFormular = require('./components/ContainersFormular/')
-var Logs = require('./components/Logs/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -30,12 +30,12 @@ var routes = (
       <Route path=':id/containers' handler={ContainerFormular}/>
     </Route>
     <Route path='/images' handler={Images}/>
+    <Route name='billing' path='/billing/:month' handler={Billing}/>
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>
     <Route path='/users' handler={Users}/>
     <Route path='/users/:id' handler={UserShow}/>
-    <Route path='/logs' handler={Logs}/>
   </Route>
 )
 
