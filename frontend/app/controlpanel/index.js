@@ -14,6 +14,7 @@ var ForgotPassword = require('./components/ForgotPassword/')
 var Users = require('./components/Users')
 var UserShow = require('./components/UserShow/')
 var Images = require('./components/Images/')
+var Billing = require('./components/Billing/')
 var ContainerFormular = require('./components/ContainersFormular/')
 var Logs = require('./components/Logs/')
 
@@ -30,6 +31,7 @@ var routes = (
       <Route path=':id/containers' handler={ContainerFormular}/>
     </Route>
     <Route path='/images' handler={Images}/>
+    <Route path='/billing' handler={Billing}/>
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>

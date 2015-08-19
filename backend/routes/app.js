@@ -4,8 +4,10 @@ var _ = require('lodash')
 var User = require('../models/User')
 var App = Promise.promisifyAll(require('../models/App'))
 var Image = Promise.promisifyAll(require('../models/Image'))
+var Billing = Promise.promisifyAll(require('../services/Billing'))
 var Container = require('../models/Container')
 var Boom = require('boom')
+var moment = require('moment')
 
 var config = require('../config')
 
@@ -262,5 +264,27 @@ exports.getContainer = function(request, reply) {
 
       reply(container)
     })
+  })
+}
+
+exports.getUserBilling = function(request, reply) {
+  var user = User.getUserIdFromRequest(request)
+
+  var month = request.params.month
+
+  if (!month.match(/\d{4}-\d{2}/g)) {
+    return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
+  }
+
+  var monthM = moment(request.params.month, "YYYY-MM")
+  var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
+
+  var billableHours = Billing.getUserAppsBillableHours(user, monthM, monthEndM)
+
+  billableHours.then(function(billableHoursResult) {
+    reply(billableHoursResult)
+  }).catch(function(e) {
+    request.log(['mongo'], e)
+    reply(Boom.badImplementation())
   })
 }

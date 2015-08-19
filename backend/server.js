@@ -398,6 +398,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: appRoutes.getAppLogs
     }
   })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/billing/{month}',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.getUserBilling
+    }
+  })
 
   // Images
   server.route({

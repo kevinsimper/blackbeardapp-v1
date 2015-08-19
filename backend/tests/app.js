@@ -337,7 +337,6 @@ lab.experiment('/app/containers', function() {
     })
   })
   lab.test('GET containers as admin', function(done) {
-
     request({
       method: 'GET',
       uri: appUrl + '/users',

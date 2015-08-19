@@ -26,6 +26,9 @@ var Sidebar = React.createClass({
             <a className='Sidebar__Link' href="#/users">Users</a>
           </div>
           <div className='Sidebar__Item'>
+            <a className='Sidebar__Link' href="#/billing">Billing</a>
+          </div>
+          <div className='Sidebar__Item'>
             <a className='Sidebar__Link' href="#/logs">Logs</a>
           </div>
           <div className='Sidebar__Item' style={{padding: 10}}>
