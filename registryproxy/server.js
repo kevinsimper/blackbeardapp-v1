@@ -68,11 +68,14 @@ var checkPath = function (user, path) {
     // if this is empty that means that they are trying
     // to get /v2/ and that is okay!
     if (pathArray[2].length === 0) {
+      debug('Path allowed')
       resolve()
     }
     if (pathArray[2] === user) {
+      debug('Path allowed')
       resolve()
     } else {
+      debug('Path forbidden!')
       reject()
     }
   })
@@ -81,11 +84,13 @@ var checkPath = function (user, path) {
 app.disable('x-powered-by')
 
 app.all('/v2/*', function(req, res) {
+  var random = Math.floor(100 * Math.random())
   var credentials = auth(req)
   res.setHeader('Docker-Distribution-API-Version', 'registry/2.0')
-  debug('request started', req.method, req.originalUrl)
+  debug(random, 'request started', req.method, req.originalUrl)
+  debug(random, 'headers', req.headers)
   checkCredentials(credentials).then(function (valid) {
-    debug('got credentials', credentials, valid)
+    debug(random, 'got credentials', credentials, valid)
     if (!credentials || !valid) {
       throw new Error('Access denied')
     }
@@ -96,18 +101,24 @@ app.all('/v2/*', function(req, res) {
       if (process.env.NODE_ENV === 'production') {
         host = 'registry.blackbeard.io'
       }
+
+      debug(random, 'Proxying URL', url)
       var proxyRequest = proxy({
         url: url,
         method: req.method,
         headers: {
           'Host': host
-        }
+        },
+        followRedirect: false
       })
       proxyRequest.on('error', function(err) {
-        debug('ERROR', err)
+        debug(random, 'ERROR', err)
       })
       proxyRequest.on('response', function(response) {
-        debug('Answer', response.statusCode, response.headers['content-type'])
+        debug(random, 'Answer', response.statusCode, response.headers['content-type'], response.headers)
+        response.on('data', function(data) {
+          debug(random, 'Answer data', data)
+        })
         if(response.statusCode === 202 && req.method === 'PUT') {
           var user = req.originalUrl.split('/')[2]
           var name = req.originalUrl.split('/')[3]
@@ -122,7 +133,7 @@ app.all('/v2/*', function(req, res) {
               name: name
             }
           })
-          debug('webhook triggered', user, name)
+          debug(random, 'webhook triggered', user, name)
         }
       })
 
