@@ -8,6 +8,7 @@ var schema = new mongoose.Schema({
   name: String,
   username: String,
   credit: Number,
+  virtualCredit: Number,
   timestamp: String,
   resetToken: String,
   resetExpiry: String,

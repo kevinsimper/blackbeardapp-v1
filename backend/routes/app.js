@@ -288,3 +288,39 @@ exports.getUserBilling = function(request, reply) {
     reply(Boom.badImplementation())
   })
 }
+
+exports.getAllBilling = function(request, reply) {
+  var month = request.params.month
+
+  month = '2015-08'
+
+  if (!month.match(/\d{4}-\d{2}/g)) {
+    return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
+  }
+
+  var monthM = moment(request.params.month, "YYYY-MM")
+  var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
+
+  var findUsersApp = function(users) {
+    var appPromises = _.map(users, function(user) {
+      return App.find({user: user}).populate('containers').then(function (apps) {
+        var billingPromises = _.map(apps, function(app) {
+          return Billing.getAppBillableHours(app, monthM, monthEndM)
+        })
+
+        return Promise.all(billingPromises)
+      })
+    })
+    return Promise.all(appPromises)
+  }
+
+  var users = User.find()
+
+  Promise.all([users, users.then(findUsersApp)]).spread(function(users, apps){
+    users.forEach(function(user, i) {
+      var hoursToday = _.sum(apps[i])
+      Billing.chargeHours(user, hoursToday)
+    })
+  })
+
+}

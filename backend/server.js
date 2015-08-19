@@ -407,6 +407,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: appRoutes.getUserBilling
     }
   })
+  server.route({
+    method: 'GET',
+    path: '/billing',
+    config: {
+      auth: 'jwt',
+      handler: appRoutes.getAllBilling
+    }
+  })
 
   // Images
   server.route({
