@@ -1,5 +1,6 @@
 var React = require('react')
 var Button = require('../Button/')
+var Select = require('../Select/')
 
 var ImagesSelect = React.createClass({
   onChange: function(e) {
@@ -7,12 +8,12 @@ var ImagesSelect = React.createClass({
   },
   render: function() {
     return (
-      <select onChange={this.onChange}>
+      <Select onChange={this.onChange}>
         <option value=''>- Choose Image -</option>
         {this.props.images.map(function(image) {
           return <option value={image._id}>{image.name}</option>
         })}
-      </select>
+      </Select>
     )
   }
 })
