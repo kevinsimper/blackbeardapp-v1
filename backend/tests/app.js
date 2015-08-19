@@ -267,20 +267,6 @@ lab.experiment('/app/containers', function() {
       done()
     })
   })
-  lab.test('GET billing', function(done) {
-    request({
-      method: 'GET',
-      uri: appUrl + '/users/me/billing/2015-07',
-      headers: {
-        Authorization: token
-      },
-      json: true
-    }, function(error, response, body) {
-      // Should get result here
-
-      done()
-    })
-  })
   lab.test('GET logs with invalid id', function(done) {
     request({
       method: 'GET',
