@@ -17,8 +17,7 @@ lab.test('javascript files should be compiled', function (done) {
       'bundle.js',
       'controlpanel.css',
       'controlpanel.js',
-      'main.css',
-      'main.scss')
+      'main.css')
     done()
   })
 })
