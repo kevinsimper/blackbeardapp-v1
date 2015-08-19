@@ -40,6 +40,24 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
+  lab.test('Verify single day', function(done) {
+
+    var start = moment('2015-08', "YYYY-MM")
+    var end = moment('2015-09', "YYYY-MM")
+
+    var containers = [
+      new Container({createdAt: moment('2015-08-06 18:00:00').unix(), deletedAt: '2015-08-06 18:40:00'})
+    ]
+    var app = new App({name: "testApp"})
+    var test = app.toObject()
+    test.containers = containers
+
+    Billing.getAppBillableHours(test, start, end).then(function(hours) {
+      expect(hours, 'to be', 1)
+
+      done()
+    })
+  })
   lab.test('Get per user', function(done) {
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
