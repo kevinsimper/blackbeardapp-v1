@@ -65,7 +65,7 @@ module.exports = {
           resolve([appObj, appObj2]);
         })
       } else {
-        apps = App.find({user: user._id}).populate('containers')
+        apps = App.find({user: user}).populate('containers')
       }
 
       apps.then(function(actualApps) {
@@ -100,13 +100,15 @@ module.exports = {
             }
           })
 
-          bill.push({
-            appName: app.name,
-            appId: app._id,
-            hours: hours
-          })
+          if (hours) {
+            bill.push({
+              appName: app.name,
+              appId: app._id,
+              hours: hours
+            })
 
-          totalHours += hours
+            totalHours += hours
+          }
         })
 
         resolve({apps: bill, total: totalHours})

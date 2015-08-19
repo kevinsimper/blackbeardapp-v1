@@ -31,7 +31,7 @@ var routes = (
       <Route path=':id/containers' handler={ContainerFormular}/>
     </Route>
     <Route path='/images' handler={Images}/>
-    <Route name='billing' path='/billing/:month' handler={Billing}/>
+    <Route path='/billing' handler={Billing}/>
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>

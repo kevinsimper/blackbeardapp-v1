@@ -13,6 +13,9 @@ var actions = require('./actions')
 module.exports = React.createClass({
   mixins: [Navigation],
   getState: function() {
+    if (!this.props.params.month) {
+      this.props.params.month = moment().format("YYYY-MM")
+    }
     return {
       billing: store.getOne(this.props.params.month)
     }
@@ -41,8 +44,6 @@ module.exports = React.createClass({
   render: function() {
     var self = this
 
-    if (!this.state.loaded) return <div/>
-
     return (
       <div>
       <h2>Billing for {this.props.params.month}</h2>
@@ -56,7 +57,7 @@ module.exports = React.createClass({
           <tbody>
           {this.state.billing.apps.map(function(app) {
             return <tr>
-              <td>{app.name}</td>
+              <td>{app.appName}</td>
               <td>{app.hours}</td>
             </tr>
           })}

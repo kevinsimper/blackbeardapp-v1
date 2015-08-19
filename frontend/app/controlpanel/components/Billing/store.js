@@ -1,5 +1,6 @@
 var Reflux = require('reflux')
 var request = require('superagent')
+var moment = require('moment')
 var config = require('../../config')
 var actions = require('./actions')
 var _billing = {}
@@ -23,7 +24,7 @@ module.exports = Reflux.createStore({
   },
   getOne: function(month) {
     if (!_billing[month]) {
-      return []
+      return {apps:[], total: 0}
     } else {
       return _billing[month];
     }
