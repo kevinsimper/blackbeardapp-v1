@@ -19,16 +19,15 @@ dependencies:
     - mkdir -p ~/docker; docker save mongo > ~/docker/mongo.tar
     - mkdir -p ~/docker; docker save node > ~/docker/node.tar
     - mkdir -p ~/docker; docker save registry > ~/docker/registry.tar
-    - ./update.sh
 test:
   override:
     - sudo service mongodb stop
     - ./docker-compose up -d
     - sleep 3
-    - ./docker-compose run backend /bin/bash -c "npm rebuild && npm test"
+    - ./docker-compose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose start backend
-    - ./docker-compose run registryproxy /bin/bash -c "npm rebuild && npm test"
-    - ./docker-compose run frontend /bin/bash -c "npm rebuild && npm test"
+    - ./docker-compose run registryproxy /bin/bash -c "npm install && npm test"
+    - ./docker-compose run frontend /bin/bash -c "npm install && npm test"
 deployment:
   production:
     branch: master
