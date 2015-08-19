@@ -79,7 +79,4 @@ app.get('/blog/:post', function (req, res) {
     })
 })
 
-var port = process.env.PORT || 9000
-app.listen(port, function() {
-  console.log('Frontend started listening on ' + port)
-})
+module.exports = app

@@ -2,11 +2,11 @@
   "name": "blackbeardapp",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "start.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node start.js",
     "build": "gulp build",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "lab tests/*",
     "browser-sync": "browser-sync start --files=\"public/**/*.js, public/**/*.css\" --proxy=\"blackbeard.dev:9000\"",
     "watch": "gulp & npm run browser-sync"
   },
@@ -55,7 +55,9 @@
     "gulp-autoprefixer": "2.3.1",
     "gulp-plumber": "1.0.1",
     "gulp-sass": "2.0.2",
+    "lab": "5.15.1",
     "through2": "2.0.0",
+    "unexpected": "9.5.2",
     "vinyl": "0.5.0"
   }
 }
