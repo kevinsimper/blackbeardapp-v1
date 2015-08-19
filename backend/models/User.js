@@ -2,7 +2,6 @@ var mongoose = require('mongoose')
 var roles = require('./roles/')
 var mongooseDelete = require('mongoose-delete')
 var _ = require('lodash')
-var CreditCard = require('./CreditCard')
 
 var schema = new mongoose.Schema({
   email: String,
