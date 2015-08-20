@@ -7,6 +7,7 @@ var User = Promise.promisifyAll(require('../models/User'))
 var Payment = require('../models/Payment')
 var paymentStatus = require('../models/paymentStatus/')
 var roles = require('../models/roles/')
+var CreditCardService = require('../services/Creditcard')
 
 exports.getCreditCards = function (request, reply) {
   var role = request.auth.credentials.role
@@ -136,44 +137,41 @@ exports.postCreditCardPayment = function (request, reply) {
         return reply(Boom.badImplementation('There was a problem with the database.'))
       }
 
-      stripe.charges.create({
+      CreditCardService.charge({
         amount: amount,
         currency: "usd",
         source: creditCard.token,
         description: name
-      }, function (err, newCharge) {
-        if (err) {
-          var newPaymentFail = new Payment({
-            amount: amount,
-            creditCard: creditCard._id,
-            user: user._id,
-            timestamp: Math.round(Date.now() / 1000),
-            ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-            status: paymentStatus.FAIL
-          })
-
-          newPaymentFail.save()
-
-          if (_.has(err, 'code')) {
-            //return reply(Boom.badRequest(err.message, {
-            //  rawType: err.rawType,
-            //  code: err.code,
-            //  param: err.param
-            //}))
-
-            // Because Boom is crap the data sent with this exception is ignored so
-            return reply(Boom.badRequest(err.message))
-          } else {
-            request.log(['mongo'], err)
-            return reply(Boom.badImplementation('There was a problem with the database.'))
-          }
-        }
-
+      }).then(function (newCharge) {
         charge = newCharge
         user.credit += newCharge.amount
-
         user.save(userSaveCallback)
-      });
+      }).catch(function (err) {
+        var newPaymentFail = new Payment({
+          amount: amount,
+          creditCard: creditCard._id,
+          user: user._id,
+          timestamp: Math.round(Date.now() / 1000),
+          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+          status: paymentStatus.FAIL
+        })
+
+        newPaymentFail.save()
+
+        if (_.has(err, 'code')) {
+          //return reply(Boom.badRequest(err.message, {
+          //  rawType: err.rawType,
+          //  code: err.code,
+          //  param: err.param
+          //}))
+
+          // Because Boom is crap the data sent with this exception is ignored so
+          return reply(Boom.badRequest(err.message))
+        } else {
+          request.log(['mongo'], err)
+          return reply(Boom.badImplementation('There was a problem with the database.'))
+        }
+      })
     })
   })
 }
@@ -237,28 +235,14 @@ exports.postCreditCards = function (request, reply) {
     }
 
     // Now save to StripeAPI
-    stripe.tokens.create({
+    CreditCardService.create({
       card: {
         number: creditcard.creditcard,
         exp_month: creditcard.expiryMonth,
         exp_year: creditcard.expiryYear,
         cvc: creditcard.cvv
       }
-    }, function (err, token) {
-      if (err) {
-        if ('code' in err) {
-          //return reply(Boom.badRequest(err.message, {
-          //  rawType: err.rawType,
-          //  code: err.code,
-          //  param: err.param
-          //}))
-          // Because Boom is crap the data sent with this exception is ignored so
-          return reply(Boom.badRequest(err.message))
-        }
-        request.log(['mongo'], err)
-        return reply(Boom.badImplementation('There was a problem with the database.'))
-      }
-
+    }).then(function (token) {
       newCreditCard = new CreditCard({
         name: creditcard.name,
         token: token.id,
@@ -268,7 +252,19 @@ exports.postCreditCards = function (request, reply) {
       })
 
       newCreditCard.save(newCardCallback)
-    });
+    }).catch(function (err) {
+      if ('code' in err) {
+        //return reply(Boom.badRequest(err.message, {
+        //  rawType: err.rawType,
+        //  code: err.code,
+        //  param: err.param
+        //}))
+        // Because Boom is crap the data sent with this exception is ignored so
+        return reply(Boom.badRequest(err.message))
+      }
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation('There was a problem with the database.'))
+    })
   })
 }
 
