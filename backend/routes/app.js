@@ -317,10 +317,14 @@ exports.getAllBilling = function(request, reply) {
   var users = User.find()
 
   Promise.all([users, users.then(findUsersApp)]).spread(function(users, apps){
+    var charges = []
     users.forEach(function(user, i) {
       var hoursToday = _.sum(apps[i])
-      Billing.chargeHours(user, hoursToday)
+      charges.push(Billing.chargeHours(user, hoursToday))
+    })
+
+    Promise.all(charges).then(function(result) {
+      reply(result)
     })
   })
-
 }

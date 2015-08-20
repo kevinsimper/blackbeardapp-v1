@@ -2,8 +2,14 @@ var _ = require('lodash')
 var moment = require('moment')
 var Promise = require('bluebird')
 var App = Promise.promisifyAll(require('../models/App'))
+var User = Promise.promisifyAll(require('../models/User'))
+var UserRoles = require('../models/roles/')
 var Container = require('../models/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
+var stripe = require('stripe')(process.env.STRIPE_SECRET)
+var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
+var CreditCardService = require('../services/CreditCard')
+var Boom = require('boom')
 
 module.exports = {
   diffHours: function (a, b) {
@@ -101,10 +107,47 @@ module.exports = {
     // 7 dollars divided by a full month of hours
     return 7 / 30 * 24
   },
-  chargeHours: function (user, hours) {
-    var payments = Payment.findOne({user: user}).sort({timestamp: -1})
-    payments.then(function(payment) {
-      console.log("PAYMENT", payment)
+  chargeHours: function (userId, hours) {
+    var self = this
+
+    var user
+    var userObjP = User.findById(userId).populate('creditCards')
+    return userObjP.then(function(actualUser) {
+      user = actualUser
+      return user
+    }).then(function(user) {
+      return Payment.findOne({user: user, status: Payment.status.SUCCESS}).sort({timestamp: -1})
+    }).then(function(payment) {
+      if (payment) {
+        // This is the last payment
+        return payment.timestamp
+      } else {
+        return user.timestamp
+      }
+    }).then(function(timestamp) {
+      // From provided timestamp calculate how much the user will owe
+      var price = self.calculateHoursPrice()
+      var seconds = moment().unix()-timestamp
+      var hours = seconds/60
+      var owed = self.calculateHoursPrice()*hours
+
+      if (owed > user.credit) {
+        var activeCard = _.find(user.creditCards, function (cc) {
+          return cc.active
+        })
+
+        if (activeCard) {
+          // They will go into debt so we need to charge them more
+          return CreditCardService.chargeCreditCard(user._id, activeCard._id, UserRoles.ADMIN, "Automatic Topup", 10, '127.0.0.1')
+        } else {
+          return Boom.badRequest("No active credit card found for user")
+        }
+      } else {
+        return Boom.badRequest("An error occurred charging users's card")
+      }
+    }).catch(function (err) {
+      console.log(err)
+      return reply(Boom.badImplementation('There was a problem with the database.'))
     })
   }
 }

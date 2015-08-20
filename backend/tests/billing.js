@@ -7,7 +7,7 @@ var Container = require('../models/Container')
 var moment = require('moment')
 var Promise = require('bluebird')
 var User = Promise.promisifyAll(require('../models/User'))
-var request = Promise.promisifyAll(require('request'))
+var request = Promise.promisify(require('request'))
 
 var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
@@ -90,20 +90,19 @@ lab.experiment('Testing Billing service', function() {
         email: 'admin@blackbeard.io',
         password: 'password'
       }
-    }, function (err, loginResponse) {
-      var token = loginResponse.body.token
-      request({
+    }).spread(function (err, loginResponse) {
+      var token = loginResponse.token
+      return request({
         method: 'GET',
         uri: appUrl + '/billing',
         json: true,
         headers: {
           'Authorization': token
         }
-      }, function (err, billingResponse) {
-        expect(response.statusCode, 'to be', 200)
-
-        done()
       })
+    }).spread(function (err, billingRespone) {
+      expect(billingRespone.statusCode, 'to be', 200)
+      done()
     })
   })
 })
