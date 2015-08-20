@@ -24,6 +24,7 @@ var forgotRoutes = require('./routes/forgot')
 var webhookRoutes = require('./routes/webhook')
 var imageRoutes = require('./routes/image')
 var logRoutes = require('./routes/log')
+var clusterRoutes = require('./routes/cluster')
 
 var server = new Hapi.Server({
   connections: {
@@ -441,6 +442,23 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: {
       auth: 'jwt',
       handler: logRoutes.getLogs
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/clusters',
+    config: {
+      auth: 'jwt',
+      handler: clusterRoutes.getClusters
+    }
+  })
+  server.route({
+    method: 'POST',
+    path: '/clusters',
+    config: {
+      auth: 'jwt',
+      handler: clusterRoutes.postCluster
     }
   })
 })
