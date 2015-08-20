@@ -119,7 +119,7 @@ app.all('/v2/*', function(req, res) {
         response.on('data', function(data) {
           debug(random, 'Answer data', data)
         })
-        if(response.statusCode === 202 && req.method === 'PUT') {
+        if(response.statusCode === 201 && req.method === 'PUT') {
           var user = req.originalUrl.split('/')[2]
           var name = req.originalUrl.split('/')[3]
 
