@@ -107,66 +107,67 @@ module.exports = {
       }
     })
   },
-  chargeCreditCard: function (user, card, role, chargeName, chargeAmount, remoteAddr) {
+  chargeCreditCard: function (user, card, chargeName, chargeAmount, remoteAddr) {
     var self = this
 
     var userObj
     var cardObj
     var charge = null
 
-    var creditCard = CreditCard.findOneByRole(card, role)
+    // findOne
+    var cardObj = CreditCard.findOne(card)
+    var userObj = User.findOne({_id: user})
 
-    return creditCard.then(function (creditCard) {
-      cardObj = creditCard
-      if (!cardObj) {
-        throw new Promise.OperationalError("Credit card not found")
-      } else {
-        return User.findOne({_id: user})
+    var newCharge = Promise.all([cardObj, userObj]).spread(function (cardObj, userObj) {
+      if (!userObj || !cardObj) {
+        throw new Promise.OperationalError("User or credit card not found")
       }
-    }).then(function (actualUserObj) {
-      userObj = actualUserObj
 
-      if (!userObj) {
-        throw new Promise.OperationalError("User not found")
-      } else {
-        return self.charge({
-          amount: chargeAmount,
-          currency: "usd",
-          source: cardObj.token,
-          description: chargeName
-        })
-      }
-    }).then(function (newCharge) {
+      return self.charge({
+        amount: chargeAmount,
+        currency: "usd",
+        source: cardObj.token,
+        description: chargeName
+      })
+    })
+
+    newCharge.then(function (newCharge) {
+      newCharge = false
       if (!newCharge) {
         throw new Promise.OperationalError("Charge failed")
-      } else {
-        charge = newCharge
-        userObj.credit += newCharge.amount
-        return userObj.save()
       }
+
+      charge = newCharge
+      userObj.credit += newCharge.amount
+      return userObj.save()
     }).then(function (savedUser) {
       if (!savedUser) {
         throw new Promise.OperationalError("User save failed")
-      } else {
-        // Now save a Payment entry
-        var newPayment = new Payment({
-          amount: charge.amount,
-          creditCard: cardObj._id,
-          chargeId: charge.id,
-          user: savedUser._id,
-          timestamp: Math.round(Date.now() / 1000),
-          ip: remoteAddr,
-          status: Payment.status.SUCCESS
-        })
-
-        return newPayment.save()
       }
+
+      // Now save a Payment entry
+      var newPayment = new Payment({
+        amount: charge.amount,
+        creditCard: cardObj._id,
+        chargeId: charge.id,
+        user: savedUser._id,
+        timestamp: Math.round(Date.now() / 1000),
+        ip: remoteAddr,
+        status: Payment.status.SUCCESS
+      })
+
+      return newPayment.save()
     }).then(function (savedPayment) {
+      if (!savedPayment) {
+        throw new Promise.OperationalError("Payment save failed")
+      }
+
       return {
         message: 'Payment successfully made.',
         paymentId: savedPayment._id
       }
     }).catch(Promise.OperationalError, function (e) {
+      return e
       //reply(Boom.notFound("Application could not be found."))
       //return Boom.badRequest(err.message, {
       //  rawType: err.rawType,
@@ -187,6 +188,10 @@ module.exports = {
       })
 
       newPaymentFail.save()
+
+      return {
+        message: 'Payment failed.'
+      }
     })
   }
 }

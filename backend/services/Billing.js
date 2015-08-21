@@ -93,12 +93,12 @@ module.exports = {
               resolve({apps: bill, total: totalHours})
             }
           }).catch(function (err) {
-            request.log(err)
+            console.log(err)
             return reply(Boom.badImplementation('There was a problem with the database.'))
           })
         })
       }).catch(function (err) {
-        request.log(err)
+        console.log(err)
         return reply(Boom.badImplementation('There was a problem with the database.'))
       })
     })
@@ -107,43 +107,38 @@ module.exports = {
     // 7 dollars divided by a full month of hours
     return 7 / 30 * 24
   },
-  chargeHours: function (userId, hours) {
-    var self = this
+  getLastPayment: function (userId) {
+    var user = User.findById(userId).populate('creditCards')
 
-    var user
-    var userObjP = User.findById(userId).populate('creditCards')
-    return userObjP.then(function(actualUser) {
-      user = actualUser
-      return user
-    }).then(function(user) {
+    return user.then(function(user) {
       return Payment.findOne({user: user, status: Payment.status.SUCCESS}).sort({timestamp: -1})
     }).then(function(payment) {
       if (payment) {
-        // This is the last payment
         return payment.timestamp
       } else {
         return user.timestamp
       }
-    }).then(function(timestamp) {
-      // From provided timestamp calculate how much the user will owe
-      var price = self.calculateHoursPrice()
-      var seconds = moment().unix()-timestamp
-      var hours = seconds/60
-      var owed = self.calculateHoursPrice()*hours
+    })
+  },
+  chargeHours: function (userId, hours) {
+    var self = this
 
-      if (owed > user.credit) {
+    var user
+    return User.findById(userId).populate('creditCards').then(function(user) {
+      if (self.calculateHoursPrice()*hours > user.credit) {
         var activeCard = _.find(user.creditCards, function (cc) {
           return cc.active
         })
 
         if (activeCard) {
-          // They will go into debt so we need to charge them more
-          return CreditCardService.chargeCreditCard(user._id, activeCard._id, UserRoles.ADMIN, "Automatic Topup", 10, '127.0.0.1')
+          // option object
+          // amount should whatever to get postive 10
+          return CreditCardService.chargeCreditCard(user._id, activeCard._id, "Automatic Topup", 1000, '127.0.0.1')
         } else {
           return Boom.badRequest("No active credit card found for user")
         }
       } else {
-        return Boom.badRequest("An error occurred charging users's card")
+        return {status: "No Charge"}
       }
     }).catch(function (err) {
       console.log(err)

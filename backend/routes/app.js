@@ -290,22 +290,21 @@ exports.getUserBilling = function(request, reply) {
 }
 
 exports.getAllBilling = function(request, reply) {
-  var month = request.params.month
+  var month = moment().format("YYYY-MM")
 
-  month = '2015-08'
-
-  if (!month.match(/\d{4}-\d{2}/g)) {
-    return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
-  }
-
-  var monthM = moment(request.params.month, "YYYY-MM")
-  var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
+  var monthM = moment(month, "YYYY-MM")
+  var monthEndM = moment(month, "YYYY-MM").add(1, 'month')
 
   var findUsersApp = function(users) {
     var appPromises = _.map(users, function(user) {
       return App.find({user: user}).populate('containers').then(function (apps) {
         var billingPromises = _.map(apps, function(app) {
-          return Billing.getAppBillableHours(app, monthM, monthEndM)
+          // find out when last payment was
+          return Billing.getLastPayment(user).then(function (lastPayment) {
+            console.log("lastPayment", lastPayment)
+
+            return Billing.getAppBillableHours(app, monthM, monthEndM) // params changed
+          })
         })
 
         return Promise.all(billingPromises)
@@ -316,10 +315,11 @@ exports.getAllBilling = function(request, reply) {
 
   var users = User.find()
 
-  Promise.all([users, users.then(findUsersApp)]).spread(function(users, apps){
+  Promise.all([users, users.then(findUsersApp)]).spread(function(users, apps) {
     var charges = []
     users.forEach(function(user, i) {
       var hoursToday = _.sum(apps[i])
+
       charges.push(Billing.chargeHours(user, hoursToday))
     })
 
