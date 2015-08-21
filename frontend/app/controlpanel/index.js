@@ -18,6 +18,7 @@ var Billing = require('./components/Billing/')
 var ContainerFormular = require('./components/ContainersFormular/')
 var Logs = require('./components/Logs/')
 var Clusters = require('./components/Clusters/')
+var ClusterShow = require('./components/ClusterShow/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -40,6 +41,7 @@ var routes = (
     <Route path='/users/:id' handler={UserShow}/>
     <Route path='/logs' handler={Logs}/>
     <Route path='/clusters' handler={Clusters}/>
+    <Route path='/clusters/:id' handler={ClusterShow}/>
   </Route>
 )
 
