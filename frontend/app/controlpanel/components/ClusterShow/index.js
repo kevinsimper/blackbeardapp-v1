@@ -34,7 +34,7 @@ var ClusterShow = React.createClass({
   onClickDelete: function() {
     var self = this
     ClusterActions.del(this.props.params.id).then(function () {
-      self.transitionTo('/clusters/')
+      self.transitionTo('/clusters')
     })
   },
   render: function () {
@@ -75,6 +75,10 @@ var ClusterShow = React.createClass({
                 <tr>
                   <td>Key</td>
                   <td>{this.state.cluster.certificates.key}</td>
+                </tr>
+                <tr>
+                  <td>Deleted</td>
+                  <td>{this.state.cluster.deletedAt}</td>
                 </tr>
               </div>
             }

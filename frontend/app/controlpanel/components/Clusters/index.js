@@ -36,6 +36,7 @@ var Clusters = React.createClass({
             <tr>
               <th>Type</th>
               <th>Machines</th>
+              <th>Deleted</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -46,6 +47,7 @@ var Clusters = React.createClass({
                 <tr>
                   <td>{item.type}</td>
                   <td>{item.machines}</td>
+                  <td>{item.deleted && 'Yes'}</td>
                   <td>
                     <Button size='small' onClick={handler}>View</Button>
                   </td>
