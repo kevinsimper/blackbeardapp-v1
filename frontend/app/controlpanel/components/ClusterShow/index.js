@@ -4,9 +4,11 @@ var extend = require('lodash/object/extend')
 var ClusterActions = require('../Clusters/actions')
 var ClusterStore = require('../Clusters/store')
 var Table = require('../Table')
+var Button = require('../Button')
+var Navigation = require('react-router').Navigation
 
 var ClusterShow = React.createClass({
-  mixins: [Reflux.ListenerMixin],
+  mixins: [Reflux.ListenerMixin, Navigation],
   getState: function () {
     return {
       cluster: ClusterStore.getOne(this.props.params.id)
@@ -28,6 +30,12 @@ var ClusterShow = React.createClass({
   },
   onChange: function () {
     this.setState(this.getState())
+  },
+  onClickDelete: function() {
+    var self = this
+    ClusterActions.del(this.props.params.id).then(function () {
+      self.transitionTo('/clusters/')
+    })
   },
   render: function () {
     var self = this
@@ -72,6 +80,9 @@ var ClusterShow = React.createClass({
             }
           </tbody>
         </Table>
+        <div>
+          <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
+        </div>
       </div>
     )
   }
