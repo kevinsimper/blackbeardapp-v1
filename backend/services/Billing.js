@@ -139,6 +139,7 @@ module.exports = {
         if (activeCard) {
           // option object
           // amount should whatever to get postive 10
+          console.log("AUTOMAGIC")
           return CreditCardService.chargeCreditCard({
             user: user._id,
             card: activeCard._id,

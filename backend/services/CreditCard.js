@@ -116,18 +116,24 @@ module.exports = {
     var chargeAmount = options.amount
     var remoteAddr = options.remoteAddr || '127.0.0.1'
 
-    var userObj
-    var cardObj
     var charge = null
 
     var cardObj = CreditCard.findOne(card)
     var userObj = User.findOne({_id: user})
 
-    var newCharge = Promise.all([cardObj, userObj]).spread(function (cardObj, userObj) {
+    var newCharge = Promise.all([cardObj, userObj]).then(function (cardObj, userObj) {
+      console.log("arguments", arguments)
+
       if (!userObj || !cardObj) {
         throw new Promise.OperationalError("User or credit card not found")
       }
 
+      console.log("CHARGE", {
+        amount: chargeAmount,
+        currency: "usd",
+        source: cardObj.token,
+        description: chargeName
+      })
       return self.charge({
         amount: chargeAmount,
         currency: "usd",
@@ -162,6 +168,8 @@ module.exports = {
 
       return newPayment.save()
     }).then(function (savedPayment) {
+      console.log("SAVED", savedPayment)
+
       if (!savedPayment) {
         throw new Promise.OperationalError("Payment save failed")
       }
@@ -171,6 +179,7 @@ module.exports = {
         paymentId: savedPayment._id
       }
     }).catch(Promise.OperationalError, function (e) {
+      console.log("ECEECC", e)
       return e
       //reply(Boom.notFound("Application could not be found."))
       //return Boom.badRequest(err.message, {

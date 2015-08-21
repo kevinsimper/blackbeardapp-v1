@@ -27,7 +27,7 @@ db.users.insert({
   "timestamp": "1435735743",
   "ip": "127.0.0.1",
   "role": "ADMIN",
-  "creditCards": [ObjectId("55b63553ec5d482b005cfbc6")],
+  "creditCards": [],
   "deleted": false,
   "__v": 0
 });
@@ -41,7 +41,7 @@ db.users.insert({
   "timestamp": "1435735744",
   "ip": "127.0.0.1",
   "role": "USER",
-  "creditCards": [],
+  "creditCards": [ObjectId("55b63553ec5d482b005cfbc6")],
   "deleted": false,
   "__v": 0
 });
