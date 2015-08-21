@@ -2,6 +2,7 @@ var Reflux = require('reflux')
 var actions = require('./actions')
 var request = require('superagent')
 var config = require('../../config')
+var findWhere = require('lodash/collection/findWhere')
 
 var _clusters = []
 
@@ -20,8 +21,12 @@ var store = Reflux.createStore({
     _clusters = clusters
     this.trigger(clusters)
   },
-  getAll: function() {
+  getAll: function () {
     return _clusters
+  },
+  getOne: function (id) {
+    var one = findWhere(_clusters, {_id: id})
+    return (typeof one === 'undefined') ? {} : one
   }
 })
 
