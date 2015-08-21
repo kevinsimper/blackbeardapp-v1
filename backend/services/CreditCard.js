@@ -107,14 +107,19 @@ module.exports = {
       }
     })
   },
-  chargeCreditCard: function (user, card, chargeName, chargeAmount, remoteAddr) {
+  chargeCreditCard: function (options) {
     var self = this
+
+    var user = options.user
+    var card = options.card
+    var chargeName = options.message
+    var chargeAmount = options.amount
+    var remoteAddr = options.remoteAddr || '127.0.0.1'
 
     var userObj
     var cardObj
     var charge = null
 
-    // findOne
     var cardObj = CreditCard.findOne(card)
     var userObj = User.findOne({_id: user})
 
@@ -136,7 +141,6 @@ module.exports = {
       if (!newCharge) {
         throw new Promise.OperationalError("Charge failed")
       }
-
       charge = newCharge
       userObj.credit += newCharge.amount
       return userObj.save()

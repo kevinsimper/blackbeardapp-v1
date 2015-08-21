@@ -37,7 +37,7 @@ db.users.insert({
   "password": "sha1$5474e86b$1$0d184fe27ec8573b8f34cf5b33e9a7a237fe5b27",
   "name": "User One",
   "username": "user01",
-  "credit": 1000,
+  "credit": 500,
   "timestamp": "1435735744",
   "ip": "127.0.0.1",
   "role": "USER",

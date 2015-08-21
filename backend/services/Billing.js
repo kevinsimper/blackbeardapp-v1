@@ -13,7 +13,7 @@ var Boom = require('boom')
 
 module.exports = {
   diffHours: function (a, b) {
-    return Math.ceil(a.diff(b, 'minute') / 60.0)
+    return Math.ceil(a.diff(b, 'second') / 60.0 / 60.0)
   },
   getAppBillableHours: function (app, start, end) {
     var self = this
@@ -23,7 +23,7 @@ module.exports = {
       app.containers.forEach(function (container, i) {
         var createdDate = moment.unix(container.createdAt)
 
-        var deletedAt = moment()
+        var deletedAt = moment().add(1, 'minute')
         if (container.deletedAt) {
           var deletedAt = moment(container.deletedAt)
         }
@@ -104,15 +104,14 @@ module.exports = {
     })
   },
   calculateHoursPrice: function () {
-    // 7 dollars divided by a full month of hours
-    return 7 / 30 * 24
+    // 7 dollars divided by a full month of hours (in cents)
+    return ((7 / 30) * 24) * 100
   },
   getLastPayment: function (userId) {
     var user = User.findById(userId).populate('creditCards')
+    var payment = Payment.findOne({user: userId, status: Payment.status.SUCCESS}).sort({timestamp: -1})
 
-    return user.then(function(user) {
-      return Payment.findOne({user: user, status: Payment.status.SUCCESS}).sort({timestamp: -1})
-    }).then(function(payment) {
+    return Promise.all([user, payment]).spread(function (user, payment) {
       if (payment) {
         return payment.timestamp
       } else {
@@ -125,6 +124,13 @@ module.exports = {
 
     var user
     return User.findById(userId).populate('creditCards').then(function(user) {
+      console.log("Charge Hours Diagnostic", {
+        hoursPrice: self.calculateHoursPrice(),
+        credit: user.credit,
+        hours: hours,
+        amount:  hours*self.calculateHoursPrice()
+      })
+
       if (self.calculateHoursPrice()*hours > user.credit) {
         var activeCard = _.find(user.creditCards, function (cc) {
           return cc.active
@@ -133,7 +139,12 @@ module.exports = {
         if (activeCard) {
           // option object
           // amount should whatever to get postive 10
-          return CreditCardService.chargeCreditCard(user._id, activeCard._id, "Automatic Topup", 1000, '127.0.0.1')
+          return CreditCardService.chargeCreditCard({
+            user: user._id,
+            card: activeCard._id,
+            message: "Automatic Topup",
+            amount: 1000
+          })
         } else {
           return Boom.badRequest("No active credit card found for user")
         }
@@ -141,7 +152,6 @@ module.exports = {
         return {status: "No Charge"}
       }
     }).catch(function (err) {
-      console.log(err)
       return reply(Boom.badImplementation('There was a problem with the database.'))
     })
   }

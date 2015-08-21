@@ -50,7 +50,6 @@ lab.experiment('Testing Billing service', function() {
     })
   })
   lab.test('Verify single day', function(done) {
-
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
 
@@ -82,7 +81,19 @@ lab.experiment('Testing Billing service', function() {
     })
   })
   lab.test('Test billing', function(done) {
-    request({
+    var token = request({
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'user@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function (err, loginResponse) {
+      return loginResponse.token
+    })
+
+    var adminToken = request({
       method: 'POST',
       uri: appUrl + '/login',
       json: true,
@@ -91,17 +102,46 @@ lab.experiment('Testing Billing service', function() {
         password: 'password'
       }
     }).spread(function (err, loginResponse) {
-      var token = loginResponse.token
+      return loginResponse.token
+    })
+    var actualToken
+    var actualAdminToken
+
+    Promise.all([token, adminToken]).spread(function (token, adminToken) {
+      actualToken = token
+      actualAdminToken = adminToken
+
+      return request({
+        method: 'GET',
+        uri: appUrl + '/users/me/apps',
+        headers: {
+          Authorization: token
+        },
+        json: true
+      })
+    }).spread(function (err, appsResponse) {
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/apps/' + appsResponse[1]._id + '/containers',
+        headers: {
+          Authorization: actualToken
+        },
+        json: true,
+        body: {
+          region: 'eu'
+        }
+      })
+    }).spread(function (err, containerResponse) {
       return request({
         method: 'GET',
         uri: appUrl + '/billing',
         json: true,
         headers: {
-          'Authorization': token
+          'Authorization': actualAdminToken
         }
       })
     }).spread(function (err, billingRespone) {
-      expect(billingRespone.statusCode, 'to be', 200)
+      expect(billingRespone[1], 'to be', 200)
       done()
     })
   })

@@ -298,12 +298,10 @@ exports.getAllBilling = function(request, reply) {
   var findUsersApp = function(users) {
     var appPromises = _.map(users, function(user) {
       return App.find({user: user}).populate('containers').then(function (apps) {
-        var billingPromises = _.map(apps, function(app) {
-          // find out when last payment was
-          return Billing.getLastPayment(user).then(function (lastPayment) {
-            console.log("lastPayment", lastPayment)
 
-            return Billing.getAppBillableHours(app, monthM, monthEndM) // params changed
+        var billingPromises = _.map(apps, function(app) {
+          return Billing.getLastPayment(user).then(function (lastPayment) {
+            return Billing.getAppBillableHours(app, moment.unix(lastPayment), monthEndM)
           })
         })
 
@@ -318,9 +316,9 @@ exports.getAllBilling = function(request, reply) {
   Promise.all([users, users.then(findUsersApp)]).spread(function(users, apps) {
     var charges = []
     users.forEach(function(user, i) {
-      var hoursToday = _.sum(apps[i])
+      var hours = _.sum(apps[i])
 
-      charges.push(Billing.chargeHours(user, hoursToday))
+      charges.push(Billing.chargeHours(user, hours))
     })
 
     Promise.all(charges).then(function(result) {

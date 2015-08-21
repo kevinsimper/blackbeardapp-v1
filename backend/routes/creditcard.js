@@ -92,12 +92,13 @@ exports.postCreditCardPayment = function (request, reply) {
   var name = request.payload.name
   var amount = request.payload.amount
 
-  var bills = CreditCardService.chargeCreditCard(user,
-    id,
-    role,
-    name,
-    amount,
-    request.headers['cf-connecting-ip'] || request.info.remoteAddress)
+  var bills = CreditCardService.chargeCreditCard({
+      user: user,
+      card: id,
+      message: name,
+      amount: amount,
+      remoteAddr: request.headers['cf-connecting-ip'] || request.info.remoteAddress
+  })
   return reply(bills)
 }
 
