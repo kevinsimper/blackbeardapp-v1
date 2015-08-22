@@ -107,11 +107,13 @@ module.exports = {
     // 7 dollars divided by a full month of hours (in cents)
     return ((7 / 30) * 24) * 100
   },
-  getLastPayment: function (userId) {
-    var user = User.findById(userId).populate('creditCards')
-    var payment = Payment.findOne({user: userId, status: Payment.status.SUCCESS}).sort({timestamp: -1})
-
-    return Promise.all([user, payment]).spread(function (user, payment) {
+  getLastPayment: function (user) {
+    Payment.findOne({
+      user: userId,
+      status: Payment.status.SUCCESS
+    }).sort({
+      timestamp: -1
+    }).then(function (payment) {
       if (payment) {
         return payment.timestamp
       } else {
