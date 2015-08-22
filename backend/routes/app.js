@@ -293,32 +293,27 @@ exports.getAllBilling = function(request, reply) {
   var month = moment().format("YYYY-MM")
   var monthEndM = moment().add(1, 'month').format("YYYY-MM")
 
-  var findUsersApp = function(users) {
+  var users = User.find()
+
+  var apps = users.then(function (users) {
     var appPromises = _.map(users, function(user) {
       return App.find({user: user}).populate('containers').then(function (apps) {
-
         var billingPromises = _.map(apps, function(app) {
           return Billing.getLastPayment(user).then(function (lastPayment) {
             return Billing.getAppBillableHours(app, moment.unix(lastPayment), monthEndM)
           })
         })
-
         return Promise.all(billingPromises)
       })
     })
     return Promise.all(appPromises)
-  }
+  })
 
-  var users = User.find()
-
-  Promise.all([users, users.then(findUsersApp)]).spread(function(users, apps) {
-    var charges = []
-    users.forEach(function(user, i) {
+  Promise.all([users, apps]).spread(function(users, apps) {
+    var charges = users.map(function(user, i) {
       var hours = _.sum(apps[i])
-
-      charges.push(Billing.chargeHours(user, hours))
+      return Billing.chargeHours(user, hours)
     })
-
     Promise.all(charges).then(function(result) {
       reply(result)
     })
