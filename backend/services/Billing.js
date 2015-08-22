@@ -25,11 +25,11 @@ module.exports = {
 
         var deletedAt = moment().add(1, 'minute')
         if (container.deletedAt) {
-          var deletedAt = moment(container.deletedAt)
+          var deletedAt = moment(Date.parse(container.deletedAt))
         }
 
         if (!deletedAt.isBefore(start)) {
-          if (deletedAt.isBefore(end)) {
+          if (deletedAt.isBefore(Date.parse(end))) {
             // Stopped within month
             if (createdDate.isBefore(start)) {
               hours += self.diffHours(deletedAt, start)
