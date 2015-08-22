@@ -185,7 +185,6 @@ lab.experiment('/users/{id}/creditcards', function () {
         expect(response.statusCode, 'to be', 200)
         expect(body[0].number, 'to be', '1234')
         creditCardId = body[1]._id
-        emptyCreditCardId = body[2]._id
         done()
       })
   })
@@ -240,7 +239,8 @@ lab.experiment('/users/{id}/creditcards', function () {
       })
   })
 
-  // lab.test('POST charge user with empty card', function (done) {
+  // TODO FIX this test
+  // lab.test('POST try to charge user with a card that will decline', function (done) {
   //   var requestData = {
   //     name: 'New Charge',
   //     amount: 50 // 50 cent charge
