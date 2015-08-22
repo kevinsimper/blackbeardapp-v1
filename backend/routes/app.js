@@ -296,26 +296,31 @@ exports.getAllBilling = function(request, reply) {
   var users = User.find()
 
   var apps = users.then(function (users) {
-    var appPromises = _.map(users, function(user) {
-      return App.find({user: user}).populate('containers').then(function (apps) {
-        var billingPromises = _.map(apps, function(app) {
-          return Billing.getLastPayment(user).then(function (lastPayment) {
-            return Billing.getAppBillableHours(app, moment.unix(lastPayment), monthEndM)
-          })
-        })
-        return Promise.all(billingPromises)
-      })
-    })
-    return Promise.all(appPromises)
+    return Promise.all(_.map(users, function(user) {
+      return App.find({user: user}).populate('containers')
+    }))
   })
 
-  Promise.all([users, apps]).spread(function(users, apps) {
-    var charges = users.map(function(user, i) {
-      var hours = _.sum(apps[i])
+  var timespans = users.then(function (users) {
+    return Promise.all(_.map(users, function (user) {
+      return Billing.getLastPayment(user)
+    }))
+  })
+
+  var hoursToBill = Promise.all([apps, timespans]).spread(function (apps, timespans) {
+    return Promise.all(_.map(apps, function(app, index) {
+      return Billing.getAppBillableHours(app, moment.unix(timespans[index]), monthEndM)
+    }))
+  })
+
+  var status = Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
+    Promise.all(users.map(function(user, i) {
+      var hours = _.sum(hoursToBill[i])
       return Billing.chargeHours(user, hours)
-    })
-    Promise.all(charges).then(function(result) {
-      reply(result)
-    })
+    }))
+  })
+
+  status.then(function(status) {
+    console.log('status', status)
   })
 }

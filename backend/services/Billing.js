@@ -109,7 +109,7 @@ module.exports = {
   },
   getLastPayment: function (user) {
     Payment.findOne({
-      user: userId,
+      user: user,
       status: Payment.status.SUCCESS
     }).sort({
       timestamp: -1
