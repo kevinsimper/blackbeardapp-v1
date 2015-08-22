@@ -291,9 +291,7 @@ exports.getUserBilling = function(request, reply) {
 
 exports.getAllBilling = function(request, reply) {
   var month = moment().format("YYYY-MM")
-
-  var monthM = moment(month, "YYYY-MM")
-  var monthEndM = moment(month, "YYYY-MM").add(1, 'month')
+  var monthEndM = moment().add(1, 'month').format("YYYY-MM")
 
   var findUsersApp = function(users) {
     var appPromises = _.map(users, function(user) {

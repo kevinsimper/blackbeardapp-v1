@@ -89,8 +89,8 @@ lab.experiment('Testing Billing service', function() {
         email: 'user@blackbeard.io',
         password: 'password'
       }
-    }).spread(function (err, loginResponse) {
-      return loginResponse.token
+    }).spread(function (response, body) {
+      return body.token
     })
 
     var adminToken = request({
@@ -101,16 +101,11 @@ lab.experiment('Testing Billing service', function() {
         email: 'admin@blackbeard.io',
         password: 'password'
       }
-    }).spread(function (err, loginResponse) {
-      return loginResponse.token
+    }).spread(function (response, body) {
+      return body.token
     })
-    var actualToken
-    var actualAdminToken
 
-    Promise.all([token, adminToken]).spread(function (token, adminToken) {
-      actualToken = token
-      actualAdminToken = adminToken
-
+    var app = token.then(function (token) {
       return request({
         method: 'GET',
         uri: appUrl + '/users/me/apps',
@@ -118,30 +113,36 @@ lab.experiment('Testing Billing service', function() {
           Authorization: token
         },
         json: true
+      }).spread(function(response, body) {
+        return body[0]
       })
-    }).spread(function (err, appsResponse) {
+    })
+
+    var container = Promise.all([token, app]).spread(function (token, app) {
       return request({
         method: 'POST',
-        uri: appUrl + '/users/me/apps/' + appsResponse[0]._id + '/containers',
+        uri: appUrl + '/users/me/apps/' + app._id + '/containers',
         headers: {
-          Authorization: actualToken
+          Authorization: token
         },
         json: true,
         body: {
           region: 'eu'
         }
       })
-    }).spread(function (err, containerResponse) {
+    })
+
+    Promise.all([adminToken, container]).then(function (adminToken, container) {
       return request({
         method: 'GET',
         uri: appUrl + '/billing',
         json: true,
         headers: {
-          'Authorization': actualAdminToken
+          'Authorization': adminToken
         }
       })
-    }).spread(function (err, billingRespone) {
-      console.log(billingRespone)
+    }).spread(function (response, body) {
+      console.log(body)
       //expect(billingRespone, 'to be', 200)
       done()
     })
