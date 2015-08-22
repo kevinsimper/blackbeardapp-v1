@@ -8,6 +8,7 @@ var schema = new mongoose.Schema({
   name: String,
   username: String,
   credit: Number,
+  virtualCredit: Number,
   timestamp: String,
   resetToken: String,
   resetExpiry: String,
@@ -46,13 +47,7 @@ schema.statics.findOneByRole = function (id, role, cb) {
     conditions = {}
   }
 
-  return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(function(error, result) {
-    if (error) {
-      return cb(error, null)
-    }
-
-    return cb(null, result)
-  })
+  return this.where('_id', id).where(conditions).select(fields.join(' ')).findOne(cb)
 }
 
 module.exports = mongoose.model('user', schema)

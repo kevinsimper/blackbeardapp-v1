@@ -26,3 +26,8 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
 }
 
 module.exports = mongoose.model('payment', schema)
+
+module.exports.status = {
+  SUCCESS: 'SUCCESS',
+  FAIL: 'FAIL'
+}

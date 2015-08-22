@@ -288,3 +288,46 @@ exports.getUserBilling = function(request, reply) {
     reply(Boom.badImplementation())
   })
 }
+
+exports.getAllBilling = function(request, reply) {
+  var today = moment()
+
+  var users = User.find()
+
+  var userApps = users.then(function (users) {
+    return Promise.all(_.map(users, function(user) {
+      return App.find({user: user}).populate('containers')
+    }))
+  })
+
+  var timespans = users.then(function (users) {
+    return Promise.all(_.map(users, function (user) {
+      return Billing.getLastPayment(user)
+    }))
+  })
+
+  var hoursToBill = Promise.all([userApps, timespans]).spread(function (users, timespans) {
+    return users.map(function(apps, index) {
+      return apps.map(function(app) {
+        return Billing.getAppBillableHours(app, moment.unix(timespans[index]), today)
+      })
+    })
+  })
+
+  var status = Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
+    return Promise.all(users.map(function(user, i) {
+      var hours = _.sum(hoursToBill[i])
+      return Billing.chargeHours(user, hours)
+    }))
+  })
+
+  status.then(function (status) {
+    reply({
+      status: 'ok',
+      data: status
+    })
+  }).catch(function (err) {
+    request.log(err)
+    reply(Boom.badImplementation())
+  })
+}

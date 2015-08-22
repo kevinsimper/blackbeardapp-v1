@@ -7,6 +7,15 @@ var Container = require('../models/Container')
 var moment = require('moment')
 var Promise = require('bluebird')
 var User = Promise.promisifyAll(require('../models/User'))
+var request = Promise.promisify(require('request'))
+
+var helpers = require('./helpers/')
+var appUrl = helpers.appUrl()
+
+var server = require('../server')
+server.start(function() {
+  console.log('Server running at:', server.info.uri)
+})
 
 lab.experiment('Testing Billing service', function() {
   lab.test('Verify date ranges', function(done) {
@@ -41,7 +50,6 @@ lab.experiment('Testing Billing service', function() {
     })
   })
   lab.test('Verify single day', function(done) {
-
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
 
@@ -58,17 +66,69 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
-  lab.test('Get per user', function(done) {
-    var start = moment('2015-08', "YYYY-MM")
-    var end = moment('2015-09', "YYYY-MM")
+  lab.test('Test billing', function(done) {
+    var token = request({
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'user@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function (response, body) {
+      return body.token
+    })
 
-    var user = new User({username: 'billing_test', email: 'test@blackbeard.io'})
+    var adminToken = request({
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'admin@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function (response, body) {
+      return body.token
+    })
 
-    Billing.getUserAppsBillableHours(user, start, end).then(function(result) {
-      expect(result.apps[0].hours, 'to be', 571) // first container in top test
-      expect(result.apps[1].hours, 'to be', 24) // first container in top test
-      expect(result.total, 'to be', 571+24)
+    var app = token.then(function (token) {
+      return request({
+        method: 'GET',
+        uri: appUrl + '/users/me/apps',
+        headers: {
+          Authorization: token
+        },
+        json: true
+      }).spread(function(response, body) {
+        return body[0]
+      })
+    })
 
+    var container = Promise.all([token, app]).spread(function (token, app) {
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/apps/' + app._id + '/containers',
+        headers: {
+          Authorization: token
+        },
+        json: true,
+        body: {
+          region: 'eu'
+        }
+      })
+    })
+
+    Promise.all([adminToken, container]).then(function (adminToken, container) {
+      return request({
+        method: 'GET',
+        uri: appUrl + '/billing',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      })
+    }).spread(function (response, body) {
+      expect(response.statusCode, 'to be', 200)
       done()
     })
   })

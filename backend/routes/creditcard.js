@@ -4,18 +4,17 @@ var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var _ = require('lodash')
 var User = Promise.promisifyAll(require('../models/User'))
-var Payment = require('../models/Payment')
-var paymentStatus = require('../models/paymentStatus/')
+var Payment = Promise.promisifyAll(require('../models/Payment'))
 var roles = require('../models/roles/')
-var CreditCardService = require('../services/Creditcard')
+var CreditCardService = require('../services/CreditCard')
 
 exports.getCreditCards = function (request, reply) {
   var role = request.auth.credentials.role
   var userId = User.getUserIdFromRequest(request)
 
-  User.findOneByRoleAsync(userId, role)
+  User.findOneByRole(userId, role)
   .then(function(user) {
-      return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
+      return CreditCard.findByIdsAndRole(user.creditCards, role)
   })
   .then(function(creditCards) {
     return reply(creditCards)
@@ -31,7 +30,7 @@ exports.getCreditCard = function (request, reply) {
   var id = request.params.creditcard
   var role = request.auth.credentials.role
 
-  CreditCard.findOneByRoleAsync(id, role).then(function(card) {
+  CreditCard.findOneByRole(id, role).then(function(card) {
     return reply(card)
   }).catch(function(CastError, e) {
     reply(Boom.notFound())
@@ -46,7 +45,7 @@ exports.postCreditCardActivate = function (request, reply) {
   var id = request.params.creditcard
   var role = request.auth.credentials.role
 
-  var findCreditCards = User.findOneAsync({_id: userId}).then(function (user) {
+  var findCreditCards = User.findOne({_id: userId}).then(function (user) {
     var foundCard = _.find(user.creditCards, function (card) {
       return card == id
     })
@@ -54,7 +53,7 @@ exports.postCreditCardActivate = function (request, reply) {
     if (!foundCard) {
       reply(Boom.notFound('The specified credit card could not be found.'))
     } else {
-      return CreditCard.findByIdsAndRoleAsync(user.creditCards, role)
+      return CreditCard.findByIdsAndRole(user.creditCards, role)
     }
   })
 
@@ -124,7 +123,7 @@ exports.postCreditCardPayment = function (request, reply) {
         user: user._id,
         timestamp: Math.round(Date.now() / 1000),
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-        status: paymentStatus.SUCCESS
+        status: Payment.status.SUCCESS
       })
 
       newPayment.save(paymentSaveCallback)
@@ -153,7 +152,7 @@ exports.postCreditCardPayment = function (request, reply) {
           user: user._id,
           timestamp: Math.round(Date.now() / 1000),
           ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-          status: paymentStatus.FAIL
+          status: Payment.status.FAIL
         })
 
         newPaymentFail.save()
