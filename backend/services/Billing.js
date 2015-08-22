@@ -54,59 +54,6 @@ module.exports = {
       resolve(hours)
     })
   },
-  getUserAppsBillableHours: function (user, start, end) {
-    var self = this
-    return new Promise(function (resolve, reject) {
-      var bill = []
-
-      var apps
-      if ((user.username === 'billing_test') && (user.email === 'test@blackbeard.io')) {
-        // Mocking stuff out - this could be improved
-        apps = new Promise(function (resolve) {
-          var app = new App({name: "testAppBilling"})
-          var appObj = app.toObject()
-          appObj.containers = [
-            new Container({createdAt: moment('2015-07-24 18:31:12').unix(), deletedAt: '2015-08-24 18:01:12'})
-          ]
-          var appObj2 = app.toObject()
-          appObj2.containers = [
-            new Container({createdAt: moment('2015-08-28 01:31:12').unix(), deletedAt: '2015-08-29 01:01:12'})
-          ]
-
-          resolve([appObj, appObj2]);
-        })
-      } else {
-        apps = App.find({user: user}).populate('containers')
-      }
-
-      apps.then(function (actualApps) {
-        var totalHours = 0
-        _.each(actualApps, function (app, i) {
-          var hours = self.getAppBillableHours(app, start, end).then(function (hours) {
-            if (hours) {
-              bill.push({
-                appName: app.name,
-                appId: app._id,
-                hours: hours
-              })
-
-              totalHours += hours
-            }
-
-            if (i === actualApps.length - 1) {
-              resolve({apps: bill, total: totalHours})
-            }
-          }).catch(function (err) {
-            console.log(err)
-            return reply(Boom.badImplementation('There was a problem with the database.'))
-          })
-        })
-      }).catch(function (err) {
-        console.log(err)
-        return reply(Boom.badImplementation('There was a problem with the database.'))
-      })
-    })
-  },
   calculateHoursPrice: function () {
     // 7 dollars divided by a full month of hours (in cents)
     return ((7 / 30) * 24) * 100

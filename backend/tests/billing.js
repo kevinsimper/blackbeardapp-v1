@@ -66,20 +66,6 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
-  lab.test('Get per user', function(done) {
-    var start = moment('2015-08', "YYYY-MM")
-    var end = moment('2015-09', "YYYY-MM")
-
-    var user = new User({username: 'billing_test', email: 'test@blackbeard.io'})
-
-    Billing.getUserAppsBillableHours(user, start, end).then(function(result) {
-      expect(result.apps[0].hours, 'to be', 571) // first container in top test
-      expect(result.apps[1].hours, 'to be', 24) // first container in top test
-      expect(result.total, 'to be', 571+24)
-
-      done()
-    })
-  })
   lab.test('Test billing', function(done) {
     var token = request({
       method: 'POST',
