@@ -15,6 +15,10 @@ module.exports = {
   diffHours: function (a, b) {
     return Math.ceil(a.diff(b, 'second') / 60.0 / 60.0)
   },
+  /**
+  * @param {moment} start
+  * @param {moment} end
+  */
   getAppBillableHours: function (app, start, end) {
     var self = this
     return new Promise(function (resolve, reject) {
@@ -29,7 +33,7 @@ module.exports = {
         }
 
         if (!deletedAt.isBefore(start)) {
-          if (deletedAt.isBefore(Date.parse(end))) {
+          if (deletedAt.isBefore(end)) {
             // Stopped within month
             if (createdDate.isBefore(start)) {
               hours += self.diffHours(deletedAt, start)
