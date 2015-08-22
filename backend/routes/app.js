@@ -290,8 +290,7 @@ exports.getUserBilling = function(request, reply) {
 }
 
 exports.getAllBilling = function(request, reply) {
-  var month = moment().format("YYYY-MM")
-  var monthEndM = moment().add(1, 'month').format("YYYY-MM")
+  var today = moment()
 
   var users = User.find()
 
@@ -310,7 +309,7 @@ exports.getAllBilling = function(request, reply) {
   var hoursToBill = Promise.all([userApps, timespans]).spread(function (users, timespans) {
     return users.map(function(apps, index) {
       return apps.map(function(app) {
-        return Billing.getAppBillableHours(app, moment.unix(timespans[index]), monthEndM)
+        return Billing.getAppBillableHours(app, moment.unix(timespans[index]), today)
       })
     })
   })
