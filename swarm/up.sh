@@ -1,7 +1,7 @@
 #!/bin/bash
-docker-machine create -d virtualbox local
-eval "$(docker-machine env local)"
-SWARM_ID=$(docker run swarm create)
+
+SWARM_ID=$(docker run --rm swarm create)
+echo $SWARM_ID
 
 docker-machine create \
 -d virtualbox \
@@ -21,6 +21,3 @@ docker-machine create \
 --swarm \
 --swarm-discovery token://$SWARM_ID \
 swarm-agent-01
-
-eval $(docker-machine env --swarm swarm-master)
-docker info
