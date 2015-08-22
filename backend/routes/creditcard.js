@@ -6,7 +6,7 @@ var _ = require('lodash')
 var User = Promise.promisifyAll(require('../models/User'))
 var Payment = Promise.promisifyAll(require('../models/Payment'))
 var roles = require('../models/roles/')
-var CreditCardService = require('../services/Creditcard')
+var CreditCardService = require('../services/CreditCard')
 
 exports.getCreditCards = function (request, reply) {
   var role = request.auth.credentials.role
