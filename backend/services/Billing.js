@@ -121,41 +121,34 @@ module.exports = {
       }
     })
   },
-  chargeHours: function (userId, hours) {
+  chargeHours: function (user, hours) {
     var self = this
-
-    var user
-    return User.findById(userId).populate('creditCards').then(function(user) {
-      console.log("Charge Hours Diagnostic", {
-        hoursPrice: self.calculateHoursPrice(),
-        credit: user.credit,
-        hours: hours,
-        amount:  hours*self.calculateHoursPrice()
-      })
-
-      if (self.calculateHoursPrice()*hours > user.credit) {
+    if(user.creditCards.length === 0) {
+      return 'has no creditcards'
+    }
+    return User.findOne(user).populate('creditCards').then(function(user) {
+      var amountUsed = self.calculateHoursPrice() * hours
+      if (amountUsed > user.credit) {
         var activeCard = _.find(user.creditCards, function (cc) {
-          return cc.active
+          return cc.active === true
         })
 
         if (activeCard) {
-          // option object
-          // amount should whatever to get postive 10
-          console.log("AUTOMAGIC")
+          var amount = (amountUsed - user.credit) + 1000
           return CreditCardService.chargeCreditCard({
             user: user._id,
             card: activeCard._id,
             message: "Automatic Topup",
-            amount: 1000
+            amount: amount
+          }).then(function () {
+            'did charge'
           })
         } else {
-          return Boom.badRequest("No active credit card found for user")
+          return 'no active card'
         }
       } else {
-        return {status: "No Charge"}
+        return 'did not charge'
       }
-    }).catch(function (err) {
-      return reply(Boom.badImplementation('There was a problem with the database.'))
     })
   }
 }

@@ -295,7 +295,7 @@ exports.getAllBilling = function(request, reply) {
 
   var users = User.find()
 
-  var apps = users.then(function (users) {
+  var userApps = users.then(function (users) {
     return Promise.all(_.map(users, function(user) {
       return App.find({user: user}).populate('containers')
     }))
@@ -307,20 +307,28 @@ exports.getAllBilling = function(request, reply) {
     }))
   })
 
-  var hoursToBill = Promise.all([apps, timespans]).spread(function (apps, timespans) {
-    return Promise.all(_.map(apps, function(app, index) {
-      return Billing.getAppBillableHours(app, moment.unix(timespans[index]), monthEndM)
-    }))
+  var hoursToBill = Promise.all([userApps, timespans]).spread(function (users, timespans) {
+    return users.map(function(apps, index) {
+      return apps.map(function(app) {
+        return Billing.getAppBillableHours(app, moment.unix(timespans[index]), monthEndM)
+      })
+    })
   })
 
   var status = Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
-    Promise.all(users.map(function(user, i) {
+    return Promise.all(users.map(function(user, i) {
       var hours = _.sum(hoursToBill[i])
       return Billing.chargeHours(user, hours)
     }))
   })
 
-  status.then(function(status) {
-    console.log('status', status)
+  status.then(function (status) {
+    reply({
+      status: 'ok',
+      data: status
+    })
+  }).catch(function (err) {
+    request.log(err)
+    reply(Boom.badImplementation())
   })
 }

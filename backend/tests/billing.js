@@ -142,8 +142,7 @@ lab.experiment('Testing Billing service', function() {
         }
       })
     }).spread(function (response, body) {
-      console.log(body)
-      //expect(billingRespone, 'to be', 200)
+      expect(response.statusCode, 'to be', 200)
       done()
     })
   })
