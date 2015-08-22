@@ -55,7 +55,10 @@ lab.experiment('/clusters', function() {
       },
       body: {
         type: 'swarm',
-        machines: 2
+        machines: 2,
+        ca: 'ca certificate',
+        cert: 'certificate',
+        key: 'key file'
       }
     }).spread(function (response, body) {
       expect(response.statusCode, 'to be', 200)

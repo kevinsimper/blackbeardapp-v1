@@ -456,10 +456,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'POST',
     path: '/clusters',
-    config: {
-      auth: 'jwt',
-      handler: clusterRoutes.postCluster
-    }
+    config: clusterRoutes.postCluster
+  })
+  server.route({
+    method: 'DELETE',
+    path: '/clusters/{id}',
+    config: clusterRoutes.deleteCluster
   })
 })
 

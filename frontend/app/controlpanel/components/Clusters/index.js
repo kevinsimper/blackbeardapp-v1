@@ -3,9 +3,11 @@ var Reflux = require('reflux')
 var actions = require('./actions')
 var store = require('./store')
 var Table = require('../Table/')
+var Button = require('../Button/')
+var Navigation = require('react-router').Navigation
 
 var Clusters = React.createClass({
-  mixins: [Reflux.ListenerMixin],
+  mixins: [Reflux.ListenerMixin, Navigation],
   getState: function () {
     return {
       clusters: store.getAll()
@@ -21,7 +23,11 @@ var Clusters = React.createClass({
   onChange: function () {
     this.setState(this.getState())
   },
+  onClickView: function(item) {
+    this.transitionTo('/clusters/' + item._id)
+  },
   render: function () {
+    var self = this
     return (
       <div className='Clusters'>
         <h1>Clusters</h1>
@@ -30,14 +36,21 @@ var Clusters = React.createClass({
             <tr>
               <th>Type</th>
               <th>Machines</th>
+              <th>Deleted</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {this.state.clusters.map(function (item) {
+              var handler = self.onClickView.bind(null, item)
               return (
                 <tr>
                   <td>{item.type}</td>
                   <td>{item.machines}</td>
+                  <td>{item.deleted && 'Yes'}</td>
+                  <td>
+                    <Button size='small' onClick={handler}>View</Button>
+                  </td>
                 </tr>
               )
             })}
