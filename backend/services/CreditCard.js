@@ -110,34 +110,26 @@ module.exports = {
   chargeCreditCard: function (options) {
     var self = this
 
-    var user = options.user
-    var card = options.card
+    var userId = options.user
+    var cardId = options.card
     var chargeName = options.message
     var chargeAmount = options.amount
     var remoteAddr = options.remoteAddr || '127.0.0.1'
 
     var charge = null
 
-    var cardObj = CreditCard.findOne(card)
-    var userObj = User.findOne({_id: user})
+    var creditcard = CreditCard.findOne(userId)
+    var user = User.findOne({_id: cardId})
 
-    var newCharge = Promise.all([cardObj, userObj]).then(function (cardObj, userObj) {
-      console.log("arguments", arguments)
-
-      if (!userObj || !cardObj) {
+    var newCharge = Promise.all([creditcard, user]).spread(function (creditcard, user) {
+      if (!user || !creditcard) {
         throw new Promise.OperationalError("User or credit card not found")
       }
 
-      console.log("CHARGE", {
-        amount: chargeAmount,
-        currency: "usd",
-        source: cardObj.token,
-        description: chargeName
-      })
       return self.charge({
         amount: chargeAmount,
         currency: "usd",
-        source: cardObj.token,
+        source: creditcard.token,
         description: chargeName
       })
     })
@@ -148,8 +140,8 @@ module.exports = {
         throw new Promise.OperationalError("Charge failed")
       }
       charge = newCharge
-      userObj.credit += newCharge.amount
-      return userObj.save()
+      user.credit += newCharge.amount
+      return user.save()
     }).then(function (savedUser) {
       if (!savedUser) {
         throw new Promise.OperationalError("User save failed")
@@ -158,7 +150,7 @@ module.exports = {
       // Now save a Payment entry
       var newPayment = new Payment({
         amount: charge.amount,
-        creditCard: cardObj._id,
+        creditCard: creditcard._id,
         chargeId: charge.id,
         user: savedUser._id,
         timestamp: Math.round(Date.now() / 1000),
@@ -178,33 +170,10 @@ module.exports = {
         message: 'Payment successfully made.',
         paymentId: savedPayment._id
       }
-    }).catch(Promise.OperationalError, function (e) {
-      console.log("ECEECC", e)
-      return e
-      //reply(Boom.notFound("Application could not be found."))
-      //return Boom.badRequest(err.message, {
-      //  rawType: err.rawType,
-      //  code: err.code,
-      //  param: err.param
-      //})
-
-      // Because Boom is crap the data sent with this exception is ignored so
-      //return Boom.badRequest(err.message)
+    }).catch(Promise.OperationalError, function (err) {
+      return err
     }).catch(function (err) {
-      var newPaymentFail = new Payment({
-        amount: chargeAmount,
-        creditCard: cardObj._id,
-        user: userObj._id,
-        timestamp: Math.round(Date.now() / 1000),
-        ip: remoteAddr,
-        status: Payment.status.FAIL
-      })
-
-      newPaymentFail.save()
-
-      return {
-        message: 'Payment failed.'
-      }
+      return new Error('Payment failed')
     })
   }
 }
