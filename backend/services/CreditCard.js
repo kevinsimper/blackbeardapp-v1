@@ -1,7 +1,7 @@
 var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
-var Payment = require('../models/Payment')
+var Payment = Promise.promisifyAll(require('../models/Payment'))
 var Boom = require('boom')
 
 module.exports = {
@@ -116,64 +116,72 @@ module.exports = {
     var chargeAmount = options.amount
     var remoteAddr = options.remoteAddr || '127.0.0.1'
 
-    var charge = null
+    var creditcard = CreditCard.findOne({_id: cardId})
+    var user = User.findOne({_id: userId})
 
-    var creditcard = CreditCard.findOne(userId)
-    var user = User.findOne({_id: cardId})
-
-    var newCharge = Promise.all([creditcard, user]).spread(function (creditcard, user) {
-      if (!user || !creditcard) {
-        throw new Promise.OperationalError("User or credit card not found")
+    // User _must_ exist
+    return user.then(function(user) {
+      if (!user) {
+        throw new Promise.OperationalError("User not found")
       }
 
-      return self.charge({
-        amount: chargeAmount,
-        currency: "usd",
-        source: creditcard.token,
-        description: chargeName
-      })
-    })
+      var card
+      var newCharge = creditcard.then(function(creditcard) {
+        if (!creditcard) {
+          throw new Promise.OperationalError("Credit card not found")
+        }
 
-    newCharge.then(function (newCharge) {
-      newCharge = false
-      if (!newCharge) {
-        throw new Promise.OperationalError("Charge failed")
-      }
-      charge = newCharge
-      user.credit += newCharge.amount
-      return user.save()
-    }).then(function (savedUser) {
-      if (!savedUser) {
-        throw new Promise.OperationalError("User save failed")
-      }
+        card = creditcard
 
-      // Now save a Payment entry
-      var newPayment = new Payment({
-        amount: charge.amount,
-        creditCard: creditcard._id,
-        chargeId: charge.id,
-        user: savedUser._id,
-        timestamp: Math.round(Date.now() / 1000),
-        ip: remoteAddr,
-        status: Payment.status.SUCCESS
+        return self.charge({
+          amount: chargeAmount,
+          currency: "usd",
+          source: creditcard.token,
+          description: chargeName
+        })
       })
 
-      return newPayment.save()
-    }).then(function (savedPayment) {
-      console.log("SAVED", savedPayment)
+      var charge = null
+      return newCharge.then(function (newCharge) {
+        if (!newCharge) {
+          throw new Promise.OperationalError("Charge failed")
+        }
 
-      if (!savedPayment) {
-        throw new Promise.OperationalError("Payment save failed")
-      }
+        charge = newCharge
+        user.credit += newCharge.amount
 
-      return {
-        message: 'Payment successfully made.',
-        paymentId: savedPayment._id
-      }
-    }).catch(Promise.OperationalError, function (err) {
-      return err
-    }).catch(function (err) {
-      return new Error('Payment failed')
+        return user.save()
+      }).then(function (savedUser) {
+        if (!savedUser) {
+          throw new Promise.OperationalError("User save failed")
+        }
+
+        // Now save a Payment entry
+        var newPayment = new Payment({
+          amount: charge.amount,
+          creditCard: card._id,
+          chargeId: charge.id,
+          user: savedUser._id,
+          timestamp: Math.round(Date.now() / 1000),
+          ip: remoteAddr,
+          status: Payment.status.SUCCESS
+        })
+
+        return newPayment.save()
+      }).then(function (savedPayment) {
+        if (!savedPayment) {
+          throw new Promise.OperationalError("Payment save failed")
+        }
+
+        return {
+          message: 'Payment successfully made.',
+          paymentId: savedPayment._id
+        }
+      }).catch(Promise.OperationalError, function (err) {
+        return err
+      }).catch(function (err) {
+        return new Error('Payment failed')
+      })
     })
   }
 }
