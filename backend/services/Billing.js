@@ -27,38 +27,31 @@ module.exports = {
       app.containers.forEach(function (container, i) {
         var createdDate = moment.unix(container.createdAt)
 
-        if ((Math.abs(moment().diff(createdDate)) < 4000) &&
-          (Math.abs(moment().diff(end)) < 4000)) {
-          
-          // Just created so set it to 1h
-          hours += 1
-        } else {
-          var deletedAt = moment()
+        var deletedAt = moment()
 
-          if (container.deletedAt) {
-            var deletedAt = moment(Date.parse(container.deletedAt))
-          }
+        if (container.deletedAt) {
+          var deletedAt = moment(Date.parse(container.deletedAt))
+        }
 
-          if (!deletedAt.isBefore(start)) {
-            if (deletedAt.isBefore(end)) {
-              // Stopped before end of month
-              // Stopped within month
-              if (createdDate.isBefore(start)) {
-                // Started before start of period
-                hours += self.diffHours(deletedAt, start)
-              } else {
-                // Started at start of period
-                hours += self.diffHours(deletedAt, createdDate)
-              }
+        if (!deletedAt.isBefore(start)) {
+          if (deletedAt.isBefore(end)) {
+            // Stopped before end of month
+            // Stopped within month
+            if (createdDate.isBefore(start)) {
+              // Started before start of period
+              hours += self.diffHours(deletedAt, start)
             } else {
-              // Stopped after end of month
-              if (createdDate.isBefore(start)) {
-                // Created before start so full month
-                hours += self.diffHours(end, start)
-              } else {
-                // from midway through to end of month
-                hours += self.diffHours(end, createdDate)
-              }
+              // Started at start of period
+              hours += self.diffHours(deletedAt, createdDate)
+            }
+          } else {
+            // Stopped after end of month
+            if (createdDate.isBefore(start)) {
+              // Created before start so full month
+              hours += self.diffHours(end, start)
+            } else {
+              // from midway through to end of month
+              hours += self.diffHours(end, createdDate)
             }
           }
         }
