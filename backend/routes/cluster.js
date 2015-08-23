@@ -65,3 +65,27 @@ exports.deleteCluster = {
     })
   }
 }
+
+exports.getClusterStatus = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      cluster: Joi.string()
+    }
+  },
+  handler: function (request, reply) {
+    var id = request.params.cluster
+    Cluster.findOne({_id: id}).then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('does not exist!')
+      }
+      reply(cluster)
+    }).error(function (err) {
+      request.log(err)
+      reply(Boom.notFound())
+    }).catch(function (err) {
+      request.log(err)
+      reply(Boom.badImplementation())
+    })
+  }
+}

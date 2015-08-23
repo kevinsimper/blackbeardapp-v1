@@ -7,7 +7,8 @@
     "start": "node start.js",
     "test": "npm run load-fixtures && npm run lab",
     "lab": "lab -m 20000 tests/*.js",
-    "load-fixtures": "./loadfixtures.sh"
+    "load-fixtures": "./loadfixtures.sh",
+    "test-cluster": "./fixtures/load.sh && ./node_modules/lab/bin/lab tests/cluster/status.js"
   },
   "author": "",
   "license": "ISC",
