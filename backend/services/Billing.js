@@ -13,7 +13,7 @@ var Boom = require('boom')
 
 module.exports = {
   diffHours: function (a, b) {
-    return Math.ceil(a.diff(b, 'second') / 60.0 / 60.0)
+    return Math.ceil(a.diff(b)/1000/60/60)
   },
   /**
   * @param {moment} start
@@ -27,25 +27,38 @@ module.exports = {
       app.containers.forEach(function (container, i) {
         var createdDate = moment.unix(container.createdAt)
 
-        var deletedAt = moment().add(1, 'minute')
-        if (container.deletedAt) {
-          var deletedAt = moment(Date.parse(container.deletedAt))
-        }
+        if ((Math.abs(moment().diff(createdDate)) < 4000) &&
+          (Math.abs(moment().diff(end)) < 4000)) {
+          
+          // Just created so set it to 1h
+          hours += 1
+        } else {
+          var deletedAt = moment()
 
-        if (!deletedAt.isBefore(start)) {
-          if (deletedAt.isBefore(end)) {
-            // Stopped within month
-            if (createdDate.isBefore(start)) {
-              hours += self.diffHours(deletedAt, start)
+          if (container.deletedAt) {
+            var deletedAt = moment(Date.parse(container.deletedAt))
+          }
+
+          if (!deletedAt.isBefore(start)) {
+            if (deletedAt.isBefore(end)) {
+              // Stopped before end of month
+              // Stopped within month
+              if (createdDate.isBefore(start)) {
+                // Started before start of period
+                hours += self.diffHours(deletedAt, start)
+              } else {
+                // Started at start of period
+                hours += self.diffHours(deletedAt, createdDate)
+              }
             } else {
-              hours += self.diffHours(deletedAt, createdDate)
-            }
-          } else {
-            // Stopped after end of month
-            if (createdDate.isBefore(start)) {
-              hours += self.diffHours(end, start)
-            } else {
-              hours += self.diffHours(end, createdDate)
+              // Stopped after end of month
+              if (createdDate.isBefore(start)) {
+                // Created before start so full month
+                hours += self.diffHours(end, start)
+              } else {
+                // from midway through to end of month
+                hours += self.diffHours(end, createdDate)
+              }
             }
           }
         }
@@ -74,11 +87,14 @@ module.exports = {
   },
   chargeHours: function (user, hours) {
     var self = this
-    if(user.creditCards.length === 0) {
-      return 'has no creditcards'
-    }
-    return User.findOne(user).populate('creditCards').then(function(user) {
+      if (user.creditCards.length === 0) {
+        return new Promise(function(resolve, reject) {
+          return resolve('has no creditcards')
+        })
+      }
+
       var amountUsed = self.calculateHoursPrice() * hours
+
       if (amountUsed > user.credit) {
         var activeCard = _.find(user.creditCards, function (cc) {
           return cc.active === true
@@ -91,15 +107,20 @@ module.exports = {
             card: activeCard._id,
             message: "Automatic Topup",
             amount: amount
-          }).then(function () {
-            'did charge'
+          }).then(function (amount) {
+            return 'did charge'
+          }).catch(function(err) {
+            return 'charging error'
           })
         } else {
-          return 'no active card'
+          return new Promise(function(resolve, reject) {
+            return resolve('no active card')
+          });
         }
       } else {
-        return 'did not charge'
+        return new Promise(function(resolve, reject) {
+          return resolve('did not charge')
+        });
       }
-    })
   }
 }
