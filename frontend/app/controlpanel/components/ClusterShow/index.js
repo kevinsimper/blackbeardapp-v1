@@ -62,6 +62,10 @@ var ClusterShow = React.createClass({
               <td>Machines</td>
               <td>{this.state.cluster.machines}</td>
             </tr>
+            <tr>
+              <td>IP</td>
+              <td>{this.state.cluster.ip}</td>
+            </tr>
             {this.state.cluster.type === 'swarm' &&
               <div>
                 <tr>

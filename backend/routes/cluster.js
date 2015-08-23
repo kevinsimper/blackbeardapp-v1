@@ -20,6 +20,7 @@ exports.postCluster = {
       ca: Joi.string(),
       cert: Joi.string(),
       key: Joi.string(),
+      ip: Joi.string()
     }
   },
   handler: function (request, reply) {
@@ -28,6 +29,7 @@ exports.postCluster = {
     var ca = request.payload.ca
     var cert = request.payload.cert
     var key = request.payload.key
+    var ip = request.payload.ip
 
     new Cluster({
       type: type,
@@ -36,7 +38,8 @@ exports.postCluster = {
         ca: ca,
         cert: cert,
         key: key
-      }
+      },
+      ip: ip
     }).saveAsync().then(function (cluster) {
       reply(cluster)
     }).catch(function (err) {
