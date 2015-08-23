@@ -107,8 +107,12 @@ module.exports = {
             card: activeCard._id,
             message: "Automatic Topup",
             amount: amount
-          }).then(function (amount) {
-            return 'did charge'
+          }).then(function (result) {
+            if (result && result.paymentId) {
+              return 'did charge'
+            } else {
+              return 'charging error'
+            }
           }).catch(function(err) {
             return 'charging error'
           })
