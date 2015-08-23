@@ -59,7 +59,7 @@ module.exports = {
     return ((7 / 30) * 24) * 100
   },
   getLastPayment: function (user) {
-    Payment.findOne({
+    return Payment.findOne({
       user: user,
       status: Payment.status.SUCCESS
     }).sort({
