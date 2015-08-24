@@ -9,3 +9,8 @@ var schema = new mongoose.Schema({
 })
 
 module.exports = mongoose.model('log', schema)
+
+module.exports.types = {
+  LOGIN: 'LOGIN',
+  VOUCHER_CLAIM: 'VOUCHER_CLAIM'
+}
