@@ -40,6 +40,8 @@ lab.before(function(done) {
   }).spread(function(response, body) {
     clusterId = body[0]._id
     done()
+  }).catch(function (err) {
+    console.log(err)
   })
 })
 
@@ -48,6 +50,20 @@ lab.test('GET cluster/status', function (done) {
   request({
     method: 'GET',
     uri: appUrl + '/clusters/' + clusterId + '/status',
+    json: true,
+    headers: {
+      'Authorization': adminToken
+    }
+  }, function (error, response, body) {
+    expect(response.statusCode, 'to be', 200)
+    done()
+  })
+})
+
+lab.test('GET cluster/containers', function (done) {
+  request({
+    method: 'GET',
+    uri: appUrl + '/clusters/' + clusterId + '/containers',
     json: true,
     headers: {
       'Authorization': adminToken

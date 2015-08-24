@@ -67,6 +67,18 @@ exports.deleteCluster = {
   }
 }
 
+var dockerapi = function (cluster, uri) {
+  return httprequest({
+    uri: uri,
+    agentOptions: {
+      cert: cluster.certificates.cert,
+      key: cluster.certificates.key,
+      ca: cluster.certificates.ca
+    },
+    json: true
+  })
+}
+
 exports.getClusterStatus = {
   auth: 'jwt',
   validate: {
@@ -80,23 +92,47 @@ exports.getClusterStatus = {
       if(!cluster) {
         throw new Promise.OperationalError('does not exist!')
       }
-      
+
       var uri = 'https://' + cluster.ip + ':3376/info'
-      return httprequest({
-        uri: uri,
-        agentOptions: {
-          cert: cluster.certificates.cert,
-          key: cluster.certificates.key,
-          ca: cluster.certificates.ca
-        },
-        json: true
-      })
+      return dockerapi(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
       request.log(err)
       reply(Boom.notFound())
     }).catch(function (err) {
+      request.log(err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
+exports.getClusterContainers = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      cluster: Joi.string()
+    }
+  },
+  handler: function (request, reply) {
+    var id = request.params.cluster
+    Cluster.findOne({_id: id}).then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('does not exist!')
+      }
+
+      var uri = 'https://' + cluster.ip + ':3376/containers/json'
+      return dockerapi(cluster, uri)
+    }).spread(function (response, body) {
+      reply(body)
+    }).error(function (err) {
+      request.log(err)
+      reply(Boom.notFound())
+    }).catch(function (err) {
+      console.log(err, err.stack)
       request.log(err)
       reply(Boom.badImplementation())
     })
