@@ -234,8 +234,8 @@ lab.experiment('/app/containers', function() {
       body: requestData
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body.message, 'to be', 'Container successfully created.')
-      containerId = body.id
+      expect(body.status, 'to be', 'UP')
+      containerId = body._id
       done()
     })
   })
