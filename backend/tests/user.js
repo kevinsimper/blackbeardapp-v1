@@ -76,7 +76,7 @@ lab.experiment('/users', function() {
         uri: appUrl + '/users',
         json: true,
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         }
       },
       function(error, response, body) {
@@ -143,10 +143,10 @@ lab.experiment('/users', function() {
   lab.test('DELETE /me', function(done) {
     request({
         method: 'DELETE',
-        uri: appUrl + '/users/me',
+        uri: appUrl + '/users/' + userId,
         json: true,
         headers: {
-          'Authorization': token
+          'Authorization': adminToken
         }
       },
       function(error, response, body) {
