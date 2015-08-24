@@ -13,6 +13,7 @@ server.start(function() {
 })
 
 var token = null
+var adminToken = null
 lab.experiment('/app', function() {
   var appId = null
   lab.before(function(done) {
@@ -22,6 +23,21 @@ lab.experiment('/app', function() {
         json: true,
         body: {
           email: 'admin@blackbeard.io',
+          password: 'password'
+        }
+      },
+      function(error, response, body) {
+        adminToken = body.token
+        done()
+      })
+  })
+  lab.before(function(done) {
+    request({
+        method: 'POST',
+        uri: appUrl + '/login',
+        json: true,
+        body: {
+          email: 'user@blackbeard.io',
           password: 'password'
         }
       },
@@ -37,7 +53,7 @@ lab.experiment('/app', function() {
 	    uri: appUrl + '/admin/vouchers/generate',
 	    json: true,
 	    headers: {
-	      'Authorization': token
+	      'Authorization': adminToken
 	    },
       body: {
         amount: 2000,
@@ -57,7 +73,7 @@ lab.experiment('/app', function() {
       uri: appUrl + '/admin/vouchers',
       json: true,
       headers: {
-        'Authorization': token
+        'Authorization': adminToken
       }
     },
     function(error, response, body) {
@@ -66,19 +82,49 @@ lab.experiment('/app', function() {
       done()
     })
   })
-  lab.test('POST /vouchers/', function(done) {
+  lab.test('GET /vouchers/', function(done) {
     request({
       method: 'GET',
       uri: appUrl + '/vouchers/' + voucherCode,
-      json: true,
-      headers: {
-        'Authorization': token
-      }
+      json: true
     },
     function(error, response, body) {
       expect(body, 'to equal', {status: 'OK'})
 
       done()
+    })
+  })
+  lab.test('POST /user/me/vouchers', function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/users/me/vouchers',
+      json: true,
+      headers: {
+        'Authorization': token
+      },
+      body: {
+        code: voucherCode
+      }
+    },
+    function(error, response, body) {
+      expect(body, 'to equal', {status: 'OK'})
+
+      request({
+        method: 'POST',
+        uri: appUrl + '/users/me/vouchers',
+        json: true,
+        headers: {
+          'Authorization': token
+        },
+        body: {
+          code: voucherCode
+        }
+      },
+      function(error, response, body) {
+        expect(body.status, 'to equal', 'FAIL')
+
+        done()
+      })
     })
   })
 })

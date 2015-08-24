@@ -370,6 +370,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: voucherRoutes.verifyVoucher
     }
   })
+  server.route({
+    method: 'POST',
+    path: '/users/{user}/vouchers',
+    config: {
+      auth: 'jwt',
+      handler: voucherRoutes.claimVoucher
+    }
+  })
 
   // Apps
   server.route({

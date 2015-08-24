@@ -2,7 +2,9 @@ var Boom = require('boom')
 var moment = require('moment')
 var Hashids = require('hashids')
 var Promise = require('bluebird')
+var User = Promise.promisifyAll(require('../models/User'))
 var Voucher = Promise.promisifyAll(require('../models/Voucher'))
+var Log = Promise.promisifyAll(require('../models/Log'))
 
 var config = require('../config')
 
@@ -53,13 +55,63 @@ exports.getVouchers = function(request, reply) {
 }
 
 exports.verifyVoucher = function(request, reply) {
-	var code = request.params.voucher
+  var code = request.params.voucher
 
-	var voucher = Voucher.findOne({code: code})
+  var voucher = Voucher.findOne({code: code})
   voucher.then(function (voucher) {
-		reply({
-			status: (voucher) ? 'OK' : 'Voucher could not be found.'
-		})
+    reply({
+      status: (voucher) ? 'OK' : 'Voucher could not be found.'
+    })
+  }).catch(function(err) {
+    request.log(err)
+    reply(Boom.badImplementation())
+  })
+}
+
+exports.claimVoucher = function(request, reply) {
+  var userId = User.getUserIdFromRequest(request)
+  var code = request.payload.code
+
+  var user = User.findById(userId)
+  var voucher = Voucher.findOne({code: code})
+
+  var userObj
+
+  return Promise.all([user, voucher]).spread(function (user, voucher) {
+    userObj = user
+
+    if (voucher.status == Voucher.status.CLAIMED) {
+      // Voucher has been claimed
+      throw new Promise.OperationalError("Voucher already used")
+    }
+
+    // Use voucher
+    voucher.status = Voucher.status.CLAIMED
+    voucher.user = userId
+
+    return voucher.save()
+  }).then(function(voucher) {
+    userObj.credit += voucher.amount
+
+    return userObj.save()
+  }).then(function(user) {
+    var log = new Log({
+      user: userId,
+      timestamp: Math.round(Date.now() / 1000),
+      ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+      type: Log.types.VOUCHER_CLAIM
+    })
+    return log.save()
+  }).then(function(log) {
+    return reply({
+      status: 'OK'
+    })
+  }).catch(Promise.OperationalError, function (e) {
+    request.log(e)
+    reply({
+      status: 'FAIL',
+      error: e
+    })
   }).catch(function(err) {
     request.log(err)
     reply(Boom.badImplementation())
