@@ -46,6 +46,13 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     key: config.AUTH_SECRET,
     validateFunc: function(decoded, request, callback) {
       User.findById(decoded, function(err, user) {
+        // check if user is allowed to access that specific route
+        var routeLevel = request.route.settings.app.level
+        if(typeof routeLevel !== 'undefined' && !userRoles.isAllowed(routeLevel, user.role)) {
+          callback(null, false)
+          request.log('not allowed')
+        }
+
         if ((user.role == userRoles.USER) && (request.path) && (request.path.search("\/") != -1) &&
           (request.path.substr(0, "/users/".length) == "/users/") && (request.path.split("/")[2] != "me")) {
           // Non admin user trying to access /user/ path
@@ -130,7 +137,10 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'DELETE',
     path: '/preusers/{id}',
     config: {
-      auth: false,
+      auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: preUsersRoutes.delPreUsers
     }
   })
@@ -182,6 +192,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: userRoutes.getUsers
     }
   })
@@ -206,6 +219,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: userRoutes.delUsers
     }
   })
@@ -314,6 +330,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/admin/invite',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: adminRoutes.inviteUser
     }
   })
@@ -412,6 +431,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/billing',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: appRoutes.getAllBilling
     }
   })
@@ -431,6 +453,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}/logs',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: userRoutes.getUserLogs
     }
   })
@@ -449,6 +474,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/logs',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: logRoutes.getLogs
     }
   })
@@ -458,6 +486,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/clusters',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: clusterRoutes.getClusters
     }
   })
