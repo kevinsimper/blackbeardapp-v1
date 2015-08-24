@@ -471,6 +471,11 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/clusters/{id}',
     config: clusterRoutes.deleteCluster
   })
+  server.route({
+    method: 'GET',
+    path: '/clusters/{cluster}/status',
+    config: clusterRoutes.getClusterStatus
+  })
 })
 
 module.exports = server

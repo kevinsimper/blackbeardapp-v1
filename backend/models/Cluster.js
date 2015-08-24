@@ -12,7 +12,8 @@ var schema = new mongoose.Schema({
     key: String
   },
   deleted: { type: Boolean, default: false },
-  deletedAt: String
+  deletedAt: String,
+  ip: String
 })
 
 schema.plugin(mongooseDelete)
