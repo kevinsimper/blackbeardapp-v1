@@ -3,7 +3,11 @@ var ObjectID = require('mongodb').ObjectID
 var passwordHash = require('password-hash')
 var _ = require('lodash')
 var Boom = require('boom')
+var moment = require('moment')
+var Hashids = require('hashids')
 var User = require('../models/User')
+var Promise = require('bluebird')
+var Voucher = Promise.promisifyAll(require('../models/Voucher'))
 var Mail = require('../services/Mail')
 
 var config = require('../config')
@@ -50,5 +54,38 @@ exports.inviteUser = function(request, reply) {
     } else {
       reply(Boom.badRequest('Could not find user account.'))
     }
+  })
+}
+
+exports.generateVoucher = function(request, reply) {
+  var amount = request.payload.amount
+  var email = request.payload.email
+  var note = request.payload.note
+
+  var lastVoucher = Voucher.findOne().sort('-codePlain')
+
+  return lastVoucher.then(function(lastVoucher) {
+    var currentCount = 0
+    if (lastVoucher) {
+      currentCount = lastVoucher.codePlain+1
+    }  
+
+    var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
+    var code = hashids.encode(currentCount);
+
+    var voucher = new Voucher({
+      codePlain: currentCount,
+      code: code,
+      email: email,
+      note: note,
+      amount: amount,
+      createdAt: moment().unix()
+    })
+
+    return voucher.save()
+  }).then(function(voucher) {
+    reply({
+      code: voucher.code
+    })
   })
 }

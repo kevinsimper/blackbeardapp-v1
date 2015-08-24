@@ -23,6 +23,7 @@
     "good-loggly": "1.0.1",
     "hapi": "8.3.1",
     "hapi-auth-jwt2": "4.4.0",
+    "hashids": "^1.0.2",
     "joi": "6.6.1",
     "jsonwebtoken": "5.0.1",
     "lab": "5.13.0",

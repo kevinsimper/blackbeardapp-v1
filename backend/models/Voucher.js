@@ -2,8 +2,9 @@ var mongoose = require('mongoose')
 var mongooseDelete = require('mongoose-delete')
 
 var schema = new mongoose.Schema({
+	codePlain: Number,
   code: String,
-  amount: Number
+  amount: Number,
   createdAt: String,
   modifiedAt: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
