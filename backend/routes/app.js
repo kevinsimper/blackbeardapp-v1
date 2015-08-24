@@ -2,6 +2,7 @@ var Promise = require('bluebird')
 var ObjectId = require('mongodb').ObjectID
 var _ = require('lodash')
 var User = require('../models/User')
+var UserRoles = require('../models/roles/')
 var App = Promise.promisifyAll(require('../models/App'))
 var Image = Promise.promisifyAll(require('../models/Image'))
 var Billing = Promise.promisifyAll(require('../services/Billing'))
@@ -149,6 +150,7 @@ exports.postContainers = function(request, reply) {
           request.log(['mongo'], err)
           return reply(Boom.badImplementation('There was a problem with the database'))
         }
+
         reply({
           message: 'Container successfully created.',
           id: container._id
@@ -290,9 +292,15 @@ exports.getUserBilling = function(request, reply) {
 }
 
 exports.getAllBilling = function(request, reply) {
+  var user = User.getUserIdFromRequest(request)
+
+  if (!UserRoles.isAllowed(UserRoles.ADMIN, request.auth.credentials.role)) {
+    reply(Boom.unauthorized())
+  }
+
   var today = moment()
 
-  var users = User.find()
+  var users = User.find().populate('creditCards')
 
   var userApps = users.then(function (users) {
     return Promise.all(_.map(users, function(user) {
@@ -306,28 +314,31 @@ exports.getAllBilling = function(request, reply) {
     }))
   })
 
-  var hoursToBill = Promise.all([userApps, timespans]).spread(function (users, timespans) {
-    return users.map(function(apps, index) {
-      return apps.map(function(app) {
+  var hoursToBill = Promise.all([userApps, timespans]).spread(function (userApps, timespans) {
+    return Promise.all(userApps.map(function(apps, index) {
+      // Loops over each of the user's apps
+      return Promise.all(apps.map(function(app) {
+        // For each app get usage
         return Billing.getAppBillableHours(app, moment.unix(timespans[index]), today)
-      })
-    })
-  })
-
-  var status = Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
-    return Promise.all(users.map(function(user, i) {
-      var hours = _.sum(hoursToBill[i])
-      return Billing.chargeHours(user, hours)
+      }))
     }))
   })
 
-  status.then(function (status) {
-    reply({
-      status: 'ok',
-      data: status
-    })
-  }).catch(function (err) {
-    request.log(err)
-    reply(Boom.badImplementation())
+  return Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
+      var charges = users.map(function(user, i) {
+        var hours = _.sum(hoursToBill[i])
+  
+        return Billing.chargeHours(user, hours)
+      })
+
+      return Promise.all(charges).then(function(charges) {
+        reply({
+            status: 'ok',
+            data: charges
+          })
+      }).catch(function (err) {
+        request.log(err)
+        reply(Boom.badImplementation())
+      })
   })
 }

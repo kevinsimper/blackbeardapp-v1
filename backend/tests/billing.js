@@ -79,7 +79,7 @@ lab.experiment('Testing Billing service', function() {
       return body.token
     })
 
-    var adminToken = request({
+    return request({
       method: 'POST',
       uri: appUrl + '/login',
       json: true,
@@ -89,36 +89,7 @@ lab.experiment('Testing Billing service', function() {
       }
     }).spread(function (response, body) {
       return body.token
-    })
-
-    var app = token.then(function (token) {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/users/me/apps',
-        headers: {
-          Authorization: token
-        },
-        json: true
-      }).spread(function(response, body) {
-        return body[0]
-      })
-    })
-
-    var container = Promise.all([token, app]).spread(function (token, app) {
-      return request({
-        method: 'POST',
-        uri: appUrl + '/users/me/apps/' + app._id + '/containers',
-        headers: {
-          Authorization: token
-        },
-        json: true,
-        body: {
-          region: 'eu'
-        }
-      })
-    })
-
-    Promise.all([adminToken, container]).then(function (adminToken, container) {
+    }).then(function (adminToken) {
       return request({
         method: 'GET',
         uri: appUrl + '/billing',
@@ -129,6 +100,8 @@ lab.experiment('Testing Billing service', function() {
       })
     }).spread(function (response, body) {
       expect(response.statusCode, 'to be', 200)
+      // Need to confirm charging was attempted
+      expect(body.data, 'to contain', 'did charge')
       done()
     })
   })

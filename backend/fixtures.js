@@ -50,7 +50,7 @@ db.apps.insert({
   "name": "testapp",
   "user": ObjectId("559396be05974b0c00b6b282"),
   "timestamp": "1435735744",
-  "containers": [],
+  "containers": [ObjectId("555cb1e2fc27fe6f5f540001")],
   "image": ObjectId("555cb1e2fc27fe6f5f543901"),
   "deleted": false,
   "__v": 0
@@ -71,5 +71,14 @@ db.supports.insert({
   "message": "This is a test message.",
   "timestamp": "1432138210",
   "ip": "127.0.0.1",
+  "__v": 0
+});
+db.containers.insert({
+  "_id": ObjectId("555cb1e2fc27fe6f5f540001"),
+  "region": "eu",
+  "status": "UP",
+  "createdAt": "1432138210",
+  "deleted": false,
+  "app": ObjectId("559396bf05974b0c00b6b284"),
   "__v": 0
 });
