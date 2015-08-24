@@ -1,6 +1,11 @@
 var mongoose = require('mongoose')
 var mongooseDelete = require('mongoose-delete')
 
+module.exports.status = {
+  CLAIMED: 'CLAIMED',
+  UNCLAIMED: 'UNCLAIMED'
+}
+
 var schema = new mongoose.Schema({
 	codePlain: Number,
   code: String,
@@ -10,6 +15,7 @@ var schema = new mongoose.Schema({
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
   email: String,
   note: String,
+  status: { type: String, default: module.exports.status.UNCLAIMED },
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
