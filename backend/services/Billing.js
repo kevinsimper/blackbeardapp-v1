@@ -81,9 +81,7 @@ module.exports = {
   chargeHours: function (user, hours) {
     var self = this
       if (user.creditCards.length === 0) {
-        return new Promise(function(resolve, reject) {
-          return resolve('has no creditcards')
-        })
+        return 'has no creditcards'
       }
 
       var amountUsed = self.calculateHoursPrice() * hours
@@ -110,14 +108,10 @@ module.exports = {
             return 'charging error'
           })
         } else {
-          return new Promise(function(resolve, reject) {
-            return resolve('no active card')
-          });
+          return 'no active card'
         }
       } else {
-        return new Promise(function(resolve, reject) {
-          return resolve('did not charge')
-        });
+        return 'did not charge'
       }
   }
 }

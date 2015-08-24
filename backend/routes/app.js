@@ -294,7 +294,7 @@ exports.getUserBilling = function(request, reply) {
 exports.getAllBilling = function(request, reply) {
   var user = User.getUserIdFromRequest(request)
 
-  if (UserRoles.isAllowed(UserRoles.ADMIN, request.auth.credentials.role)) {
+  if (!UserRoles.isAllowed(UserRoles.ADMIN, request.auth.credentials.role)) {
     reply(Boom.unauthorized())
   }
 
@@ -314,26 +314,21 @@ exports.getAllBilling = function(request, reply) {
     }))
   })
 
-
-  var hoursToBill = Promise.all([userApps, timespans]).spread(function (users, timespans) {
-    return users.map(function(apps, index) {
-      var appPromises = []
-
-      apps.map(function(app) {
-        appPromises.push(Billing.getAppBillableHours(app, moment.unix(timespans[index]), today))
-      })
-
-      return Promise.all(appPromises)
-    })
+  var hoursToBill = Promise.all([userApps, timespans]).spread(function (userApps, timespans) {
+    return Promise.all(userApps.map(function(apps, index) {
+      // Loops over each of the user's apps
+      return Promise.all(apps.map(function(app) {
+        // For each app get usage
+        return Billing.getAppBillableHours(app, moment.unix(timespans[index]), today)
+      }))
+    }))
   })
 
-  return Promise.all(hoursToBill).then(function(hoursToBill) {
-    return Promise.all(users).then(function(users) {
-      var charges = []
-      users.map(function(user, i) {
+  return Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
+      var charges = users.map(function(user, i) {
         var hours = _.sum(hoursToBill[i])
   
-        charges.push(Billing.chargeHours(user, hours))
+        return Billing.chargeHours(user, hours)
       })
 
       return Promise.all(charges).then(function(charges) {
@@ -345,6 +340,5 @@ exports.getAllBilling = function(request, reply) {
         request.log(err)
         reply(Boom.badImplementation())
       })
-    })
   })
 }
