@@ -342,6 +342,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/admin/vouchers/generate',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: adminRoutes.generateVoucher
     }
   })
@@ -350,6 +353,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/admin/vouchers',
     config: {
       auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
       handler: adminRoutes.getVouchers
     }
   })
