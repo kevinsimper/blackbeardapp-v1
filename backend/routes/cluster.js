@@ -2,6 +2,7 @@ var Boom = require('boom')
 var Joi = require('joi')
 var Cluster = require('../models/Cluster')
 var Promise = require('bluebird')
+var httprequest = Promise.promisify(require('request'))
 
 exports.getClusters = function (request, reply) {
   Cluster.find().then(function (clusters) {
@@ -79,7 +80,18 @@ exports.getClusterStatus = {
       if(!cluster) {
         throw new Promise.OperationalError('does not exist!')
       }
-      reply(cluster)
+      
+      var uri = 'https://' + cluster.ip + ':3376/info'
+      return httprequest({
+        uri: uri,
+        agentOptions: {
+          cert: cluster.certificates.cert,
+          key: cluster.certificates.key,
+          ca: cluster.certificates.ca
+        }
+      })
+    }).spread(function (response, body) {
+      reply(body)
     }).error(function (err) {
       request.log(err)
       reply(Boom.notFound())
