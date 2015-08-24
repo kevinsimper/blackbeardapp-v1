@@ -325,6 +325,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
 
+  // Admin routes
   server.route({
     method: 'GET',
     path: '/admin/invite',
@@ -334,6 +335,28 @@ server.register(require('hapi-auth-jwt2'), function(err) {
         level: 'ADMIN'
       },
       handler: adminRoutes.inviteUser
+    }
+  })
+  server.route({
+    method: 'POST',
+    path: '/admin/vouchers/generate',
+    config: {
+      auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
+      handler: adminRoutes.generateVoucher
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/admin/vouchers',
+    config: {
+      auth: 'jwt',
+      app: {
+        level: 'ADMIN'
+      },
+      handler: adminRoutes.getVouchers
     }
   })
 
