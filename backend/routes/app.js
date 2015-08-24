@@ -294,7 +294,7 @@ exports.getUserBilling = function(request, reply) {
 exports.getAllBilling = function(request, reply) {
   var user = User.getUserIdFromRequest(request)
 
-  if (request.auth.credentials.role !== UserRoles.ADMIN) {
+  if (UserRoles.isAllowed(UserRoles.ADMIN, request.auth.credentials.role)) {
     reply(Boom.unauthorized())
   }
 
