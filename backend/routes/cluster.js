@@ -88,7 +88,8 @@ exports.getClusterStatus = {
           cert: cluster.certificates.cert,
           key: cluster.certificates.key,
           ca: cluster.certificates.ca
-        }
+        },
+        json: true
       })
     }).spread(function (response, body) {
       reply(body)

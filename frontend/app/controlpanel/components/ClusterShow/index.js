@@ -6,6 +6,7 @@ var ClusterStore = require('../Clusters/store')
 var Table = require('../Table')
 var Button = require('../Button')
 var Navigation = require('react-router').Navigation
+var ClusterStatus = require('../ClusterStatus')
 
 var ClusterShow = React.createClass({
   mixins: [Reflux.ListenerMixin, Navigation],
@@ -91,6 +92,7 @@ var ClusterShow = React.createClass({
         <div>
           <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
         </div>
+        <ClusterStatus cluster={this.props.params.id}/>
       </div>
     )
   }
