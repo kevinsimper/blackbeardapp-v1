@@ -345,6 +345,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: adminRoutes.generateVoucher
     }
   })
+  server.route({
+    method: 'GET',
+    path: '/admin/vouchers',
+    config: {
+      auth: 'jwt',
+      handler: adminRoutes.getVouchers
+    }
+  })
 
   // Apps
   server.route({

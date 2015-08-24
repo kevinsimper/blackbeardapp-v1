@@ -49,4 +49,19 @@ lab.experiment('/app', function() {
 	    done()
 	  })
 	})
+  lab.test('GET /admin/vouchers', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/admin/vouchers',
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    },
+    function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+
+      done()
+    })
+  })
 })

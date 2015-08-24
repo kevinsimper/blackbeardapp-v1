@@ -87,5 +87,18 @@ exports.generateVoucher = function(request, reply) {
     reply({
       code: voucher.code
     })
+  }).catch(function(err) {
+    request.log(err)
+    reply(Boom.badImplementation())
+  })
+}
+
+exports.getVouchers = function(request, reply) {
+  var vouchers = Voucher.find()
+  vouchers.then(function (vouchers) {
+    reply(vouchers)
+  }).catch(function(err) {
+    request.log(err)
+    reply(Boom.badImplementation())
   })
 }
