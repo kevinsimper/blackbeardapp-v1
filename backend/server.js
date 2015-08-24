@@ -25,6 +25,7 @@ var webhookRoutes = require('./routes/webhook')
 var imageRoutes = require('./routes/image')
 var logRoutes = require('./routes/log')
 var clusterRoutes = require('./routes/cluster')
+var voucherRoutes = require('./routes/voucher')
 
 var server = new Hapi.Server({
   connections: {
@@ -337,6 +338,8 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       handler: adminRoutes.inviteUser
     }
   })
+
+  // Vouchers
   server.route({
     method: 'POST',
     path: '/admin/vouchers/generate',
@@ -345,7 +348,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       app: {
         level: 'ADMIN'
       },
-      handler: adminRoutes.generateVoucher
+      handler: voucherRoutes.generateVoucher
     }
   })
   server.route({
@@ -356,7 +359,15 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       app: {
         level: 'ADMIN'
       },
-      handler: adminRoutes.getVouchers
+      handler: voucherRoutes.getVouchers
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/vouchers/{voucher}',
+    config: {
+      auth: false,
+      handler: voucherRoutes.verifyVoucher
     }
   })
 

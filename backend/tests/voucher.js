@@ -30,6 +30,7 @@ lab.experiment('/app', function() {
         done()
       })
   })
+  var voucherCode
 	lab.test('POST /admin/vouchers/generate', function(done) {
 	  request({
 	    method: 'POST',
@@ -44,7 +45,8 @@ lab.experiment('/app', function() {
       }
 	  },
 	  function(error, response, body) {
-	  	expect(body, 'to have key', 'code')
+    	expect(body, 'to have key', 'code')
+      voucherCode = body.code
 
 	    done()
 	  })
@@ -60,6 +62,21 @@ lab.experiment('/app', function() {
     },
     function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
+
+      done()
+    })
+  })
+  lab.test('POST /vouchers/', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/vouchers/' + voucherCode,
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    },
+    function(error, response, body) {
+      expect(body, 'to equal', {status: 'OK'})
 
       done()
     })
