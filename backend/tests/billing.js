@@ -12,10 +12,7 @@ var request = Promise.promisify(require('request'))
 var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
 
-var server = require('../server')
-server.start(function() {
-  console.log('Server running at:', server.info.uri)
-})
+var server = require('../startdev')()
 
 lab.experiment('Testing Billing service', function() {
   lab.test('Verify date ranges', function(done) {
