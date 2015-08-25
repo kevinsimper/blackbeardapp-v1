@@ -5,6 +5,7 @@ var Hashids = require('hashids')
 var Promise = require('bluebird')
 var User = Promise.promisifyAll(require('../models/User'))
 var Voucher = Promise.promisifyAll(require('../models/Voucher'))
+var VoucherClaimant = Promise.promisifyAll(require('../models/VoucherClaimant'))
 var Log = Promise.promisifyAll(require('../models/Log'))
 
 var config = require('../config')
@@ -15,7 +16,8 @@ exports.generateVoucher = {
     payload: {
       email: Joi.string().email(),
       amount: Joi.number(),
-      note: Joi.string()
+      note: Joi.string(),
+      limit: Joi.number()
     }
   },
   app: {
@@ -25,6 +27,7 @@ exports.generateVoucher = {
     var amount = request.payload.amount
     var email = request.payload.email
     var note = request.payload.note
+    var limit = request.payload.limit
 
     var lastVoucher = Voucher.findOne().sort('-codePlain')
 
@@ -58,9 +61,8 @@ exports.generateVoucher = {
   }
 }
 
-
 exports.getVouchers = function(request, reply) {
-  var vouchers = Voucher.find()
+  var vouchers = Voucher.find().populate('claimants')
   vouchers.then(function (vouchers) {
     reply(vouchers)
   }).catch(function(err) {
@@ -74,8 +76,19 @@ exports.verifyVoucher = function(request, reply) {
 
   var voucher = Voucher.findOne({code: code.toUpperCase()})
   voucher.then(function (voucher) {
+    var status = 'Voucher could not be found.'
+    if (voucher) {
+      // Check if voucher is in unlimited mode
+      // or has not been claimed too many times
+      if ((voucher.limit === false) || (voucher.used < voucher.limit)) {
+        status = 'OK'
+      } else {
+        status = 'Voucher is no longer valid'
+      }
+    }
+
     reply({
-      status: (voucher) ? 'OK' : 'Voucher could not be found.'
+      status: status
     })
   }).catch(function(err) {
     request.log(err)
@@ -95,23 +108,33 @@ exports.claimVoucher = {
     var code = request.payload.code
 
     var user = User.findById(userId)
-    var voucher = Voucher.findOne({code: code.toUpperCase()})
+    var voucher = Voucher.findOne({code: code.toUpperCase()}).populate('claimants')
 
     var userObj
+    var voucherObj
 
     return Promise.all([user, voucher]).spread(function (user, voucher) {
       userObj = user
+      voucherObj = voucher
 
-      if (voucher.status == Voucher.status.CLAIMED) {
-        // Voucher has been claimed
-        throw new Promise.OperationalError("Voucher already used")
+      // Check if voucher is in unlimited mode
+      // or has not been claimed too many times
+      if ((voucher.limit === false) || (voucher.used < voucher.limit)) {
+        var voucherClaimant = new VoucherClaimant({
+          voucher: voucher._id,
+          user: userObj._id,
+          claimedAt: moment().unix()
+        })
+
+        return voucherClaimant.save()
+      } else {
+        throw new Promise.OperationalError("Voucher is invalid")
       }
+    }).then(function(voucherClaimant) {
+      voucherObj.claimants.push(voucherClaimant)
+      voucherObj.used += 1
 
-      // Use voucher
-      voucher.status = Voucher.status.CLAIMED
-      voucher.user = userId
-
-      return voucher.save()
+      return voucherObj.save()
     }).then(function(voucher) {
       userObj.credit += voucher.amount
 
