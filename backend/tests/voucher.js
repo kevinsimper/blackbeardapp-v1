@@ -1,6 +1,7 @@
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var request = require('request')
+var Promise = require('bluebird')
+var request = Promise.promisify(require('request'))
 var expect = require('unexpected')
 var _ = require('lodash')
 
@@ -18,55 +19,58 @@ lab.experiment('/app', function() {
   var appId = null
   lab.before(function(done) {
     request({
-        method: 'POST',
-        uri: appUrl + '/login',
-        json: true,
-        body: {
-          email: 'admin@blackbeard.io',
-          password: 'password'
-        }
-      },
-      function(error, response, body) {
-        adminToken = body.token
-        done()
-      })
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'admin@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function(response, body) {
+      adminToken = body.token
+      done()
+    }).catch(function(err) {
+      console.log(err)
+    })
   })
   lab.before(function(done) {
     request({
-        method: 'POST',
-        uri: appUrl + '/login',
-        json: true,
-        body: {
-          email: 'user@blackbeard.io',
-          password: 'password'
-        }
-      },
-      function(error, response, body) {
-        token = body.token
-        done()
-      })
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'user@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function(response, body) {
+      token = body.token
+      done()
+    }).catch(function(err) {
+      console.log(err)
+    })
   })
   var voucherCode
-	lab.test('POST /admin/vouchers/generate', function(done) {
-	  request({
-	    method: 'POST',
-	    uri: appUrl + '/admin/vouchers/generate',
-	    json: true,
-	    headers: {
-	      'Authorization': adminToken
-	    },
+  lab.test('POST /admin/vouchers/generate', function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/admin/vouchers/generate',
+      json: true,
+      headers: {
+        'Authorization': adminToken
+      },
       body: {
         amount: 2000,
         note: "This is an extended\nNOTE!"
       }
-	  },
-	  function(error, response, body) {
-    	expect(body, 'to have key', 'code')
+    }).spread(function(response, body) {
+      expect(body, 'to have key', 'code')
       voucherCode = body.code
 
-	    done()
-	  })
-	})
+      done()
+    }).catch(function(err) {
+      console.log(err)
+    })
+  })
   lab.test('GET /admin/vouchers', function(done) {
     request({
       method: 'GET',
@@ -75,11 +79,12 @@ lab.experiment('/app', function() {
       headers: {
         'Authorization': adminToken
       }
-    },
-    function(error, response, body) {
+    }).spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
 
       done()
+    }).catch(function(err) {
+      console.log(err)
     })
   })
   lab.test('GET /vouchers/', function(done) {
@@ -87,11 +92,14 @@ lab.experiment('/app', function() {
       method: 'GET',
       uri: appUrl + '/vouchers/' + voucherCode,
       json: true
-    },
-    function(error, response, body) {
-      expect(body, 'to equal', {status: 'OK'})
+    }).spread(function(response, body) {
+      expect(body, 'to equal', {
+        status: 'OK'
+      })
 
       done()
+    }).catch(function(err) {
+      console.log(err)
     })
   })
   lab.test('POST /user/me/vouchers', function(done) {
@@ -105,11 +113,12 @@ lab.experiment('/app', function() {
       body: {
         code: voucherCode
       }
-    },
-    function(error, response, body) {
-      expect(body, 'to equal', {status: 'OK'})
-
-      request({
+    }).spread(function(response, body) {
+      expect(body, 'to equal', {
+        status: 'OK'
+      })
+    }).then(function() {
+      return request({
         method: 'POST',
         uri: appUrl + '/users/me/vouchers',
         json: true,
@@ -119,12 +128,13 @@ lab.experiment('/app', function() {
         body: {
           code: voucherCode
         }
-      },
-      function(error, response, body) {
-        expect(body.status, 'to equal', 'FAIL')
-
-        done()
       })
+    }).spread(function(response, body) {
+      expect(body.status, 'to equal', 'FAIL')
+
+      done()
+    }).catch(function(err) {
+      console.log(err)
     })
   })
 })
