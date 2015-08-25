@@ -122,41 +122,33 @@ exports.deleteApp = function(request, reply) {
 }
 
 exports.postContainers = function(request, reply) {
-  var app = request.params.app
+  var appId = request.params.app
   var user = User.getUserIdFromRequest(request)
 
-  var container = new Container({
-    region: request.payload.region,
-    status: Container.status.UP,
-    app: app,
-    createdAt: Math.round(Date.now() / 1000)
-  })
-
-  App.findById(app, function(err, result) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
+  var app = App.findById(appId)
+  var container = app.then(function(app) {
+    if(!app) {
+      throw new Promise.OperationalError('could not find app')
     }
-
-    container.save(function(err, container) {
-      if (err) {
-        request.log(['mongo'], err)
-        return reply(Boom.badImplementation('There was a problem with the database'))
-      }
-
-      result.containers.push(container)
-      result.save(function(err, app) {
-        if(err) {
-          request.log(['mongo'], err)
-          return reply(Boom.badImplementation('There was a problem with the database'))
-        }
-
-        reply({
-          message: 'Container successfully created.',
-          id: container._id
-        })
-      })
-    })
+    return new Container({
+      region: request.payload.region,
+      status: Container.status.UP,
+      app: app,
+      createdAt: Math.round(Date.now() / 1000)
+    }).save()
+  })
+  var savingApp = Promise.all([app, container]).spread(function (app, container) {
+      app.containers.push(container)
+      return app.save()
+  })
+  Promise.all([container, savingApp]).spread(function (container, savedApp) {
+    reply(container)
+  }).error(function (err) {
+    request.log(['mongo'], err.message)
+    return reply(Boom.notFound())
+  }).catch( function (err) {
+    request.log(['mongo'], err)
+    return reply(Boom.badImplementation('There was a problem with the database'))
   })
 }
 
@@ -327,7 +319,7 @@ exports.getAllBilling = function(request, reply) {
   return Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
       var charges = users.map(function(user, i) {
         var hours = _.sum(hoursToBill[i])
-  
+
         return Billing.chargeHours(user, hours)
       })
 

@@ -540,6 +540,16 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/clusters/{cluster}/status',
     config: clusterRoutes.getClusterStatus
   })
+  server.route({
+    method: 'GET',
+    path: '/clusters/{cluster}/containers',
+    config: clusterRoutes.getClusterContainers
+  })
+  server.route({
+    method: 'GET',
+    path: '/clusters/{cluster}/startcontainer',
+    config: clusterRoutes.getClusterStartContainer
+  })
 })
 
 module.exports = server
