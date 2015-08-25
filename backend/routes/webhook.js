@@ -54,7 +54,7 @@ exports.postNotifyImage = function(request, reply) {
     }
   }).then(function(image) {
     reply("ok")
-  }).catch(Promise.OperationalError, function (e) {
+  }).error(function (e) {
     // Not outputting error on purpose to stop people hitting the API
     // to find active usernames
     reply("ok")

@@ -177,7 +177,7 @@ module.exports = {
           message: 'Payment successfully made.',
           paymentId: savedPayment._id
         }
-      }).catch(Promise.OperationalError, function (err) {
+      }).error(function (err) {
         return err
       }).catch(function (err) {
         return new Error('Payment failed')

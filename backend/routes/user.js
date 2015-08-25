@@ -175,7 +175,7 @@ exports.postLogin = function(request, reply) {
           user: user,
           timestamp: Math.round(Date.now() / 1000),
           ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-          type: 'Login',
+          type: Log.types.LOGIN,
         })
         log.saveAsync()
 
