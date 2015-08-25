@@ -179,7 +179,7 @@ exports.getAppLogs = function(request, reply) {
     }
   }).then(function(image) {
     reply(image.logs)
-  }).catch(Promise.OperationalError, function (e) {
+  }).error(function (e) {
     reply(Boom.notFound("Application could not be found."))
   }).catch(function(e) {
     request.log(['mongo'], e)

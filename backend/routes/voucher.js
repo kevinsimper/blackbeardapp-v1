@@ -72,7 +72,7 @@ exports.getVouchers = function(request, reply) {
 exports.verifyVoucher = function(request, reply) {
   var code = request.params.voucher
 
-  var voucher = Voucher.findOne({code: code})
+  var voucher = Voucher.findOne({code: code.toUpperCase()})
   voucher.then(function (voucher) {
     reply({
       status: (voucher) ? 'OK' : 'Voucher could not be found.'
@@ -95,7 +95,7 @@ exports.claimVoucher = {
     var code = request.payload.code
 
     var user = User.findById(userId)
-    var voucher = Voucher.findOne({code: code})
+    var voucher = Voucher.findOne({code: code.toUpperCase()})
 
     var userObj
 
@@ -128,11 +128,11 @@ exports.claimVoucher = {
       return reply({
         status: 'OK'
       })
-    }).catch(Promise.OperationalError, function (e) {
-      request.log(e)
+    }).error(function (err) {
+      request.log(err)
       reply({
         status: 'FAIL',
-        error: e
+        error: err
       })
     }).catch(function(err) {
       request.log(err)
