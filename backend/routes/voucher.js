@@ -113,26 +113,20 @@ exports.claimVoucher = {
     var user = User.findById(userId)
     var voucher = Voucher.findOne({code: code.toUpperCase()}).populate('claimants')
 
-    var userObj
-    var voucherObj
-
-    return Promise.all([user, voucher]).spread(function (user, voucher) {
-      userObj = user
-      voucherObj = voucher
-
+    var voucherClaimant = Promise.all([user, voucher]).spread(function (user, voucher) {
       // Check if voucher is in unlimited mode
       // or has not been claimed too many times
       if ((voucher.limit === null) || (voucher.used < voucher.limit)) {
         // Check if voucher has not been previously claimed by user
-        voucherObj.claimants.forEach(function(previousClaimant) {
-          if (previousClaimant.user+'' == userObj._id) {
+        voucher.claimants.forEach(function(previousClaimant) {
+          if (previousClaimant.user+'' == user._id) {
             throw new Promise.OperationalError("Voucher already claimed")
           }
         })
 
         var voucherClaimant = new VoucherClaimant({
           voucher: voucher._id,
-          user: userObj._id,
+          user: user._id,
           claimedAt: moment().unix()
         })
 
@@ -140,15 +134,19 @@ exports.claimVoucher = {
       } else {
         throw new Promise.OperationalError("Voucher is invalid")
       }
-    }).then(function(voucherClaimant) {
-      voucherObj.claimants.push(voucherClaimant)
-      voucherObj.used += 1
+    })
 
-      return voucherObj.save()
-    }).then(function(voucher) {
-      userObj.credit += voucher.amount
+    var savedVoucher = Promise.all([voucher, voucherClaimant]).spread(function(voucher, voucherClaimant) {
+      voucher.claimants.push(voucherClaimant)
+      voucher.used += 1
 
-      return userObj.save()
+      return voucher.save()
+    })
+
+    return Promise.all([user, savedVoucher]).spread(function(user, voucher) {
+      user.credit += voucher.amount
+
+      return user.save()
     }).then(function(user) {
       var log = new Log({
         user: userId,
@@ -156,8 +154,8 @@ exports.claimVoucher = {
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         type: Log.types.VOUCHER_CLAIM
       })
-      return log.save()
-    }).then(function(log) {
+      log.save()
+
       return reply({
         status: 'OK'
       })
@@ -168,6 +166,7 @@ exports.claimVoucher = {
         error: err
       })
     }).catch(function(err) {
+      console.log('err', err)
       request.log(err)
       reply(Boom.badImplementation())
     })
