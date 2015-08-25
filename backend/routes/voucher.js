@@ -1,4 +1,5 @@
 var Boom = require('boom')
+var Joi = require('joi')
 var moment = require('moment')
 var Hashids = require('hashids')
 var Promise = require('bluebird')
@@ -8,41 +9,55 @@ var Log = Promise.promisifyAll(require('../models/Log'))
 
 var config = require('../config')
 
-exports.generateVoucher = function(request, reply) {
-  var amount = request.payload.amount
-  var email = request.payload.email
-  var note = request.payload.note
+exports.generateVoucher = {
+  auth: 'jwt',
+  validate: {
+    payload: {
+      email: Joi.string().email(),
+      amount: Joi.number(),
+      note: Joi.string()
+    }
+  },
+  app: {
+    level: 'ADMIN'
+  },
+  handler: function(request, reply) {
+    var amount = request.payload.amount
+    var email = request.payload.email
+    var note = request.payload.note
 
-  var lastVoucher = Voucher.findOne().sort('-codePlain')
+    var lastVoucher = Voucher.findOne().sort('-codePlain')
 
-  return lastVoucher.then(function(lastVoucher) {
-    var currentCount = 0
-    if (lastVoucher) {
-      currentCount = lastVoucher.codePlain+1
-    }  
+    return lastVoucher.then(function(lastVoucher) {
+      var currentCount = 0
+      if (lastVoucher) {
+        currentCount = lastVoucher.codePlain+1
+      }  
 
-    var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
-    var code = hashids.encode(currentCount);
+      var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
+      var code = hashids.encode(currentCount);
 
-    var voucher = new Voucher({
-      codePlain: currentCount,
-      code: code,
-      email: email,
-      note: note,
-      amount: amount,
-      createdAt: moment().unix()
+      var voucher = new Voucher({
+        codePlain: currentCount,
+        code: code,
+        email: email,
+        note: note,
+        amount: amount,
+        createdAt: moment().unix()
+      })
+
+      return voucher.save()
+    }).then(function(voucher) {
+      reply({
+        code: voucher.code
+      })
+    }).catch(function(err) {
+      request.log(err)
+      reply(Boom.badImplementation())
     })
-
-    return voucher.save()
-  }).then(function(voucher) {
-    reply({
-      code: voucher.code
-    })
-  }).catch(function(err) {
-    request.log(err)
-    reply(Boom.badImplementation())
-  })
+  }
 }
+
 
 exports.getVouchers = function(request, reply) {
   var vouchers = Voucher.find()

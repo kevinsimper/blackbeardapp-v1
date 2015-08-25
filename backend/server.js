@@ -343,13 +343,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'POST',
     path: '/admin/vouchers/generate',
-    config: {
-      auth: 'jwt',
-      app: {
-        level: 'ADMIN'
-      },
-      handler: voucherRoutes.generateVoucher
-    }
+    config: voucherRoutes.generateVoucher
   })
   server.route({
     method: 'GET',
