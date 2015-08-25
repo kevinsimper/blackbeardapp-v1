@@ -13,6 +13,7 @@ server.start(function() {
   console.log('Server running at:', server.info.uri)
 })
 
+var VOUCHER_AMOUNT = 2000
 var token = null
 var adminToken = null
 lab.experiment('/app', function() {
@@ -59,7 +60,7 @@ lab.experiment('/app', function() {
         'Authorization': adminToken
       },
       body: {
-        amount: 2000,
+        amount: VOUCHER_AMOUNT,
         note: "This is an extended\nNOTE!"
       }
     }).spread(function(response, body) {
@@ -103,21 +104,33 @@ lab.experiment('/app', function() {
     })
   })
   lab.test('POST /user/me/vouchers', function(done) {
+    var creditBefore
     request({
-      method: 'POST',
-      uri: appUrl + '/users/me/vouchers',
+      method: 'GET',
+      uri: appUrl + '/users/me',
       json: true,
       headers: {
         'Authorization': token
-      },
-      body: {
-        code: voucherCode
       }
+    }).spread(function(response, body) {
+      creditBefore = body.credit
+      
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/vouchers',
+        json: true,
+        headers: {
+          'Authorization': token
+        },
+        body: {
+          code: voucherCode
+        }
+      })
     }).spread(function(response, body) {
       expect(body, 'to equal', {
         status: 'OK'
       })
-    }).then(function() {
+
       return request({
         method: 'POST',
         uri: appUrl + '/users/me/vouchers',
@@ -131,6 +144,17 @@ lab.experiment('/app', function() {
       })
     }).spread(function(response, body) {
       expect(body.status, 'to equal', 'FAIL')
+
+      return request({
+        method: 'GET',
+        uri: appUrl + '/users/me',
+        json: true,
+        headers: {
+          'Authorization': token
+        }
+      })
+    }).spread(function(response, body) {
+      expect(body.credit-creditBefore, 'to equal', VOUCHER_AMOUNT)
 
       done()
     }).catch(function(err) {
