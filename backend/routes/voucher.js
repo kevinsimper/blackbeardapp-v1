@@ -17,7 +17,7 @@ exports.generateVoucher = {
       email: Joi.string().email(),
       amount: Joi.number(),
       note: Joi.string(),
-      limit: Joi.number()
+      limit: Joi.number().allow(null)
     }
   },
   app: {
@@ -44,8 +44,9 @@ exports.generateVoucher = {
         codePlain: currentCount,
         code: code,
         email: email,
-        note: note,
         amount: amount,
+        note: note,
+        limit: limit,
         createdAt: moment().unix()
       })
 
@@ -71,16 +72,18 @@ exports.getVouchers = function(request, reply) {
   })
 }
 
+// Please note this is anonymous and does not check if the voucher has previously
+// been claimed by the user. Only checks that the code is valid
 exports.verifyVoucher = function(request, reply) {
   var code = request.params.voucher
 
-  var voucher = Voucher.findOne({code: code.toUpperCase()})
+  var voucher = Voucher.findOne({code: code.toUpperCase()}).populate('claimants')
   voucher.then(function (voucher) {
     var status = 'Voucher could not be found.'
     if (voucher) {
       // Check if voucher is in unlimited mode
       // or has not been claimed too many times
-      if ((voucher.limit === false) || (voucher.used < voucher.limit)) {
+      if ((voucher.limit === null) || (voucher.used < voucher.limit)) {
         status = 'OK'
       } else {
         status = 'Voucher is no longer valid'
@@ -119,7 +122,14 @@ exports.claimVoucher = {
 
       // Check if voucher is in unlimited mode
       // or has not been claimed too many times
-      if ((voucher.limit === false) || (voucher.used < voucher.limit)) {
+      if ((voucher.limit === null) || (voucher.used < voucher.limit)) {
+        // Check if voucher has not been previously claimed by user
+        voucherObj.claimants.forEach(function(previousClaimant) {
+          if (previousClaimant.user+'' == userObj._id) {
+            throw new Promise.OperationalError("Voucher already claimed")
+          }
+        })
+
         var voucherClaimant = new VoucherClaimant({
           voucher: voucher._id,
           user: userObj._id,
