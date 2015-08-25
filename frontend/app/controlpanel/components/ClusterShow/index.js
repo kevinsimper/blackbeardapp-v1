@@ -1,6 +1,8 @@
 var React = require('react')
 var Reflux = require('reflux')
 var extend = require('lodash/object/extend')
+var request = require('superagent')
+var config = require('../../config')
 var ClusterActions = require('../Clusters/actions')
 var ClusterStore = require('../Clusters/store')
 var Table = require('../Table')
@@ -39,6 +41,13 @@ var ClusterShow = React.createClass({
       self.transitionTo('/clusters')
     })
   },
+  onClickStartContainer: function () {
+    var self = this
+    request.get(config.BACKEND_HOST + '/clusters/' + this.props.params.id + '/startcontainer')
+      .set('Authorization', localStorage.token)
+      .end(function (err, res) {
+      })
+  },
   render: function () {
     var self = this
     if(!this.state.loaded) {
@@ -47,6 +56,7 @@ var ClusterShow = React.createClass({
 
     return (
       <div className='ClusterShow'>
+        <Button onClick={this.onClickStartContainer}>Start container</Button>
         <h1>Cluster</h1>
         <Table variant='striped'>
           <thead>
@@ -93,8 +103,10 @@ var ClusterShow = React.createClass({
         <div>
           <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
         </div>
-        <ClusterStatus cluster={this.props.params.id}/>
-        <ClusterContainers cluster={this.props.params.id}/>
+        <div>
+          <ClusterStatus cluster={this.props.params.id}/>
+          <ClusterContainers cluster={this.props.params.id}/>
+        </div>
       </div>
     )
   }

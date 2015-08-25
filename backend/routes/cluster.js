@@ -166,6 +166,7 @@ exports.getClusterStartContainer = {
       }
 
       var uri = 'https://' + cluster.ip + ':3376/containers/create'
+      request.log('creating container')
       return dockerapi(cluster, uri, 'POST', {
         Image: 'nginx',
         ExposedPorts: {
@@ -179,6 +180,7 @@ exports.getClusterStartContainer = {
 
     Promise.all([cluster, createContainer]).spread(function (cluster, container) {
       var uri = 'https://' + cluster.ip + ':3376/containers/' + container[1].Id + '/start'
+      request.log('start container ' + container[1].Id)
       return dockerapi(cluster, uri, 'POST')
     }).spread(function (response, body) {
       reply(body)
