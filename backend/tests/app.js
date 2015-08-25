@@ -1,6 +1,7 @@
+var Promise = require('bluebird')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
-var request = require('request')
+var request = Promise.promisify(require('request'))
 var expect = require('unexpected')
 var _ = require('lodash')
 
@@ -44,29 +45,23 @@ lab.experiment('/app', function() {
       })
   })
 
-  var imageId
-  lab.test('GET /me/images', function(done) {
-    request({
-        method: 'GET',
-        uri: appUrl + '/users/me/images',
-        json: true,
-        headers: {
-          'Authorization': token
-        }
-      },
-      function(error, response, body) {
-        imageId = body[0]._id
-
-        done()
-      })
-  })
-
   lab.test('POST', function(done) {
-    var requestData = {
-      name: 'testapp',
-      image: imageId
-    }
-    request({
+    var image = request({
+      method: 'GET',
+      uri: appUrl + '/users/me/images',
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    }).spread(function (response, body) {
+      return body[0]
+    })
+    image.then(function (image) {
+      var requestData = {
+        name: 'testapp',
+        image: image._id
+      }
+      return request({
         method: 'POST',
         uri: appUrl + '/users/me/apps',
         headers: {
@@ -74,14 +69,13 @@ lab.experiment('/app', function() {
         },
         body: requestData,
         json: true
-      },
-      function(error, response, body) {
-        expect(response.statusCode, 'to be', 200)
-        expect(body.name, 'to be', requestData.name)
-        appId = body._id
-
-        done()
       })
+    }).spread(function (response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body.name, 'to be', 'testapp')
+      appId = body._id
+      done()
+    })
   })
   lab.test('PUT', function(done) {
     var requestData = {
