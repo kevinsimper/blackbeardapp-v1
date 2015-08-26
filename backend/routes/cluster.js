@@ -2,7 +2,7 @@ var Boom = require('boom')
 var Joi = require('joi')
 var Cluster = require('../models/Cluster')
 var Promise = require('bluebird')
-var httprequest = Promise.promisify(require('request'))
+var ClusterService = require('../services/Cluster')
 
 exports.getClusters = function (request, reply) {
   Cluster.find().then(function (clusters) {
@@ -54,7 +54,6 @@ exports.deleteCluster = {
   handler: function (request, reply) {
     var id = request.params.id
     Cluster.findOne({_id: id}).then(function (cluster) {
-      console.log(cluster)
       return Promise.fromNode(function (callback) {
         cluster.delete(callback)
       })
@@ -67,24 +66,6 @@ exports.deleteCluster = {
   }
 }
 
-var dockerapi = function (cluster, uri, method, json) {
-  var options = {
-    uri: uri,
-    agentOptions: {
-      cert: cluster.certificates.cert,
-      key: cluster.certificates.key,
-      ca: cluster.certificates.ca
-    },
-    json: true
-  }
-  if (json) {
-    options.body = json
-  }
-  if (method) {
-    options.method = method
-  }
-  return httprequest(options)
-}
 
 exports.getClusterStatus = {
   auth: 'jwt',
@@ -95,20 +76,21 @@ exports.getClusterStatus = {
   },
   handler: function (request, reply) {
     var id = request.params.cluster
+
     Cluster.findOne({_id: id}).then(function (cluster) {
       if(!cluster) {
         throw new Promise.OperationalError('does not exist!')
       }
 
       var uri = 'https://' + cluster.ip + ':3376/info'
-      return dockerapi(cluster, uri)
+      return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
-      request.log(err)
+      request.log([], err)
       reply(Boom.notFound())
     }).catch(function (err) {
-      request.log(err)
+      request.log([], err)
       reply(Boom.badImplementation())
     })
   }
@@ -132,14 +114,13 @@ exports.getClusterContainers = {
       }
 
       var uri = 'https://' + cluster.ip + ':3376/containers/json'
-      return dockerapi(cluster, uri)
+      return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
       request.log(err)
       reply(Boom.notFound())
     }).catch(function (err) {
-      console.log(err, err.stack)
       request.log(err)
       reply(Boom.badImplementation())
     })
@@ -158,39 +139,21 @@ exports.getClusterStartContainer = {
   },
   handler: function (request, reply) {
     var id = request.params.cluster
-    var cluster = Cluster.findOne({_id: id})
 
-    var createContainer = cluster.then(function (cluster) {
-      if(!cluster) {
-        throw new Promise.OperationalError('does not exist!')
-      }
-
-      var uri = 'https://' + cluster.ip + ':3376/containers/create'
-      request.log('creating container')
-      return dockerapi(cluster, uri, 'POST', {
-        Image: 'nginx',
-        ExposedPorts: {
-         '80/tcp': {}
-        },
-        HostConfig: {
-          'PublishAllPorts': true
-        }
-      })
+    var cluster = ClusterService.getCluster()
+    var containerId = cluster.then(function (cluster) {
+      return ClusterService.createContainer(cluster)
     })
 
-    Promise.all([cluster, createContainer]).spread(function (cluster, container) {
-      var uri = 'https://' + cluster.ip + ':3376/containers/' + container[1].Id + '/start'
-      request.log('start container ' + container[1].Id)
-      return dockerapi(cluster, uri, 'POST')
-    }).spread(function (response, body) {
-      reply(body)
-    }).error(function (err) {
-      request.log(err)
-      reply(Boom.notFound())
+    var startContainer = Promise.all([cluster, containerId]).spread(function (cluster, containerId) {
+      return ClusterService.startContainer(cluster, containerId)
+    })
+    Promise.all([containerId, startContainer]).spread(function(containerId, startContainer) {
+      reply(containerId)
     }).catch(function (err) {
-      console.log(err, err.stack)
-      request.log(err)
+      request.log([], err)
       reply(Boom.badImplementation())
     })
+
   }
 }
