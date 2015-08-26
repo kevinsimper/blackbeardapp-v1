@@ -2,7 +2,7 @@ var Boom = require('boom')
 var Joi = require('joi')
 var Cluster = require('../models/Cluster')
 var Promise = require('bluebird')
-var httprequest = Promise.promisify(require('request'))
+var ClusterService = require('../services/Cluster')
 
 exports.getClusters = function (request, reply) {
   Cluster.find().then(function (clusters) {
@@ -67,24 +67,6 @@ exports.deleteCluster = {
   }
 }
 
-var dockerapi = function (cluster, uri, method, json) {
-  var options = {
-    uri: uri,
-    agentOptions: {
-      cert: cluster.certificates.cert,
-      key: cluster.certificates.key,
-      ca: cluster.certificates.ca
-    },
-    json: true
-  }
-  if (json) {
-    options.body = json
-  }
-  if (method) {
-    options.method = method
-  }
-  return httprequest(options)
-}
 
 exports.getClusterStatus = {
   auth: 'jwt',
@@ -101,7 +83,7 @@ exports.getClusterStatus = {
       }
 
       var uri = 'https://' + cluster.ip + ':3376/info'
-      return dockerapi(cluster, uri)
+      return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
@@ -132,7 +114,7 @@ exports.getClusterContainers = {
       }
 
       var uri = 'https://' + cluster.ip + ':3376/containers/json'
-      return dockerapi(cluster, uri)
+      return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
@@ -167,7 +149,7 @@ exports.getClusterStartContainer = {
 
       var uri = 'https://' + cluster.ip + ':3376/containers/create'
       request.log('creating container')
-      return dockerapi(cluster, uri, 'POST', {
+      return ClusterService.request(cluster, uri, 'POST', {
         Image: 'nginx',
         ExposedPorts: {
          '80/tcp': {}
@@ -181,7 +163,7 @@ exports.getClusterStartContainer = {
     Promise.all([cluster, createContainer]).spread(function (cluster, container) {
       var uri = 'https://' + cluster.ip + ':3376/containers/' + container[1].Id + '/start'
       request.log('start container ' + container[1].Id)
-      return dockerapi(cluster, uri, 'POST')
+      return ClusterService.request(cluster, uri, 'POST')
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
