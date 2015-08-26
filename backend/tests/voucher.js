@@ -48,6 +48,7 @@ lab.experiment('/app', function() {
     })
   })
   var voucherCode
+  var unlimitedVoucherCode
   lab.test('POST /admin/vouchers/generate', function(done) {
     request({
       method: 'POST',
@@ -58,11 +59,28 @@ lab.experiment('/app', function() {
       },
       body: {
         amount: VOUCHER_AMOUNT,
-        note: "This is an extended\nNOTE!"
+        note: "This is single-user voucher."
       }
     }).spread(function(response, body) {
       expect(body, 'to have key', 'code')
       voucherCode = body.code
+
+      return request({
+        method: 'POST',
+        uri: appUrl + '/admin/vouchers/generate',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          amount: VOUCHER_AMOUNT,
+          note: "This is an unlimited voucher.",
+          limit: null
+        }
+      })
+    }).spread(function(response, body) {
+      expect(body, 'to have key', 'code')
+      unlimitedVoucherCode = body.code
 
       done()
     }).catch(function(err) {
@@ -100,7 +118,7 @@ lab.experiment('/app', function() {
       console.log(err)
     })
   })
-  lab.test('POST /user/me/vouchers', function(done) {
+  lab.test('POST /user/me/vouchers (Limited Voucher)', function(done) {
     var creditBefore
     request({
       method: 'GET',
@@ -141,6 +159,7 @@ lab.experiment('/app', function() {
       })
     }).spread(function(response, body) {
       expect(body.status, 'to equal', 'FAIL')
+      expect(body.error.cause, 'to equal', 'Voucher is invalid')
 
       return request({
         method: 'GET',
@@ -156,6 +175,52 @@ lab.experiment('/app', function() {
       done()
     }).catch(function(err) {
       console.log(err)
+    })
+  })
+  lab.test('POST /user/me/vouchers (Unlimited Voucher)', function(done) {
+    // Claim unlimited voucher
+    request({
+      method: 'POST',
+      uri: appUrl + '/users/me/vouchers',
+      json: true,
+      headers: {
+        'Authorization': token
+      },
+      body: {
+        code: unlimitedVoucherCode
+      }
+    }).spread(function(response, body) {
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/vouchers',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          code: unlimitedVoucherCode
+        }
+      })
+    }).spread(function(response, body) {
+      expect(body, 'to equal', {
+        status: 'OK'
+      })
+
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/vouchers',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          code: unlimitedVoucherCode
+        }
+      })
+    }).spread(function(response, body) {
+      expect(body.status, 'to equal', 'FAIL')
+      expect(body.error.cause, 'to equal', 'Voucher already claimed')
+      done()
     })
   })
 })

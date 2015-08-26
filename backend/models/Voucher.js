@@ -1,21 +1,17 @@
 var mongoose = require('mongoose')
 var mongooseDelete = require('mongoose-delete')
 
-var status = {
-  CLAIMED: 'CLAIMED',
-  UNCLAIMED: 'UNCLAIMED'
-}
-
 var schema = new mongoose.Schema({
+	limit: { type: Number, default: 1 }, // Default to single voucher claimant
+	used: { type: Number, default: 0 }, // Default to unused
 	codePlain: Number,
   code: String,
+  email: String,
   amount: Number,
   createdAt: String,
   modifiedAt: String,
-  user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
-  email: String,
   note: String,
-  status: { type: String, default: status.UNCLAIMED },
+  claimants: [{type: mongoose.Schema.Types.ObjectId, ref: 'voucherclaimant'}],
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
@@ -23,5 +19,3 @@ var schema = new mongoose.Schema({
 schema.plugin(mongooseDelete)
 
 module.exports = mongoose.model('voucher', schema)
-
-module.exports.status = status
