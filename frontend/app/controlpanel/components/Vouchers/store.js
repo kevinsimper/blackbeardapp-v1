@@ -24,7 +24,33 @@ var store = Reflux.createStore({
   },
   getAll: function () {
     return _vouchers
-  }
+  },
+  getOne: function (id) {
+    var one = findWhere(_vouchers, {_id: id})
+    return (typeof one === 'undefined') ? {} : one
+  },
+  onNew: function(voucher) {
+    var data = {}
+    data.amount = voucher.amount
+    data.limit = voucher.limit
+    if (voucher.email) {
+      data.email = voucher.email
+    }
+    if (voucher.note) {
+      data.note = voucher.note
+    }
+    request
+      .post(config.BACKEND_HOST + '/admin/vouchers/generate')
+      .set('Authorization', localStorage.token)
+      .send(data)
+      .end(function(err, res) {
+        actions.new.completed(res.body)
+      })
+  },
+  onNewCompleted: function(data) {
+    _vouchers.push(data)
+    this.trigger(data)
+  },
 })
 
 module.exports = store
