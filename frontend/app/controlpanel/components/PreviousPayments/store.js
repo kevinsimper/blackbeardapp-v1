@@ -14,7 +14,15 @@ var store = Reflux.createStore({
     request.get(config.BACKEND_HOST + '/users/me/payments')
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
-        actions.load.completed(res.body)
+        var payments = res
+
+        // Should promisify this
+        request.get(config.BACKEND_HOST + '/users/me/vouchers')
+        .set('Authorization', localStorage.token)
+        .end(function(err, res) {
+          console.log(res)
+          actions.load.completed(payments)
+        })
       })
   },
   onLoadCompleted: function(payments) {

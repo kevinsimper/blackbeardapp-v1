@@ -118,6 +118,22 @@ lab.experiment('/app', function() {
       console.log(err)
     })
   })
+  lab.test('GET /vouchers/', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/vouchers/',
+      json: true
+    }).spread(function(response, body) {
+      //expect(body, 'to equal', {
+      //  status: 'OK'
+      //})
+      console.log(body)
+
+      done()
+    }).catch(function(err) {
+      console.log(err)
+    })
+  })
   lab.test('POST /user/me/vouchers (Limited Voucher)', function(done) {
     var creditBefore
     request({

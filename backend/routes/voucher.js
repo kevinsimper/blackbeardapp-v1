@@ -70,6 +70,25 @@ exports.getVouchers = function(request, reply) {
   })
 }
 
+exports.getUsedVouchers = {
+  auth: 'jwt',
+  validate: {
+    payload: {
+      code: Joi.string()
+    }
+  },
+  handler: function(request, reply) {
+    var userId = User.getUserIdFromRequest(request)
+    var vouchers = Voucher.find({user: userId}).populate('claimants')
+    vouchers.then(function (vouchers) {
+      reply(vouchers)
+    }).catch(function(err) {
+      request.log(err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
 // Please note this is anonymous and does not check if the voucher has previously
 // been claimed by the user. Only checks that the code is valid
 exports.verifyVoucher = function(request, reply) {

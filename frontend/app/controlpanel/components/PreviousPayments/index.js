@@ -36,7 +36,7 @@ var PreviousPayments = React.createClass({
             <th>Created</th>
             <th>Amount</th>
             <th>Status</th>
-            <th>CreditCard</th>
+            <th>Source</th>
             </tr>
           </thead>
           <tbody>
@@ -45,7 +45,7 @@ var PreviousPayments = React.createClass({
               <td>{moment.unix(object.timestamp).format()}</td>
               <td>${object.amount}</td>
               <td>{object.status}</td>
-              <td>****-{object.creditCard.number}</td>
+              <td>{object.source}</td>
             </tr>;
         })}
         </tbody>
