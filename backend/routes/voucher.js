@@ -52,9 +52,7 @@ exports.generateVoucher = {
 
       return voucher.save()
     }).then(function(voucher) {
-      reply({
-        code: voucher.code
-      })
+      reply(voucher)
     }).catch(function(err) {
       request.log(err)
       reply(Boom.badImplementation())
@@ -166,7 +164,6 @@ exports.claimVoucher = {
         error: err
       })
     }).catch(function(err) {
-      console.log('err', err)
       request.log(err)
       reply(Boom.badImplementation())
     })
