@@ -8,10 +8,7 @@ var _ = require('lodash')
 var helpers = require('./helpers/')
 var appUrl = helpers.appUrl()
 
-var server = require('../server')
-server.start(function() {
-  console.log('Server running at:', server.info.uri)
-})
+var server = require('../startdev')()
 
 var VOUCHER_AMOUNT = 2000
 var token = null
@@ -114,7 +111,7 @@ lab.experiment('/app', function() {
       }
     }).spread(function(response, body) {
       creditBefore = body.credit
-      
+
       return request({
         method: 'POST',
         uri: appUrl + '/users/me/vouchers',

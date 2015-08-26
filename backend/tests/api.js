@@ -1,6 +1,3 @@
-var server = require('../server')
-
-var Code = require('code')
 var Lab = require('lab')
 var lab = exports.lab = Lab.script()
 var request = require('request')
@@ -13,9 +10,7 @@ var testUserEmail = 'user+' + time + '@jambroo.com'
 var testContactEmail = 'contact+' + time + '@jambroo.com'
 var testSignupEmail = 'signup+' + time + '@jambroo.com'
 
-server.start(function() {
-  console.log('Server running at:', server.info.uri)
-})
+var server = require('../startdev')()
 
 var createdUserId = -1
 var token = -1

@@ -8,10 +8,7 @@ var _ = require('lodash')
 var helpers = require('../helpers/')
 var appUrl = helpers.appUrl()
 
-var server = require('../../server')
-server.start(function() {
-  console.log('Server running at:', server.info.uri)
-})
+var server = require('../../startdev')()
 
 var adminToken = ''
 var clusterId = ''
