@@ -5,8 +5,8 @@ var httprequest = Promise.promisify(require('request'))
 
 exports.getCluster = function() {
   return new Promise(function (resolve, reject) {
-    return Cluster.find().then(function(clusters) {
-      return clusters[0]
+    Cluster.find().then(function(clusters) {
+      resolve(clusters[0])
     })
   })
 }
@@ -31,33 +31,31 @@ exports.request = function (cluster, uri, method, json) {
 }
 
 /**
+* @params {Object} cluster
 * @returns {String} container id
 */
-exports.createContainer = function () {
+exports.createContainer = function (cluster) {
   var self = this
-  var cluster = this.getCluster()
-  return cluster.then(function (cluster) {
-    var uri = 'https://' + cluster.ip + ':3376/containers/create'
-    return self.request(cluster, uri, 'POST', {
-      Image: 'nginx',
-      ExposedPorts: {
-       '80/tcp': {}
-      },
-      HostConfig: {
-        'PublishAllPorts': true
-      }
-    }).spread(function (response, body) {
-      return body.Id
-    })
+  var uri = 'https://' + cluster.ip + ':3376/containers/create'
+  return self.request(cluster, uri, 'POST', {
+    Image: 'nginx',
+    ExposedPorts: {
+     '80/tcp': {}
+    },
+    HostConfig: {
+      'PublishAllPorts': true
+    }
+  }).spread(function (response, body) {
+    return body.Id
   })
 }
 
 /**
 * @params {String} container id
 */
-exports.startContainer = function (containerId) {
+exports.startContainer = function (cluster, containerId) {
   var uri = 'https://' + cluster.ip + ':3376/containers/' + containerId + '/start'
-  return ClusterService.request(cluster, uri, 'POST')
+  return this.request(cluster, uri, 'POST')
     .spread(function (response, body) {
       return 'ok'
     })
