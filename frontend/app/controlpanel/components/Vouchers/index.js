@@ -37,7 +37,7 @@ var Vouchers = React.createClass({
     return (
       <div className='Vouchers'>
         <h1>Vouchers</h1>
-        <Button size='small' onClick={self.onClickNew.bind(null)}>Generate New</Button>
+        <Button size='small' onClick={self.onClickNew.bind()}>Generate New</Button>
         <Table variant='striped'>
           <thead>
             <tr>
