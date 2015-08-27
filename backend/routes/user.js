@@ -10,6 +10,7 @@ var _ = require('lodash')
 var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
 var Log = require('../models/Log')
+var Joi = require('joi')
 
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
@@ -123,24 +124,69 @@ exports.postUser = function(request, reply) {
   }, resultCallback)
 }
 
-exports.putUsers = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  User.findById(id, function(err, user) {
-    if(err) {
-      request.log(['mongo'], err)
-      reply(Boom.badImplementation())
+exports.putMe = {
+  auth: 'jwt',
+  validate: {
+    payload: {
+      email: Joi.string().email().required(),
+      name: Joi.string().min(3).required()
     }
-    user.email = request.payload.email
-    user.name = request.payload.name
-    user.save(function(err, updated) {
-      if (err) {
+  },
+  handler: function(request, reply) {
+    var id = request.auth.credentials._id
+
+    User.findById(id, function(err, user) {
+      if(err) {
         request.log(['mongo'], err)
-        return reply(Boom.badImplementation('There was a problem with the database'))
+        reply(Boom.badImplementation())
       }
-      reply(updated)
+      user.email = request.payload.email
+      user.name = request.payload.name
+      user.save(function(err, updated) {
+        if (err) {
+          request.log(['mongo'], err)
+          return reply(Boom.badImplementation('There was a problem with the database'))
+        }
+        reply(updated)
+      })
     })
-  })
+  }
 }
+
+exports.putUsers = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    payload: {
+      email: Joi.string().email(),
+      name: Joi.string(),
+      role: Joi.string(),
+      credit: Joi.number()
+    }
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+    User.findById(id, function(err, user) {
+      if(err) {
+        request.log(['mongo'], err)
+        reply(Boom.badImplementation())
+      }
+      user.email = request.payload.email
+      user.name = request.payload.name
+      user.role = request.payload.role
+      user.save(function(err, updated) {
+        if (err) {
+          request.log(['mongo'], err)
+          return reply(Boom.badImplementation('There was a problem with the database'))
+        }
+        reply(updated)
+      })
+    })
+  }
+}
+
 
 exports.delUsers = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
