@@ -45,7 +45,6 @@ var ClusterContainers = React.createClass({
                   <td>{item.Status}</td>
                   <td>
                     {item.Ports.map(function (port) {
-                      console.log(port)
                       return <div>{port.IP}:{port.PublicPort}-&gt;{port.PrivatePort}, </div>
                     })}
                   </td>
