@@ -5,6 +5,7 @@ var Container = require('../models/Container')
 var Boom = require('boom')
 var moment = require('moment')
 var config = require('../config')
+var ClusterService = require('../services/Cluster')
 
 
 exports.postContainers = function(request, reply) {
@@ -24,10 +25,19 @@ exports.postContainers = function(request, reply) {
     }).save()
   })
   var savingApp = Promise.all([app, container]).spread(function (app, container) {
-      app.containers.push(container)
-      return app.save()
+    app.containers.push(container)
+    return app.save()
   })
-  Promise.all([container, savingApp]).spread(function (container, savedApp) {
+
+  var cluster = ClusterService.getCluster()
+  var containerId = cluster.then(function (cluster) {
+    return ClusterService.createContainer(cluster)
+  })
+  var started = Promise.all([cluster, containerId]).spread(function (cluster, containerId) {
+    return ClusterService.startContainer(cluster, containerId)
+  })
+
+  Promise.all([container, savingApp, started]).spread(function (container, savedApp) {
     reply(container)
   }).error(function (err) {
     request.log(['mongo'], err.message)
