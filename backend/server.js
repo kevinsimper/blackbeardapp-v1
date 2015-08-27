@@ -26,6 +26,7 @@ var imageRoutes = require('./routes/image')
 var logRoutes = require('./routes/log')
 var clusterRoutes = require('./routes/cluster')
 var voucherRoutes = require('./routes/voucher')
+var billingRoutes = require('./routes/billing')
 
 var server = new Hapi.Server({
   connections: {
@@ -469,7 +470,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       app: {
         level: 'ADMIN'
       },
-      handler: appRoutes.getAllBilling
+      handler: billingRoutes.getAllBilling
     }
   })
 
