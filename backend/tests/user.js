@@ -127,6 +127,7 @@ lab.experiment('/users', function() {
           'Authorization': token
         },
         body: {
+          name: 'Blackbeard',
           email: testUserEmail
         }
       })
