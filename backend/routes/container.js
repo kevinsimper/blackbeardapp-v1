@@ -66,24 +66,26 @@ exports.getContainers = function(request, reply) {
   var app = request.params.app
   var role = request.auth.credentials.role
 
-  App.findById(app, function(err, result) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
+  var app = App.findById(app)
+
+  app.then(function (app) {
+    if(!app) {
+      throw new Promise.OperationalError('Did not found')
+    }
+    // if there are no containers, return an empty array
+    if(app.containers.length === 0) {
+      return []
     }
 
-    if (result.containers.length) {
-      Container.findByIdsAndRole(result.containers, role, function(err, containers) {
-        if (err) {
-          request.log(['mongo'], err)
-          return reply(Boom.badImplementation('There was a problem with the database'))
-        }
-
-        reply(containers)
-      })
-    } else {
-      reply([])
-    }
+    return Container.findByIdsAndRole(app.containers, role)
+  }).then(function (containers) {
+    reply(containers)
+  }).error(function (err) {
+    request.log(['mongo'], err.message)
+    return reply(Boom.notFound())
+  }).catch( function (err) {
+    request.log(['mongo'], err)
+    return reply(Boom.badImplementation())
   })
 }
 
