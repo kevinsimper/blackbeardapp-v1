@@ -1,6 +1,8 @@
 var React = require('react')
 var request = require('superagent')
 var config = require('../../config')
+var Snippet = require('../Snippet')
+var Table = require('../Table')
 
 var ClusterStatus = React.createClass({
   getInitialState: function () {
@@ -23,7 +25,9 @@ var ClusterStatus = React.createClass({
       <div className='ClusterStatus'>
         <h2>Cluster Status</h2>
         <pre>
-          {JSON.stringify(this.state.status, null, 2)}
+          <Snippet>
+            {JSON.stringify(this.state.status, null, 2)}
+          </Snippet>
         </pre>
       </div>
     )

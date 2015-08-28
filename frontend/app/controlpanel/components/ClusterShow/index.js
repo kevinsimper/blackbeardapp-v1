@@ -7,6 +7,7 @@ var ClusterActions = require('../Clusters/actions')
 var ClusterStore = require('../Clusters/store')
 var Table = require('../Table')
 var Button = require('../Button')
+var Snippet = require('../Snippet')
 var Navigation = require('react-router').Navigation
 var ClusterStatus = require('../ClusterStatus')
 var ClusterContainers = require('../ClusterContainers')
@@ -82,15 +83,27 @@ var ClusterShow = React.createClass({
               <div>
                 <tr>
                   <td>CA</td>
-                  <td>{this.state.cluster.certificates.ca}</td>
+                  <td>
+                    <Snippet>
+                      {this.state.cluster.certificates.ca}
+                    </Snippet>
+                  </td>
                 </tr>
                 <tr>
                   <td>Certificate</td>
-                  <td>{this.state.cluster.certificates.cert}</td>
+                  <td>
+                    <Snippet>
+                      {this.state.cluster.certificates.cert}
+                    </Snippet>
+                  </td>
                 </tr>
                 <tr>
                   <td>Key</td>
-                  <td>{this.state.cluster.certificates.key}</td>
+                  <td>
+                    <Snippet>
+                      {this.state.cluster.certificates.key}
+                    </Snippet>
+                  </td>
                 </tr>
                 <tr>
                   <td>Deleted</td>
