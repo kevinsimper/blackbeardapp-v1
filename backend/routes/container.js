@@ -35,13 +35,23 @@ exports.postContainers = function(request, reply) {
   })
   var started = Promise.all([cluster, containerId]).spread(function (cluster, containerId) {
     return ClusterService.startContainer(cluster, containerId)
-  }).catch(function (err) {
-    if(process.env.NODE_ENV === 'production') {
-      throw err
-    }
   })
 
-  Promise.all([container, savingApp, started]).spread(function (container, savedApp, started) {
+  var savedDetails = Promise.all([container, cluster, containerId, started])
+    .spread(function (container, cluster, containerId, started) {
+      container.cluster = cluster
+      container.containerHash = containerId
+      return container.save()
+    })
+    .catch(function (err) {
+      if(process.env.NODE_ENV === 'production') {
+        throw err
+      } else {
+        console.warn('No cluster attached', err.stack)
+      }
+    })
+
+  Promise.all([container, savingApp, savedDetails]).spread(function (container, savedApp, savedDetails) {
     reply(container)
   }).error(function (err) {
     request.log(['mongo'], err.message)

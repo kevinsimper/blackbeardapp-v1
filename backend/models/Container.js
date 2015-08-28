@@ -9,7 +9,9 @@ var schema = new mongoose.Schema({
   app: {type: mongoose.Schema.Types.ObjectId, ref: 'container'},
   createdAt: String,
   deleted: { type: Boolean, default: false },
-  deletedAt: String
+  deletedAt: String,
+  cluster: {type: mongoose.Schema.Types.ObjectId, ref: 'cluster'},
+  containerHash: String
 })
 
 schema.plugin(mongooseDelete)
