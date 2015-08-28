@@ -43,7 +43,7 @@ var PreviousPayments = React.createClass({
         {this.state.payments.map(function(object, i){
           return <tr>
               <td>{moment.unix(object.timestamp).format()}</td>
-              <td>${object.amount}</td>
+              <td>${(object.amount/100.0).toFixed(2)}</td>
               <td>{object.status}</td>
               <td>{object.source}</td>
             </tr>;

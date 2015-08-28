@@ -344,12 +344,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   // Vouchers
   server.route({
     method: 'POST',
-    path: '/admin/vouchers/generate',
+    path: '/vouchers',
     config: voucherRoutes.generateVoucher
   })
   server.route({
     method: 'GET',
-    path: '/admin/vouchers',
+    path: '/vouchers',
     config: {
       auth: 'jwt',
       app: {

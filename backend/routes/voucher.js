@@ -72,16 +72,13 @@ exports.getVouchers = function(request, reply) {
 
 exports.getUsedVouchers = {
   auth: 'jwt',
-  validate: {
-    payload: {
-      code: Joi.string()
-    }
-  },
   handler: function(request, reply) {
     var userId = User.getUserIdFromRequest(request)
-    var vouchers = Voucher.find({user: userId}).populate('claimants')
-    vouchers.then(function (vouchers) {
-      reply(vouchers)
+
+    var voucherClaimants = VoucherClaimant.find({user: userId}).populate('voucher')
+
+    voucherClaimants.then(function (voucherClaimant) {
+      reply(voucherClaimant)
     }).catch(function(err) {
       request.log(err)
       reply(Boom.badImplementation())
