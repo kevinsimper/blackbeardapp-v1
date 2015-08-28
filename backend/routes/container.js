@@ -35,9 +35,13 @@ exports.postContainers = function(request, reply) {
   })
   var started = Promise.all([cluster, containerId]).spread(function (cluster, containerId) {
     return ClusterService.startContainer(cluster, containerId)
+  }).catch(function (err) {
+    if(process.env.NODE_ENV === 'production') {
+      throw err
+    }
   })
 
-  Promise.all([container, savingApp, started]).spread(function (container, savedApp) {
+  Promise.all([container, savingApp, started]).spread(function (container, savedApp, started) {
     reply(container)
   }).error(function (err) {
     request.log(['mongo'], err.message)
