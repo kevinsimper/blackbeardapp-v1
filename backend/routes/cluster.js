@@ -82,7 +82,7 @@ exports.getClusterStatus = {
         throw new Promise.OperationalError('does not exist!')
       }
 
-      var uri = 'https://' + cluster.ip + ':3376/info'
+      var uri = '/info'
       return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
@@ -113,7 +113,7 @@ exports.getClusterContainers = {
         throw new Promise.OperationalError('does not exist!')
       }
 
-      var uri = 'https://' + cluster.ip + ':3376/containers/json'
+      var uri = '/containers/json'
       return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)

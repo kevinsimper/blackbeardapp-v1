@@ -12,8 +12,9 @@ exports.getCluster = function() {
 }
 
 exports.request = function (cluster, uri, method, json) {
+  var _uri = 'https://' + cluster.ip + ':3376' + uri
   var options = {
-    uri: uri,
+    uri: _uri,
     agentOptions: {
       cert: cluster.certificates.cert,
       key: cluster.certificates.key,
@@ -36,7 +37,7 @@ exports.request = function (cluster, uri, method, json) {
 */
 exports.createContainer = function (cluster) {
   var self = this
-  var uri = 'https://' + cluster.ip + ':3376/containers/create'
+  var uri = '/containers/create'
   return self.request(cluster, uri, 'POST', {
     Image: 'nginx',
     ExposedPorts: {
@@ -54,7 +55,7 @@ exports.createContainer = function (cluster) {
 * @params {String} container id
 */
 exports.startContainer = function (cluster, containerId) {
-  var uri = 'https://' + cluster.ip + ':3376/containers/' + containerId + '/start'
+  var uri = '/containers/' + containerId + '/start'
   return this.request(cluster, uri, 'POST')
     .spread(function (response, body) {
       return 'ok'
