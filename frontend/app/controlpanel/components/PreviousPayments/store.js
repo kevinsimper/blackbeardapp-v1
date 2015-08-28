@@ -12,39 +12,15 @@ var store = Reflux.createStore({
     return _payments;
   },
   onLoad: function() {
-    var combined = []
-    request.get(config.BACKEND_HOST + '/users/me/payments')
-      .set('Authorization', localStorage.token)
-      .end(function(err, res) {
-        _.each(res.body, function(payment) {
-          combined.push({
-            timestamp: payment.timestamp,
-            amount: payment.amount,
-            status: payment.status,
-            source: 'Credit Card'
-          })
-        })
-
-        // Should promisify this
-        request.get(config.BACKEND_HOST + '/users/me/vouchers')
-        .set('Authorization', localStorage.token)
-        .end(function(err, res) {
-          _.each(res.body, function(voucherPayment) {
-            combined.push({
-              timestamp: voucherPayment.claimedAt,
-              amount: voucherPayment.voucher.amount,
-              status: 'SUCCESS',
-              source: 'Voucher'
-            })
-          })
-
-          actions.load.completed(combined)
-        })
-      })
+    request.get(config.BACKEND_HOST + '/users/me/creditlogs')
+    .set('Authorization', localStorage.token)
+    .end(function(err, res) {
+      console.log(res)
+      actions.load.completed(res.body)
+    })
   },
   onLoadCompleted: function(payments) {
     _payments = payments
-    // This breaks
     this.trigger(payments)
   }
 })

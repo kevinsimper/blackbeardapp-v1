@@ -7,6 +7,7 @@ var User = Promise.promisifyAll(require('../models/User'))
 var Voucher = Promise.promisifyAll(require('../models/Voucher'))
 var VoucherClaimant = Promise.promisifyAll(require('../models/VoucherClaimant'))
 var Log = Promise.promisifyAll(require('../models/Log'))
+var Payment = Promise.promisifyAll(require('../models/Payment'))
 
 var config = require('../config')
 
