@@ -240,4 +240,21 @@ lab.experiment('/app', function() {
       console.log(err)
     })
   })
+  lab.test('GET /users/me/creditlog', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/creditlogs',
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    }).spread(function(response, body) {
+      // With credit card payment included there are 3 log entries
+      expect(body.length, 'to equal', 3)
+
+      done()
+    }).catch(function(err) {
+      console.log(err)
+    })
+  })
 })
