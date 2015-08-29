@@ -63,6 +63,7 @@ registryproxy:
    - ./registryproxy/:/app
 
 rabbitmq:
-  image: rabbitmq:3.5
+  image: rabbitmq:3.5-management
   ports:
     - "5672:5672"
+    - "15672:15672"
