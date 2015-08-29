@@ -3,6 +3,7 @@ var User = require('../models/User')
 var App = Promise.promisifyAll(require('../models/App'))
 var Container = require('../models/Container')
 var Boom = require('boom')
+var _ = require('lodash')
 var moment = require('moment')
 var config = require('../config')
 var ClusterService = require('../services/Cluster')
@@ -68,7 +69,7 @@ exports.getContainers = function(request, reply) {
 
   var app = App.findById(app)
 
-  app.then(function (app) {
+  var containers = app.then(function (app) {
     if(!app) {
       throw new Promise.OperationalError('Did not found')
     }
@@ -77,9 +78,44 @@ exports.getContainers = function(request, reply) {
       return []
     }
 
-    return Container.findByIdsAndRole(app.containers, role)
-  }).then(function (containers) {
-    reply(containers)
+    return Container
+      .findByIdsAndRole(app.containers, role)
+      .populate('cluster')
+  })
+
+  var containerObjects = containers.then(function (containers) {
+    return Promise.all(containers.map(function (container) {
+      return container.toObject({
+        depopulate: true
+      })
+    }))
+  })
+
+  var clusterContainer = containers.then(function (containers) {
+    return Promise.all(containers.map(function (container) {
+      if(!container.cluster) {
+        throw new Promise.OperationalError('No cluster attached')
+      }
+      return ClusterService.lookupContainer(container.cluster, container.containerHash)
+    }))
+  }).then(function (containersInfo) {
+    return Promise.all(containersInfo.map(function (containerInfo) {
+      var ports = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
+      return {
+        ip: containerInfo.NetworkSettings.Ports[ports[0]][0].HostIp,
+        port: containerInfo.NetworkSettings.Ports[ports[0]][0].HostPort
+      }
+    }))
+  }).error(function (err) {
+    if(process.env.NODE_ENV === 'production') {
+      throw err
+    } else {
+      console.warn(err.stack)
+    }
+  })
+
+  Promise.all([containerObjects, clusterContainer]).spread(function (containers, clusterContainer) {
+    reply(_.merge(containers, clusterContainer))
   }).error(function (err) {
     request.log(['mongo'], err.message)
     return reply(Boom.notFound())

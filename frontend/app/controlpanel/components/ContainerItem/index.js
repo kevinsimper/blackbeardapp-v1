@@ -19,7 +19,11 @@ var ContainerItem = React.createClass({
       <tr>
         <td>{this.props.container.region}</td>
         <td>{this.props.container.status}</td>
-        <td>{this.props.container.ip}</td>
+        <td>
+          <a target='_BLANK' href={'http://' + this.props.container.ip + ':' + this.props.container.port}>
+            {this.props.container.ip}:{this.props.container.port}
+          </a>
+        </td>
         <td>{containerButton}</td>
       </tr>
     );

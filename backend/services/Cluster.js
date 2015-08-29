@@ -61,3 +61,11 @@ exports.startContainer = function (cluster, containerId) {
       return 'ok'
     })
 }
+
+exports.lookupContainer = function (cluster, containerId) {
+  var uri = '/containers/' + containerId + '/json'
+  return this.request(cluster, uri, 'GET')
+    .spread(function (response, body) {
+      return body
+    })
+}
