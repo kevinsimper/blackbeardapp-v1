@@ -26,6 +26,8 @@ var imageRoutes = require('./routes/image')
 var logRoutes = require('./routes/log')
 var clusterRoutes = require('./routes/cluster')
 var voucherRoutes = require('./routes/voucher')
+var billingRoutes = require('./routes/billing')
+var containerRoutes = require('./routes/container')
 
 var server = new Hapi.Server({
   connections: {
@@ -429,7 +431,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}/apps/{app}/containers',
     config: {
       auth: 'jwt',
-      handler: appRoutes.postContainers
+      handler: containerRoutes.postContainers
     }
   })
   server.route({
@@ -437,7 +439,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}/apps/{app}/containers',
     config: {
       auth: 'jwt',
-      handler: appRoutes.getContainers
+      handler: containerRoutes.getContainers
     }
   })
   server.route({
@@ -445,7 +447,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}/apps/{app}/containers/{container}',
     config: {
       auth: 'jwt',
-      handler: appRoutes.getContainer
+      handler: containerRoutes.getContainer
     }
   })
   server.route({
@@ -453,7 +455,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}/apps/{app}/containers/{container}',
     config: {
       auth: 'jwt',
-      handler: appRoutes.deleteContainers
+      handler: containerRoutes.deleteContainers
     }
   })
   server.route({
@@ -480,7 +482,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
       app: {
         level: 'ADMIN'
       },
-      handler: appRoutes.getAllBilling
+      handler: billingRoutes.getAllBilling
     }
   })
 
