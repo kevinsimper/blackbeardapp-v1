@@ -6,23 +6,20 @@ var moment = require('moment')
 var config = require('../../config')
 var VoucherActions = require('../Vouchers/actions')
 var VoucherStore = require('../Vouchers/store')
+var PreviousPaymentsActions = require('../PreviousPayments/actions')
 var Input = require('../Input')
 var Button = require('../Button')
 var Navigation = require('react-router').Navigation
 
 var VoucherClaim = React.createClass({
   mixins: [Navigation],
-  getState: function () {
+  getInitialState: function () {
     return {
       voucher: '',
-      message: ''
-    }
-  },
-  getInitialState: function () {
-    return extend(this.getState(), {
+      message: '',
       loading: false,
       result: ''
-    })
+    }
   },
   onClickRequest: function() {
     var self = this
@@ -39,7 +36,7 @@ var VoucherClaim = React.createClass({
 
         if (voucher.status == 'OK') {
           // Re-render previous payments table
-
+          PreviousPaymentsActions.load()
         }
       })
   },
@@ -47,9 +44,6 @@ var VoucherClaim = React.createClass({
     this.setState({
       voucher: e.target.value
     })
-  },
-  onChange: function () {
-    this.setState(this.getState())
   },
   render: function () {
     var self = this
@@ -71,7 +65,7 @@ var VoucherClaim = React.createClass({
         <h1>Claim a Voucher</h1>
         <Input type='voucher' placeholder='Voucher' value={this.state.email} onChange={this.handleVoucher}/>
         <div>
-          <Button onClick={this.onClickRequest.bind(this)}>Claim</Button>
+          <Button onClick={this.onClickRequest}>Claim</Button>
         </div>
         {result}
       </div>
