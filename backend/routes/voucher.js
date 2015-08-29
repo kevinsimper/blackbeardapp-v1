@@ -135,6 +135,10 @@ exports.claimVoucher = {
     var voucher = Voucher.findOne({code: code.toUpperCase()}).populate('claimants')
 
     var voucherClaimant = Promise.all([user, voucher]).spread(function (user, voucher) {
+      if (!voucher) {
+        throw new Promise.OperationalError("Voucher is invalid")
+      }
+
       // Check if voucher is in unlimited mode
       // or has not been claimed too many times
       if ((voucher.limit === null) || (voucher.used < voucher.limit)) {
