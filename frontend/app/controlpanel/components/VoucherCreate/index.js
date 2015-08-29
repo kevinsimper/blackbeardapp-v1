@@ -12,8 +12,7 @@ var ErrorMessage = require('../ErrorMessage/')
 var VoucherCreate = React.createClass({
   mixins: [Navigation],
   getState: function() {
-    return {
-    }
+    return {}
   },
   getInitialState: function() {
     return extend(this.getState(), {

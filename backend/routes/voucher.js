@@ -1,6 +1,7 @@
 var Boom = require('boom')
 var Joi = require('joi')
 var moment = require('moment')
+var _ = require('lodash')
 var Hashids = require('hashids')
 var Promise = require('bluebird')
 var User = Promise.promisifyAll(require('../models/User'))
@@ -79,6 +80,11 @@ exports.getUsedVouchers = {
     var voucherClaimants = VoucherClaimant.find({user: userId}).populate('voucher')
 
     voucherClaimants.then(function (voucherClaimant) {
+      voucherClaimant = _.map(voucherClaimant, function(v) {
+        var claimant = v.toObject()
+        delete claimant.voucher.claimants
+        return claimant
+      })
       reply(voucherClaimant)
     }).catch(function(err) {
       request.log(err)

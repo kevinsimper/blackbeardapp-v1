@@ -2,15 +2,15 @@ var Promise = require('bluebird')
 var passwordHash = require('password-hash')
 var Boom = require('boom')
 var config = require('../config')
-var User = Promise.promisifyAll(require('../models/User'))
+var User = require('../models/User')
 var roles = require('../models/roles/')
 var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
-var Payment = Promise.promisifyAll(require('../models/Payment'))
-var Voucher = Promise.promisifyAll(require('../models/Voucher'))
-var VoucherClaimant = Promise.promisifyAll(require('../models/VoucherClaimant'))
+var Payment = require('../models/Payment')
+var Voucher = require('../models/Voucher')
+var VoucherClaimant = require('../models/VoucherClaimant')
 var Log = require('../models/Log')
 var Joi = require('joi')
 
@@ -312,11 +312,13 @@ exports.getCreditLogs = {
           timestamp: voucherClaimant.claimedAt,
           amount: voucherClaimant.voucher.amount,
           status: 'SUCCESS',
-          source: 'Voucher'
+          source: 'Voucher '+voucherClaimant.voucher.code
         })
       })
 
-      return reply(combined)
+      return reply(_.sortBy(combined, function(n) {
+        return n.timestamp;
+      }))
     })
   }
 }
