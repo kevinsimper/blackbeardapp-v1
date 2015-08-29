@@ -46,7 +46,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   }
 
   server.auth.strategy('jwt', 'jwt', true, {
-    key: config.AUTH_SECRET,
+    key: process.env.AUTH_SECRET,
     validateFunc: function(decoded, request, callback) {
       User.findById(decoded, function(err, user) {
         // check if user is allowed to access that specific route
