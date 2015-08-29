@@ -12,7 +12,7 @@ var store = Reflux.createStore({
   onLoad: function() {
     var self = this
     request
-      .get(config.BACKEND_HOST + '/admin/vouchers')
+      .get(config.BACKEND_HOST + '/vouchers')
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
         actions.load.completed(res.body)
@@ -40,7 +40,7 @@ var store = Reflux.createStore({
       data.note = voucher.note
     }
     request
-      .post(config.BACKEND_HOST + '/admin/vouchers/generate')
+      .post(config.BACKEND_HOST + '/vouchers')
       .set('Authorization', localStorage.token)
       .send(data)
       .end(function(err, res) {

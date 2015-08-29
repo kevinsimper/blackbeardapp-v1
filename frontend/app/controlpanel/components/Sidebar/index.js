@@ -38,7 +38,7 @@ var Sidebar = React.createClass({
             <a className='Sidebar__Link' href="#/vouchers">Vouchers</a>
           </div>
           <div className='Sidebar__Item' style={{padding: 10}}>
-            <Button onClick={auth.logout}>Log ud</Button>
+            <Button onClick={auth.logout}>Log out</Button>
           </div>
         </div>
       </div>

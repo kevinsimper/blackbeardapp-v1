@@ -1,12 +1,14 @@
 var Boom = require('boom')
 var Joi = require('joi')
 var moment = require('moment')
+var _ = require('lodash')
 var Hashids = require('hashids')
 var Promise = require('bluebird')
 var User = Promise.promisifyAll(require('../models/User'))
 var Voucher = Promise.promisifyAll(require('../models/Voucher'))
 var VoucherClaimant = Promise.promisifyAll(require('../models/VoucherClaimant'))
 var Log = Promise.promisifyAll(require('../models/Log'))
+var Payment = Promise.promisifyAll(require('../models/Payment'))
 
 var config = require('../config')
 
@@ -68,6 +70,27 @@ exports.getVouchers = function(request, reply) {
     request.log(err)
     reply(Boom.badImplementation())
   })
+}
+
+exports.getUsedVouchers = {
+  auth: 'jwt',
+  handler: function(request, reply) {
+    var userId = User.getUserIdFromRequest(request)
+
+    var voucherClaimants = VoucherClaimant.find({user: userId}).populate('voucher')
+
+    voucherClaimants.then(function (voucherClaimant) {
+      voucherClaimant = _.map(voucherClaimant, function(v) {
+        var claimant = v.toObject()
+        delete claimant.voucher.claimants
+        return claimant
+      })
+      reply(voucherClaimant)
+    }).catch(function(err) {
+      request.log(err)
+      reply(Boom.badImplementation())
+    })
+  }
 }
 
 // Please note this is anonymous and does not check if the voucher has previously

@@ -1,9 +1,11 @@
 var React = require('react')
 
-module.exports = React.createClass({
+var TextArea = React.createClass({
   render: function() {
     return (
       <textarea className='TextArea' {...this.props}/>
     )
   }
 })
+
+module.exports = TextArea

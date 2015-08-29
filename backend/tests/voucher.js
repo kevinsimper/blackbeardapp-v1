@@ -49,10 +49,10 @@ lab.experiment('/app', function() {
   })
   var voucherCode
   var unlimitedVoucherCode
-  lab.test('POST /admin/vouchers/generate', function(done) {
+  lab.test('POST /vouchers', function(done) {
     request({
       method: 'POST',
-      uri: appUrl + '/admin/vouchers/generate',
+      uri: appUrl + '/vouchers',
       json: true,
       headers: {
         'Authorization': adminToken
@@ -67,7 +67,7 @@ lab.experiment('/app', function() {
 
       return request({
         method: 'POST',
-        uri: appUrl + '/admin/vouchers/generate',
+        uri: appUrl + '/vouchers',
         json: true,
         headers: {
           'Authorization': adminToken
@@ -87,10 +87,10 @@ lab.experiment('/app', function() {
       console.log(err)
     })
   })
-  lab.test('GET /admin/vouchers', function(done) {
+  lab.test('GET /vouchers', function(done) {
     request({
       method: 'GET',
-      uri: appUrl + '/admin/vouchers',
+      uri: appUrl + '/vouchers',
       json: true,
       headers: {
         'Authorization': adminToken
@@ -221,6 +221,40 @@ lab.experiment('/app', function() {
       expect(body.status, 'to equal', 'FAIL')
       expect(body.error.cause, 'to equal', 'Voucher already claimed')
       done()
+    })
+  })
+  lab.test('GET /users/me/vouchers', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/vouchers',
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    }).spread(function(response, body) {
+      // 2 Vouchers should come through here being claimed by regular user
+      expect(body.length, 'to equal', 2)
+
+      done()
+    }).catch(function(err) {
+      console.log(err)
+    })
+  })
+  lab.test('GET /users/me/creditlog', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/creditlogs',
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    }).spread(function(response, body) {
+      // With credit card payment included there are 3 log entries
+      expect(body.length, 'to equal', 3)
+
+      done()
+    }).catch(function(err) {
+      console.log(err)
     })
   })
 })

@@ -257,6 +257,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
 
   server.route({
+    method: 'GET',
+    path: '/users/{user}/creditlogs',
+    config: userRoutes.getCreditLogs
+  }) 
+
+  server.route({
     method: 'POST',
     path: '/forgot',
     config: {
@@ -344,12 +350,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   // Vouchers
   server.route({
     method: 'POST',
-    path: '/admin/vouchers/generate',
+    path: '/vouchers',
     config: voucherRoutes.generateVoucher
   })
   server.route({
     method: 'GET',
-    path: '/admin/vouchers',
+    path: '/vouchers',
     config: {
       auth: 'jwt',
       app: {
@@ -370,6 +376,11 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'POST',
     path: '/users/{user}/vouchers',
     config: voucherRoutes.claimVoucher
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/vouchers',
+    config: voucherRoutes.getUsedVouchers
   })
 
   // Apps
