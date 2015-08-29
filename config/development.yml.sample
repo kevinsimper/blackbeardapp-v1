@@ -8,3 +8,6 @@ common:
     - LOGGLY_SUBDOMAIN=blackbeard
     - LOGGLY_NAME=blackbeard
     - LOGGLY_HOSTNAME=blackbeard.io
+    - MAILGUN_KEY=####
+    - MAILGUN_DOMAIN=####
+    - AUTH_SECRET=####

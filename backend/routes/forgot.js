@@ -4,7 +4,6 @@ var jwt = require('jsonwebtoken')
 var Boom = require('boom')
 var crypto = require('crypto')
 var passwordHash = require('password-hash')
-var config = require('../config')
 
 exports.postForgot = function(request, reply) {
   var email = request.payload.email
@@ -78,7 +77,7 @@ exports.postForgotReset = function(request, reply) {
     }
 
     // Automatically log user in
-    var token = jwt.sign(user._id, config.AUTH_SECRET, {
+    var token = jwt.sign(user._id, process.env.AUTH_SECRET, {
       expiresInMinutes: 1440 // 24h
     });
 

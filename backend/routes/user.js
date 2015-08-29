@@ -1,7 +1,6 @@
 var Promise = require('bluebird')
 var passwordHash = require('password-hash')
 var Boom = require('boom')
-var config = require('../config')
 var User = require('../models/User')
 var roles = require('../models/roles/')
 var jwt = require('jsonwebtoken')
@@ -215,7 +214,7 @@ exports.postLogin = function(request, reply) {
     }
     if (user) {
       if (passwordHash.verify(password, user.password)) {
-        var token = jwt.sign(user._id, config.AUTH_SECRET, {
+        var token = jwt.sign(user._id, process.env.AUTH_SECRET, {
           expiresInMinutes: 1440 // 24h
         });
 
