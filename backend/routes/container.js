@@ -13,6 +13,7 @@ var Queue = require('../services/Queue')
 exports.postContainers = function(request, reply) {
   var appId = request.params.app
   var user = User.getUserIdFromRequest(request)
+  var region = request.payload.region
 
   var app = App.findById(appId)
   var container = app.then(function(app) {
@@ -20,7 +21,7 @@ exports.postContainers = function(request, reply) {
       throw new Promise.OperationalError('could not find app')
     }
     return new Container({
-      region: request.payload.region,
+      region: region,
       status: Container.status.UP,
       app: app,
       createdAt: Math.round(Date.now() / 1000)
@@ -31,9 +32,10 @@ exports.postContainers = function(request, reply) {
     return app.save()
   })
 
-  var sendToWorker = container.then(function(container) {
+  var sendToWorker = Promise.all([container, savingApp]).spread(function(container, savingApp) {
     return Queue.send('container-start', {
-      containerId: container._id
+      containerId: container._id,
+      region: region
     })
   })
 

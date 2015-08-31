@@ -14,7 +14,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var ClusterService = require('./services/Cluster')
     var Container = require('./models/Container')
 
-    var container = Container.findOne(message.containerId)
+    var container = Container.findOne({_id: message.containerId})
     var cluster = ClusterService.getCluster()
     var clusterContainerId = cluster.then(function (cluster) {
       return ClusterService.createContainer(cluster)
