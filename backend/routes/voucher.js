@@ -19,6 +19,7 @@ exports.generateVoucher = {
       email: Joi.string().email(),
       amount: Joi.number(),
       note: Joi.string(),
+      code: Joi.string(),
       limit: Joi.number().allow(null)
     }
   },
@@ -27,34 +28,54 @@ exports.generateVoucher = {
   },
   handler: function(request, reply) {
     var amount = request.payload.amount
-    var email = request.payload.email
-    var note = request.payload.note
+    var email = request.payload.email || null
+    var note = request.payload.note || null
+    var code = request.payload.code || null
     var limit = request.payload.limit
 
-    var lastVoucher = Voucher.findOne().sort('-codePlain')
+    if (limit === undefined) {
+      limit = 1
+    }
 
-    return lastVoucher.then(function(lastVoucher) {
-      var currentCount = 0
-      if (lastVoucher) {
-        currentCount = lastVoucher.codePlain+1
-      }  
+    var voucher = new Voucher({
+      email: email,
+      amount: amount,
+      note: note,
+      limit: limit,
+      createdAt: moment().unix()
+    })
+
+    var newVoucher = voucher.save()
+
+    var newCode = newVoucher.then(function(voucher) {
+      if (code) {
+        return code.toUpperCase().replace(' ', '_').replace(/[^A-Z0-9_]/gi, '');
+      }
 
       var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
-      var code = hashids.encode(currentCount);
+      return hashids.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)]);
+    })
 
-      var voucher = new Voucher({
-        codePlain: currentCount,
-        code: code,
-        email: email,
-        amount: amount,
-        note: note,
-        limit: limit,
-        createdAt: moment().unix()
-      })
+    var existingVoucherWithCode = newCode.then(function(code) {
+      return Voucher.findOne({code: code})
+    })    
 
-      return voucher.save()
-    }).then(function(voucher) {
+    var newVoucherWithCode = Promise.all([newVoucher, newCode, existingVoucherWithCode]).spread(function(newVoucher, newCode, existingVoucherWithCode) {
+      // It does not clash so the code is good to go
+      if (existingVoucherWithCode === null) {
+        newVoucher.code = newCode
+
+        return newVoucher.save()  
+      }
+
+      throw new Promise.OperationalError("Voucher code already taken")
+    })
+
+    return newVoucherWithCode.then(function(voucher) {
       reply(voucher)
+    }).error(function (err) {
+      request.log(err)
+      reply(Boom.badRequest())
     }).catch(function(err) {
       request.log(err)
       reply(Boom.badImplementation())
@@ -135,6 +156,10 @@ exports.claimVoucher = {
     var voucher = Voucher.findOne({code: code.toUpperCase()}).populate('claimants')
 
     var voucherClaimant = Promise.all([user, voucher]).spread(function (user, voucher) {
+      if (!voucher) {
+        throw new Promise.OperationalError("Voucher is invalid")
+      }
+
       // Check if voucher is in unlimited mode
       // or has not been claimed too many times
       if ((voucher.limit === null) || (voucher.used < voucher.limit)) {

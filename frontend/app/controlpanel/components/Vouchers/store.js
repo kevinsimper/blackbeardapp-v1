@@ -39,6 +39,9 @@ var store = Reflux.createStore({
     if (voucher.note) {
       data.note = voucher.note
     }
+    if (voucher.code) {
+      data.code = voucher.code
+    }
     request
       .post(config.BACKEND_HOST + '/vouchers')
       .set('Authorization', localStorage.token)
@@ -50,6 +53,20 @@ var store = Reflux.createStore({
   onNewCompleted: function(data) {
     _vouchers.push(data)
     this.trigger(data)
+  },
+  onClaim: function(voucher) {
+    request
+    .post(config.BACKEND_HOST + '/users/me/vouchers')
+    .set('Authorization', localStorage.token)
+    .send({
+      code: voucher
+    })
+    .end(function(err, res) {
+      actions.claim.completed(res.body)
+    })
+  },
+  onClaimCompleted: function(data) {
+    this.trigger(data.status)
   },
 })
 

@@ -4,7 +4,6 @@ var mongooseDelete = require('mongoose-delete')
 var schema = new mongoose.Schema({
 	limit: { type: Number, default: 1 }, // Default to single voucher claimant
 	used: { type: Number, default: 0 }, // Default to unused
-	codePlain: Number,
   code: String,
   email: String,
   amount: Number,

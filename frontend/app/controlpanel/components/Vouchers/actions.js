@@ -7,4 +7,7 @@ module.exports = Reflux.createActions({
   'new': {
     asyncResult: true
   },
+  'claim': {
+    asyncResult: true
+  }
 })

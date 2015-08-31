@@ -57,6 +57,10 @@ var VoucherShow = React.createClass({
               <td>${this.state.voucher.amount/100}</td>
             </tr>
             <tr>
+              <td>Code</td>
+              <td>{this.state.voucher.code}</td>
+            </tr>
+            <tr>
               <td>Note</td>
               <td>{this.state.voucher.note}</td>
             </tr>
