@@ -27,34 +27,51 @@ exports.generateVoucher = {
   },
   handler: function(request, reply) {
     var amount = request.payload.amount
-    var email = request.payload.email
-    var note = request.payload.note
+    var email = request.payload.email || null
+    var note = request.payload.note || null
     var limit = request.payload.limit
 
-    var lastVoucher = Voucher.findOne().sort('-codePlain')
+    if (limit === undefined) {
+      limit = 1
+    }
 
-    return lastVoucher.then(function(lastVoucher) {
-      var currentCount = 0
-      if (lastVoucher) {
-        currentCount = lastVoucher.codePlain+1
-      }  
+    var voucher = new Voucher({
+      email: email,
+      amount: amount,
+      note: note,
+      limit: limit,
+      createdAt: moment().unix()
+    })
 
+    var newVoucher = voucher.save()
+
+    var code = newVoucher.then(function(voucher) {
       var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
-      var code = hashids.encode(currentCount);
+      var code = hashids.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)]);
 
-      var voucher = new Voucher({
-        codePlain: currentCount,
-        code: code,
-        email: email,
-        amount: amount,
-        note: note,
-        limit: limit,
-        createdAt: moment().unix()
-      })
+      return code
+    })
 
-      return voucher.save()
-    }).then(function(voucher) {
+    var existingVoucherWithCode = code.then(function(code) {
+      return Voucher.findOne({code: code})
+    })    
+
+    var newVoucherWithCode = Promise.all([newVoucher, code, existingVoucherWithCode]).spread(function(newVoucher, code, existingVoucherWithCode) {
+      // It does not clash so the code is good to go
+      if (existingVoucherWithCode === null) {
+        newVoucher.code = code
+
+        return newVoucher.save()  
+      }
+
+      throw new Promise.OperationalError("Voucher code already taken")
+    })
+
+    return newVoucherWithCode.then(function(voucher) {
       reply(voucher)
+    }).error(function (err) {
+      request.log(err)
+      reply(Boom.badRequest())
     }).catch(function(err) {
       request.log(err)
       reply(Boom.badImplementation())

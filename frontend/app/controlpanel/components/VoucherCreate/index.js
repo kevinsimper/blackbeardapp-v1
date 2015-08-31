@@ -59,6 +59,11 @@ var VoucherCreate = React.createClass({
       email: e.target.value
     })
   },
+  onChangeCode: function(e) {
+    this.setState({
+      code: e.target.value
+    })
+  },
   onSubmit: function(e) {
     e.preventDefault()
     var self = this
@@ -96,6 +101,8 @@ var VoucherCreate = React.createClass({
     return (
       <form className="Voucher" onSubmit={this.onSubmit}>
         <h1>Create Voucher</h1>
+        <Label>Code*</Label>
+        <Input type="text" value={this.state.code} onChange={this.onChangeCode} />
         <Label>Amount*</Label>
         <Input type="text" value={this.state.amount} onChange={this.onChangeAmount} />
         <Label>Usage</Label>
