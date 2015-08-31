@@ -6,6 +6,7 @@ var Button = require('../../components/Button/')
 var CreditcardsFormular = require('../../components/CreditcardsFormular/')
 var Creditcards = require('../../components/Creditcards/')
 var PreviousPayments = require('../PreviousPayments/')
+var VoucherClaim = require('../VoucherClaim/')
 var ProfileActions = require('./actions')
 var moment = require('moment')
 
@@ -73,6 +74,7 @@ var Profile = React.createClass({
           {moment.unix(this.state.timestamp).format()}
         <Creditcards/>
         <CreditcardsFormular/>
+        <VoucherClaim/>
         <PreviousPayments/>
       </div>
     );
