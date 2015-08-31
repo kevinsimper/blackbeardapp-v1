@@ -7,6 +7,7 @@ var _ = require('lodash')
 var moment = require('moment')
 var config = require('../config')
 var ClusterService = require('../services/Cluster')
+var Queue = require('../services/Queue')
 
 
 exports.postContainers = function(request, reply) {
@@ -30,6 +31,8 @@ exports.postContainers = function(request, reply) {
     return app.save()
   })
 
+  var sendToWorker = Queue.send('container', 'start')
+
   var cluster = ClusterService.getCluster()
   var containerId = cluster.then(function (cluster) {
     return ClusterService.createContainer(cluster)
@@ -52,7 +55,8 @@ exports.postContainers = function(request, reply) {
       }
     })
 
-  Promise.all([container, savingApp, savedDetails]).spread(function (container, savedApp, savedDetails) {
+  Promise.all([container, savingApp, savedDetails, sendToWorker])
+  .spread(function (container, savedApp, savedDetails) {
     reply(container)
   }).error(function (err) {
     request.log(['mongo'], err.message)
