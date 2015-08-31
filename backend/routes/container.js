@@ -31,31 +31,13 @@ exports.postContainers = function(request, reply) {
     return app.save()
   })
 
-  var sendToWorker = Queue.send('container', 'start')
-
-  var cluster = ClusterService.getCluster()
-  var containerId = cluster.then(function (cluster) {
-    return ClusterService.createContainer(cluster)
-  })
-  var started = Promise.all([cluster, containerId]).spread(function (cluster, containerId) {
-    return ClusterService.startContainer(cluster, containerId)
+  var sendToWorker = container.then(function(container) {
+    return Queue.send('container-start', {
+      containerId: container._id
+    })
   })
 
-  var savedDetails = Promise.all([container, cluster, containerId, started])
-    .spread(function (container, cluster, containerId, started) {
-      container.cluster = cluster
-      container.containerHash = containerId
-      return container.save()
-    })
-    .catch(function (err) {
-      if(process.env.NODE_ENV === 'production') {
-        throw err
-      } else {
-        console.warn('No cluster attached', err.stack)
-      }
-    })
-
-  Promise.all([container, savingApp, savedDetails, sendToWorker])
+  Promise.all([container, savingApp, sendToWorker])
   .spread(function (container, savedApp, savedDetails) {
     reply(container)
   }).error(function (err) {
