@@ -23,6 +23,7 @@ backend:
    - ./backend/:/app
   links:
    - db
+   - rabbitmq
 
 router:
   environment:
@@ -60,3 +61,9 @@ registryproxy:
    - "9500:9500"
   volumes:
    - ./registryproxy/:/app
+
+rabbitmq:
+  image: rabbitmq:3.5-management
+  ports:
+    - "5672:5672"
+    - "15672:15672"

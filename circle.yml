@@ -22,6 +22,7 @@ dependencies:
 test:
   override:
     - sudo service mongodb stop
+    - sudo service rabbitmq-server stop
     - ./docker-compose up -d
     - sleep 3
     - ./docker-compose run backend /bin/bash -c "npm install && npm test"
