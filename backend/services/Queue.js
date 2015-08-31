@@ -23,7 +23,10 @@ exports.consume = function (queue, callback) {
   return this.connect().then(function (connection) {
     return connection.createChannel()
   }).then(function (channel) {
-    channel.assertQueue(queue)
+    channel.assertQueue(queue, {
+      durable: true
+    })
+    channel.prefetch(1)
     channel.consume(queue, function (message) {
       var ackCallback = function (channel, message) {
         return function () {
