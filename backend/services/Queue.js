@@ -1,10 +1,9 @@
 var amqplib = require('amqplib')
 var Promise = require('bluebird')
+var config = require('../config')
 
-var connect = function () {
-  var url = 'amqp://' + process.env.RABBITMQ_PORT.replace('tcp://', '')
-  console.log('url', url)
-  return amqplib.connect(url)
+exports.connect = function () {
+  return amqplib.connect(config.RABBITMQ_URL)
 }
 
 /**
@@ -12,7 +11,7 @@ var connect = function () {
 * @params {string} message
 */
 exports.send = function (queue, message) {
-  return connect().then(function (connection) {
+  return this.connect().then(function (connection) {
     return connection.createChannel()
   }).then(function (channel) {
     channel.assertQueue(queue)
@@ -21,7 +20,7 @@ exports.send = function (queue, message) {
 }
 
 exports.consume = function (queue, callback) {
-  return connect().then(function (connection) {
+  return this.connect().then(function (connection) {
     return connection.createChannel()
   }).then(function (channel) {
     channel.assertQueue(queue)

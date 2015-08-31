@@ -3,6 +3,7 @@ common:
     - DB_HOST=127.0.0.1:27017
     - BACKEND_HOST=http://blackbeard.dev:8000
     - ROUTER_HOST=http://blackbeard.dev:9500
+    - RABBITMQ_URL=####
     - STRIPE_SECRET=####
     - LOGGLY_TOKEN=####
     - LOGGLY_SUBDOMAIN=blackbeard
