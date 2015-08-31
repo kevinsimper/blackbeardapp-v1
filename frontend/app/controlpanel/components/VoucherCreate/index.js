@@ -21,7 +21,9 @@ var VoucherCreate = React.createClass({
       note: '',
       limit: '1',
       email: '',
-      unlimited: false
+      unlimited: false,
+      code: '',
+      autoCode: true
     })
   },
   onChange: function() {
@@ -64,6 +66,11 @@ var VoucherCreate = React.createClass({
       code: e.target.value
     })
   },
+  onChangeAutoCode: function(e) {
+    this.setState({
+      autoCode: !this.state.autoCode
+    })
+  },
   onSubmit: function(e) {
     e.preventDefault()
     var self = this
@@ -77,6 +84,17 @@ var VoucherCreate = React.createClass({
       }
     } else {
       this.state.limit = null
+    }
+
+    if (!this.state.autoCode) {
+      if (this.state.code === "") {
+        this.setState({
+          status: 'You must input a custom code'
+        })
+        return false
+      }
+    } else {
+      this.state.code = null
     }
 
     if(!this.state.amount) {
@@ -102,7 +120,16 @@ var VoucherCreate = React.createClass({
       <form className="Voucher" onSubmit={this.onSubmit}>
         <h1>Create Voucher</h1>
         <Label>Code*</Label>
-        <Input type="text" value={this.state.code} onChange={this.onChangeCode} />
+        <div>
+          <span>Automatically generated </span>
+          <input type="checkbox" name="autoCode" checked={this.state.autoCode} onChange={this.onChangeAutoCode}/>
+        </div>
+        {!this.state.autoCode &&
+        <div>
+         <span>Custom code </span>
+         <Input type="text" value={this.state.code} onChange={this.onChangeCode} />
+        </div>
+        }
         <Label>Amount*</Label>
         <Input type="text" value={this.state.amount} onChange={this.onChangeAmount} />
         <Label>Usage</Label>

@@ -74,6 +74,7 @@ lab.experiment('/app', function() {
         },
         body: {
           amount: VOUCHER_AMOUNT,
+          code: "UNLIM_TEST",
           note: "This is an unlimited voucher.",
           limit: null
         }

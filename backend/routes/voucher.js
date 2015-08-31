@@ -19,6 +19,7 @@ exports.generateVoucher = {
       email: Joi.string().email(),
       amount: Joi.number(),
       note: Joi.string(),
+      code: Joi.string(),
       limit: Joi.number().allow(null)
     }
   },
@@ -29,6 +30,7 @@ exports.generateVoucher = {
     var amount = request.payload.amount
     var email = request.payload.email || null
     var note = request.payload.note || null
+    var code = request.payload.code || null
     var limit = request.payload.limit
 
     if (limit === undefined) {
@@ -45,21 +47,23 @@ exports.generateVoucher = {
 
     var newVoucher = voucher.save()
 
-    var code = newVoucher.then(function(voucher) {
-      var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
-      var code = hashids.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)]);
+    var newCode = newVoucher.then(function(voucher) {
+      if (code) {
+        return code.toUpperCase().replace(' ', '_').replace(/[^A-Z0-9_]/gi, '');
+      }
 
-      return code
+      var hashids = new Hashids("saltySALT", 8, "ABCDEFGHIJKMNPQRSTUVWXYZ23456789");
+      return hashids.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)]);
     })
 
-    var existingVoucherWithCode = code.then(function(code) {
+    var existingVoucherWithCode = newCode.then(function(code) {
       return Voucher.findOne({code: code})
     })    
 
-    var newVoucherWithCode = Promise.all([newVoucher, code, existingVoucherWithCode]).spread(function(newVoucher, code, existingVoucherWithCode) {
+    var newVoucherWithCode = Promise.all([newVoucher, newCode, existingVoucherWithCode]).spread(function(newVoucher, newCode, existingVoucherWithCode) {
       // It does not clash so the code is good to go
       if (existingVoucherWithCode === null) {
-        newVoucher.code = code
+        newVoucher.code = newCode
 
         return newVoucher.save()  
       }

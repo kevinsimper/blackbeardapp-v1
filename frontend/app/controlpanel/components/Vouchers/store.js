@@ -39,6 +39,9 @@ var store = Reflux.createStore({
     if (voucher.note) {
       data.note = voucher.note
     }
+    if (voucher.code) {
+      data.code = voucher.code
+    }
     request
       .post(config.BACKEND_HOST + '/vouchers')
       .set('Authorization', localStorage.token)
