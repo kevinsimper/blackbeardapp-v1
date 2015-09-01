@@ -5,16 +5,16 @@ var AppsActions = require('../Apps/actions')
 
 var ContainerItem = React.createClass({
   stopContainer: function() {
-    ContainerActions.stopOne(this.props.app, this.props.container._id)
+    ContainerActions.delOne(this.props.app, this.props.container._id)
+  },
+  getContainerButton: function () {
+    if (this.props.container.status === 'UP') {
+      return <Button onClick={this.stopContainer}>Stop</Button>
+    } else {
+      return <Button>Start</Button>
+    }
   },
   render: function() {
-    var containerButton
-    if ((this.props.container.status === 'Running') || (this.props.container.status === 'Starting')) {
-      containerButton = <Button onClick={this.stopContainer}>Stop</Button>
-    } else {
-      containerButton = <Button>Start</Button>
-    }
-
     return (
       <tr>
         <td>{this.props.container.region}</td>
@@ -24,7 +24,7 @@ var ContainerItem = React.createClass({
             {this.props.container.ip}:{this.props.container.port}
           </a>
         </td>
-        <td>{containerButton}</td>
+        <td>{this.getContainerButton()}</td>
       </tr>
     );
   }

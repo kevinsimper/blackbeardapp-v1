@@ -63,11 +63,11 @@ var AppShow = React.createClass({
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>Created: {moment.unix(this.state.app.timestamp).format()}</div>
-        <Containers app={this.state.app._id} />
         <div>
           <Button onClick={this.onClickStart}>Start containers</Button>
           <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
         </div>
+        <Containers app={this.state.app._id} />
         <AppLogs app={this.state.app._id} />
       </div>
     );

@@ -23,7 +23,6 @@ var store = Reflux.createStore({
   },
   onLoadOneCompleted: function(app, data) {
     _containers[app] = data
-
     this.trigger(data)
   },
   getOne: function(app) {
@@ -33,7 +32,7 @@ var store = Reflux.createStore({
       return _containers[app];
     }
   },
-  onStopOne: function(app, container) {
+  onDelOne: function(app, container) {
     remove(_containers[app], function(item) {
       return item._id === container
     })
@@ -43,9 +42,9 @@ var store = Reflux.createStore({
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
         if(err) {
-          return actions.stopOne.failed(err)
+          return actions.delOne.failed(err)
         }
-        actions.stopOne.completed(app, container)
+        actions.delOne.completed(app, container)
       })
   }
 })
