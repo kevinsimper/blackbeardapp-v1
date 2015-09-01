@@ -17,7 +17,6 @@ var ContainerItem = React.createClass({
   render: function() {
     return (
       <tr>
-        <td>{this.props.container.region}</td>
         <td>{this.props.container.status}</td>
         <td>
           <a target='_BLANK' href={'http://' + this.props.container.ip + ':' + this.props.container.port}>

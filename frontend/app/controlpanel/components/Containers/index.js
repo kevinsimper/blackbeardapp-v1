@@ -65,7 +65,7 @@ var Containers = React.createClass({
             })}
             {!runningContainers.length &&
               <tr>
-                <td colspan='3'>
+                <td colSpan='3'>
                   No containers running
                 </td>
               </tr>
