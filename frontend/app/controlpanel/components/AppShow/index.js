@@ -10,6 +10,7 @@ var AppLogs = require('../AppLogs/')
 var Containers = require('../Containers/')
 var Button = require('../Button/')
 var StatusIcon = require('../StatusIcon/')
+var TimeSince = require('../TimeSince/')
 
 var AppShow = React.createClass({
   mixins: [Navigation],
@@ -62,7 +63,10 @@ var AppShow = React.createClass({
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
-        <div>Created: {moment.unix(this.state.app.timestamp).format()}</div>
+        <div>
+          <span>Created&nbsp;</span>
+          <TimeSince timestamp={this.state.app.timestamp}/>
+        </div>
         <div>
           <Button onClick={this.onClickStart}>Start containers</Button>
           <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
