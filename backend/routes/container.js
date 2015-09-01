@@ -145,7 +145,7 @@ exports.deleteContainers = function(request, reply) {
     })
   }
 
-  Container.findByIdAndRole(containerId, role, function(err, container) {
+  Container.findOneByRole(containerId, role, function(err, container) {
     if (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
@@ -171,7 +171,7 @@ exports.getContainer = function(request, reply) {
       return reply(Boom.notFound('The specified app could not be found.'))
     }
 
-    Container.findByIdAndRole(container, role, function(err, container) {
+    Container.findOneByRole(container, role, function(err, container) {
       if (err) {
         request.log(['mongo'], err)
         return reply(Boom.badImplementation('There was a problem with the database'))
