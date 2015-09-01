@@ -57,9 +57,6 @@ var store = Reflux.createStore({
     request
       .post(config.BACKEND_HOST + '/users/me/apps/' + id + '/containers')
       .set('Authorization', localStorage.token)
-      .send({
-        region: container.region
-      })
       .end(function(err, res) {
         if(err) {
           return actions.newContainer.failed(err)
@@ -69,6 +66,9 @@ var store = Reflux.createStore({
   },
   onNewContainerCompleted: function(id, container) {
     var app = this.getOneApp(id)
+    if(!app) {
+      location = '#/apps/' + id
+    }
     if(app.containers) {
       app.containers.push(container)
     } else {
