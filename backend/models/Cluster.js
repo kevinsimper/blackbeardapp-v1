@@ -9,7 +9,9 @@ var schema = new mongoose.Schema({
   certificates: {
     ca: String,
     cert: String,
-    key: String
+    key: String,
+    sshPublic: String,
+    sshPrivate: String
   },
   deleted: { type: Boolean, default: false },
   deletedAt: String,

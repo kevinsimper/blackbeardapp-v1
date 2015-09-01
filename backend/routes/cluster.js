@@ -21,7 +21,9 @@ exports.postCluster = {
       ca: Joi.string(),
       cert: Joi.string(),
       key: Joi.string(),
-      ip: Joi.string()
+      ip: Joi.string(),
+      sshPublic: Joi.string(),
+      sshPrivate: Joi.string()
     }
   },
   handler: function (request, reply) {
@@ -31,6 +33,8 @@ exports.postCluster = {
     var cert = request.payload.cert
     var key = request.payload.key
     var ip = request.payload.ip
+    var sshPublic = request.payload.sshPublic
+    var sshPrivate = request.payload.sshPrivate
 
     new Cluster({
       type: type,
@@ -38,7 +42,9 @@ exports.postCluster = {
       certificates: {
         ca: ca,
         cert: cert,
-        key: key
+        key: key,
+        sshPublic: sshPublic,
+        sshPrivate: sshPrivate
       },
       ip: ip
     }).saveAsync().then(function (cluster) {

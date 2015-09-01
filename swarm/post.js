@@ -35,13 +35,17 @@ process.stdin.on('end', function() {
   var certPem = new Buffer(envDecoded['cert.pem'], 'base64').toString()
   var caPem = new Buffer(envDecoded['ca.pem'], 'base64').toString()
   var keyPem = new Buffer(envDecoded['key.pem'], 'base64').toString()
+  var idRSA = new Buffer(envDecoded['id_rsa'], 'base64').toString()
+  var idRSAPub = new Buffer(envDecoded['id_rsa.pub'], 'base64').toString()
 
   req.write(JSON.stringify({
     type: 'swarm',
     machines: 3,
     ca: caPem,
     cert: certPem,
-    key: keyPem
+    key: keyPem,
+    sshPrivate: idRSA,
+    sshPublic: idRSAPub
   }))
 
   req.end()  
