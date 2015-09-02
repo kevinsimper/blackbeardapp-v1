@@ -95,6 +95,9 @@ module.exports = {
       })
 
       if (activeCard) {
+        // This code dictates how much the user is charged.
+        // A note has been placed on the wiki about it here:
+        // https://github.com/kevinsimper/blackbeardapp/wiki/Charging-Users
         var leftover = user.credit - amountUsed
         var paymentCount = 0
         while (leftover < 0) {
@@ -129,7 +132,6 @@ module.exports = {
       user.virtualCredit = user.credit - amountUsed
 
       return user.saveAsync().spread(function(user) {
-        console.log(user)
         return 'did not charge'
       })
     }
