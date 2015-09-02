@@ -67,3 +67,18 @@ rabbitmq:
   ports:
     - "5672:5672"
     - "15672:15672"
+
+worker:
+  environment:
+    NODE_ENV: development
+    DEBUG: queue
+  extends:
+    file: config/development.yml
+    service: common
+  image: blackbeardapp_backend
+  command: node worker
+  volumes:
+   - ./backend/:/app
+  links:
+   - rabbitmq
+   - db

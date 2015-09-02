@@ -23,8 +23,12 @@ test:
   override:
     - sudo service mongodb stop
     - sudo service rabbitmq-server stop
-    - ./docker-compose up -d
+    - ./docker-compose build frontend
+    - ./docker-compose build backend
+    - ./docker-compose build registryproxy
+    - ./docker-compose build router
     - sleep 3
+    - ./docker-compose up -d 
     - ./docker-compose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose start backend
     - ./docker-compose run registryproxy /bin/bash -c "npm install && npm test"

@@ -13,6 +13,7 @@ var Queue = require('../services/Queue')
 exports.postContainers = function(request, reply) {
   var appId = request.params.app
   var user = User.getUserIdFromRequest(request)
+  var region = request.payload.region
 
   var app = App.findById(appId)
   var container = app.then(function(app) {
@@ -20,7 +21,7 @@ exports.postContainers = function(request, reply) {
       throw new Promise.OperationalError('could not find app')
     }
     return new Container({
-      region: request.payload.region,
+      region: region,
       status: Container.status.UP,
       app: app,
       createdAt: Math.round(Date.now() / 1000)
@@ -31,31 +32,14 @@ exports.postContainers = function(request, reply) {
     return app.save()
   })
 
-  var sendToWorker = Queue.send('container', 'start')
-
-  var cluster = ClusterService.getCluster()
-  var containerId = cluster.then(function (cluster) {
-    return ClusterService.createContainer(cluster)
-  })
-  var started = Promise.all([cluster, containerId]).spread(function (cluster, containerId) {
-    return ClusterService.startContainer(cluster, containerId)
+  var sendToWorker = Promise.all([container, savingApp]).spread(function(container, savingApp) {
+    return Queue.send('container-start', {
+      containerId: container._id,
+      region: region
+    })
   })
 
-  var savedDetails = Promise.all([container, cluster, containerId, started])
-    .spread(function (container, cluster, containerId, started) {
-      container.cluster = cluster
-      container.containerHash = containerId
-      return container.save()
-    })
-    .catch(function (err) {
-      if(process.env.NODE_ENV === 'production') {
-        throw err
-      } else {
-        console.warn('No cluster attached', err.stack)
-      }
-    })
-
-  Promise.all([container, savingApp, savedDetails, sendToWorker])
+  Promise.all([container, savingApp, sendToWorker])
   .spread(function (container, savedApp, savedDetails) {
     reply(container)
   }).error(function (err) {
