@@ -13,11 +13,43 @@ Promise.all([mongo, rabbitmq]).then(function () {
   Queue.consume('container-start', function (message, ack) {
     var ClusterService = require('./services/Cluster')
     var Container = require('./models/Container')
+    var App = require('./models/App')
+    var Image = require('./models/Image')
+    var User = require('./models/User')
+    var sequest = require('sequest')
 
     var container = Container.findOne({_id: message.containerId})
     var cluster = ClusterService.getCluster()
-    var clusterContainerId = cluster.then(function (cluster) {
-      return ClusterService.createContainer(cluster)
+    var app = container.then(function(container) {
+      return App.findOne({_id: container.app})
+    })
+    var user = app.then(function (app) {
+      return User.findOne({_id: app.user})
+    })
+    var image = app.then(function(app) {
+      return Image.findOne({_id: app.image}).then(function(image) {
+        return image
+      })
+    })
+
+    var registry = 'registry.blackbeard.dev:9500'
+    var pullImage = Promise.all([cluster, image, user]).spread(function (cluster, image, user) {
+      var fullPath = registry + '/' + user.username + '/' + image.name
+      console.log('pull path', fullPath)
+      return new Promise(function (resolve, reject) {
+        sequest('docker@' + cluster.ip, {
+          command: 'docker login -u blackbeard -p password -e kevin.simper@gmail.com registry.blackbeard.dev:9500 && docker pull ' + fullPath,
+          privateKey: cluster.certificates.sshPrivate
+        }, function (err, stdout) {
+          console.log(err)
+          console.log(stdout)
+          resolve(stdout)
+        })
+      })
+    })
+
+    var clusterContainerId = Promise.all([cluster, user, image, pullImage]).spread(function (cluster, user, image, pullImage) {
+      return ClusterService.createContainer(cluster, registry + '/' + user.username + '/' + image.name + ':latest')
     })
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {

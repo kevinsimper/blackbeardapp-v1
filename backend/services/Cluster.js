@@ -35,14 +35,11 @@ exports.request = function (cluster, uri, method, json) {
 * @params {Object} cluster
 * @returns {String} container id
 */
-exports.createContainer = function (cluster) {
+exports.createContainer = function (cluster, image) {
   var self = this
   var uri = '/containers/create'
   return self.request(cluster, uri, 'POST', {
-    Image: 'nginx',
-    ExposedPorts: {
-     '80/tcp': {}
-    },
+    Image: image,
     HostConfig: {
       'PublishAllPorts': true
     }
