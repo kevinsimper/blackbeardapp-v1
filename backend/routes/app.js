@@ -3,12 +3,13 @@ var ObjectId = require('mongodb').ObjectID
 var _ = require('lodash')
 var User = require('../models/User')
 var UserRoles = require('../models/roles/')
-var App = Promise.promisifyAll(require('../models/App'))
-var Image = Promise.promisifyAll(require('../models/Image'))
-var Billing = Promise.promisifyAll(require('../services/Billing'))
+var App = require('../models/App')
+var Image = require('../models/Image')
+var Billing = require('../services/Billing')
 var Container = require('../models/Container')
-var Boom = require('boom')
 var moment = require('moment')
+var Boom = require('boom')
+var Joi = require('joi')
 
 var config = require('../config')
 
@@ -39,40 +40,45 @@ exports.search = function(request, reply) {
   })
 }
 
-exports.postApp = function(request, reply) {
-  var name = request.payload.name
-  var image = request.payload.image
-  var user = User.getUserIdFromRequest(request)
-
-  if (!name) {
-    return reply(Boom.badRequest('You must supply an application name.'))
-  }
-
-  if (!image) {
-    return reply(Boom.badRequest('You must supply an image to base your application on.'))
-  }
-
-  var insertCallback = function(err, app) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
+exports.postApp = {
+  auth: 'jwt',
+  validate: {
+    payload: {
+      name: Joi.string().required(),
+      image: Joi.string().required()
     }
-    reply(app)
-  }
+  },
+  handler: function(request, reply) {
+    var name = request.payload.name
+    var image = request.payload.image
+    var user = User.getUserIdFromRequest(request)
 
-  var newApp = new App({
-    name: name,
-    image: image,
-    user: user,
-    timestamp: Math.round(Date.now() / 1000)
-  })
-  newApp.save(function(err, app) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    reply(app)
-  })
+    App.findAsync({name: name}).then(function(app) {
+      if (app.length) {
+        throw new Promise.OperationalError('There is already an App with this name')
+      }
+
+      // Cleanse name
+      name = name.replace(/[^a-zA-Z0-9-]/g, '')
+
+      var newApp = new App({
+        name: name,
+        image: image,
+        user: user,
+        timestamp: Math.round(Date.now() / 1000)
+      })
+
+      return newApp.saveAsync()
+    }).then(function(app) {
+      reply(app[0])
+    }).error(function(err) {
+      request.log(err)
+      reply(Boom.badRequest(err.cause))
+    }).catch(function(err) {
+      request.log(err)
+      reply(Boom.badImplementation('There was a problem with the database'))
+    })
+  }
 }
 
 exports.putApp = function(request, reply) {

@@ -56,24 +56,42 @@ lab.experiment('/app', function() {
     }).spread(function (response, body) {
       return body[0]
     })
-    image.then(function (image) {
-      var requestData = {
-        name: 'testapp',
-        image: image._id
-      }
+
+    var newApp = image.then(function (image) {
       return request({
         method: 'POST',
         uri: appUrl + '/users/me/apps',
         headers: {
           'Authorization': token
         },
-        body: requestData,
+        body: {
+          name: 'testa!!!@#!@#pp-new',
+          image: image._id
+        },
         json: true
       })
     }).spread(function (response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body.name, 'to be', 'testapp')
+      expect(body.name, 'to be', 'testapp-new')
       appId = body._id
+    })
+
+    Promise.all([image, newApp]).spread(function(image) {
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/apps',
+        headers: {
+          'Authorization': token
+        },
+        body: {
+          name: 'testapp-new',
+          image: image._id
+        },
+        json: true
+      })
+    }).spread(function(response, body) {
+      expect(body.message, 'to be', 'There is already an App with this name')
+
       done()
     })
   })
@@ -206,7 +224,7 @@ lab.experiment('/app/containers', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
-        expect(body.name, 'to be', requestData.name)
+        expect(body.name, 'to be', 'TestAppContainer')
         appId = body._id
         done()
       })
