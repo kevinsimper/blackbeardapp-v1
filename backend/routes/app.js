@@ -53,15 +53,24 @@ exports.postApp = {
     var image = request.payload.image
     var user = User.getUserIdFromRequest(request)
 
-    var newApp = new App({
-      name: name,
-      image: image,
-      user: user,
-      timestamp: Math.round(Date.now() / 1000)
-    })
+    App.findAsync({name: name}).then(function(app) {
+      if (app.length) {
+        throw new Promise.OperationalError('There is already an App with this name')
+      }
 
-    newApp.saveAsync().then(function(app) {
+      var newApp = new App({
+        name: name,
+        image: image,
+        user: user,
+        timestamp: Math.round(Date.now() / 1000)
+      })
+
+      return newApp.saveAsync()
+    }).then(function(app) {
       reply(app[0])
+    }).error(function(err) {
+      request.log(err)
+      reply(Boom.badRequest(err))
     }).catch(function(err) {
       request.log(err)
       reply(Boom.badImplementation('There was a problem with the database'))
