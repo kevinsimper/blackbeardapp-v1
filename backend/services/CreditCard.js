@@ -115,6 +115,7 @@ module.exports = {
     var chargeName = options.message
     var chargeAmount = options.amount
     var remoteAddr = options.remoteAddr || '127.0.0.1'
+    var balance = options.balance
 
     var creditcard = CreditCard.findOne({_id: cardId})
     var user = User.findOne({_id: userId})
@@ -148,7 +149,8 @@ module.exports = {
         }
 
         charge = newCharge
-        user.credit += newCharge.amount
+        user.credit = balance
+        user.virtualCredit = balance
 
         return user.save()
       }).then(function (savedUser) {

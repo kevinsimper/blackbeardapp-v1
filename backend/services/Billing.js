@@ -12,6 +12,8 @@ var CreditCardService = require('../services/CreditCard')
 var Boom = require('boom')
 
 module.exports = {
+  topUpInterval: 1000,
+
   diffHours: function (a, b) {
     return Math.ceil(a.diff(b)/1000/60/60)
   },
@@ -80,27 +82,43 @@ module.exports = {
   },
   chargeHours: function (user, hours) {
     var self = this
-      if (user.creditCards.length === 0) {
-        return 'has no creditcards'
-      }
 
-      var amountUsed = self.calculateHoursPrice() * hours
+    if (user.creditCards.length === 0) {
+      return Promise.resolve('has no creditcards')
+    }
 
+    var amountUsed = self.calculateHoursPrice() * hours
+
+    // Set virtualcredit
+    user.virtualCredit = user.virtualCredit-amountUsed
+
+    return user.saveAsync().spread(function(user, unknown) {
       if (amountUsed > user.credit) {
         var activeCard = _.find(user.creditCards, function (cc) {
           return cc.active === true
         })
 
         if (activeCard) {
-          var amount = (amountUsed - user.credit) + 1000
+          var leftover = user.credit - amountUsed
+          var paymentCount = 0
+          while (leftover < 0) {
+            leftover += self.topUpInterval
+
+            paymentCount++
+          }
+
+          var amount = paymentCount*self.topUpInterval
+
           return CreditCardService.chargeCreditCard({
             user: user._id,
             card: activeCard._id,
             message: "Automatic Topup",
-            amount: amount
+            amount: amount,
+            balance: (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
           }).then(function (result) {
             if (result && result.paymentId) {
               return 'did charge'
+
             } else {
               return 'charging error'
             }
@@ -113,5 +131,6 @@ module.exports = {
       } else {
         return 'did not charge'
       }
+    })
   }
 }
