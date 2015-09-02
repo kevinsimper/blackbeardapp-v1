@@ -21,30 +21,12 @@ schema.statics.findByIds = function (ids, cb) {
 }
 
 schema.statics.findByIdsAndRole = function (ids, role, cb) {
-  // As default do not show deleted
-  var conditions = {
-    deleted: false
-  }
-
-  if(roles.isAllowed(roles.ADMIN, role)) {
-    // Show deleted and not deleted to admins
-    conditions = {}
-  }
-
+  var conditions = {}
   return this.where({'_id': { $in: ids }}).where(conditions).find(cb)
 }
 
-schema.statics.findByIdAndRole = function (id, role, cb) {
-  // As default do not show deleted
-  var conditions = {
-    deleted: false
-  }
-
-  if(roles.isAllowed(roles.ADMIN, role)) {
-    // Show deleted and not deleted to admins
-    conditions = {}
-  }
-
+schema.statics.findOneByRole = function (id, role, cb) {
+  var conditions = {}
   return this.where({'_id': id}).where(conditions).findOne(cb)
 }
 

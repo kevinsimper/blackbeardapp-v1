@@ -299,7 +299,7 @@ lab.experiment('/app/containers', function() {
       done()
     })
   })
-  lab.test('GET container', function(done) {
+  lab.test('GET deleted container', function(done) {
     request({
       method: 'GET',
       uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
@@ -308,7 +308,7 @@ lab.experiment('/app/containers', function() {
       },
       json: true
     }, function(error, response, body) {
-      expect(body.statusCode, 'to be', 404)
+      expect(response.statusCode, 'to be', 200)
 
       done()
     })
@@ -322,7 +322,7 @@ lab.experiment('/app/containers', function() {
       },
       json: true
     }, function(error, response, body) {
-      expect(body, 'to equal', [])
+      expect(body, 'to be non-empty')
 
       done()
     })

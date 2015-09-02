@@ -10,12 +10,12 @@ var ContainerFormular = React.createClass({
   mixins: [Navigation],
   getInitialState: function() {
     return {
-      region: ''
+      amount: '1'
     }
   },
-  handleRegionChange: function(e) {
+  handleAmountChange: function(e) {
     this.setState({
-      region: e.target.value
+      amount: '1'
     })
   },
   onSubmit: function(e) {
@@ -30,8 +30,11 @@ var ContainerFormular = React.createClass({
     return (
       <form className='ContainerFormular' onSubmit={this.onSubmit}>
         <h1>Start new containers</h1>
-        <Label>Region</Label>
-        <Input value={this.state.region} onChange={this.handleRegionChange}/>
+        <Label>Amount of new containers</Label>
+        <Input type='number' min='1' max='1' value={this.state.amount} onChange={this.handleAmountChange}/>
+        <div>
+          <small>Right now it is only possible to start a single container.</small>
+        </div>
         <div>
           <Button>Start</Button>
         </div>
