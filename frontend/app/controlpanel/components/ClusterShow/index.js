@@ -106,6 +106,22 @@ var ClusterShow = React.createClass({
                   </td>
                 </tr>
                 <tr>
+                  <td>SSH Public</td>
+                  <td>
+                    <Snippet>
+                      {this.state.cluster.certificates.sshPublic}
+                    </Snippet>
+                  </td>
+                </tr>
+                <tr>
+                  <td>SSH Private</td>
+                  <td>
+                    <Snippet>
+                      {this.state.cluster.certificates.sshPrivate}
+                    </Snippet>
+                  </td>
+                </tr>
+                <tr>
                   <td>Deleted</td>
                   <td>{this.state.cluster.deletedAt}</td>
                 </tr>

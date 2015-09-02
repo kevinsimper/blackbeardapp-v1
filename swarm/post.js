@@ -1,5 +1,14 @@
 #! /usr/bin/env node
 
+var accessToken = ''
+var ip = ''
+if(!accessToken) {
+  throw new Error('You have to define accessToken!')
+}
+if(!ip) {
+  throw new Error('You have to define the swarm-master ip!')
+}
+
 process.stdin.setEncoding('utf8');
 
 var env = ''
@@ -21,7 +30,7 @@ process.stdin.on('end', function() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.IjU1OTM5NmJlMDU5NzRiMGMwMGI2YjI4MSI.40uGM0A_DBMJX9ofejbVtPCYuEvXvZ02ZMoOUwVktfw'
+      'Authorization': accessToken
     }
   }, function (res) {
     console.log('STATUS: ' + res.statusCode);
@@ -41,6 +50,7 @@ process.stdin.on('end', function() {
   req.write(JSON.stringify({
     type: 'swarm',
     machines: 3,
+    ip: ip,
     ca: caPem,
     cert: certPem,
     key: keyPem,
@@ -48,5 +58,5 @@ process.stdin.on('end', function() {
     sshPublic: idRSAPub
   }))
 
-  req.end()  
+  req.end()
 })
