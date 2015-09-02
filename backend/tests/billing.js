@@ -136,7 +136,6 @@ lab.experiment('Testing Billing service', function() {
       expect(userAfter[0].credit, 'to be greater than', 0)
       expect(user[0].virtualCredit, 'not to equal', userAfter[0].virtualCredit)
 
-
       done()
     })
   })

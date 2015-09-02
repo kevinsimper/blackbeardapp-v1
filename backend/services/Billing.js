@@ -89,48 +89,49 @@ module.exports = {
 
     var amountUsed = self.calculateHoursPrice() * hours
 
-    // Set virtualcredit
-    user.virtualCredit = user.virtualCredit-amountUsed
+    if (amountUsed > user.credit) {
+      var activeCard = _.find(user.creditCards, function (cc) {
+        return cc.active === true
+      })
 
-    return user.saveAsync().spread(function(user, unknown) {
-      if (amountUsed > user.credit) {
-        var activeCard = _.find(user.creditCards, function (cc) {
-          return cc.active === true
-        })
+      if (activeCard) {
+        var leftover = user.credit - amountUsed
+        var paymentCount = 0
+        while (leftover < 0) {
+          leftover += self.topUpInterval
 
-        if (activeCard) {
-          var leftover = user.credit - amountUsed
-          var paymentCount = 0
-          while (leftover < 0) {
-            leftover += self.topUpInterval
-
-            paymentCount++
-          }
-
-          var amount = paymentCount*self.topUpInterval
-
-          return CreditCardService.chargeCreditCard({
-            user: user._id,
-            card: activeCard._id,
-            message: "Automatic Topup",
-            amount: amount,
-            balance: (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
-          }).then(function (result) {
-            if (result && result.paymentId) {
-              return 'did charge'
-
-            } else {
-              return 'charging error'
-            }
-          }).catch(function(err) {
-            return 'charging error'
-          })
-        } else {
-          return 'no active card'
+          paymentCount++
         }
+
+        var amount = paymentCount*self.topUpInterval
+
+        return CreditCardService.chargeCreditCard({
+          user: user._id,
+          card: activeCard._id,
+          message: "Automatic Topup",
+          amount: amount,
+          balance: (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
+        }).then(function (result) {
+          if (result && result.paymentId) {
+            return 'did charge'
+
+          } else {
+            return 'charging error'
+          }
+        }).catch(function(err) {
+          return 'charging error'
+        })
       } else {
-        return 'did not charge'
+        return 'no active card'
       }
-    })
+    } else {
+      // Set virtualcredit
+      user.virtualCredit = user.credit - amountUsed
+
+      return user.saveAsync().spread(function(user) {
+        console.log(user)
+        return 'did not charge'
+      })
+    }
   }
 }
