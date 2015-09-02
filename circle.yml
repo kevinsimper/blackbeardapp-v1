@@ -28,7 +28,7 @@ test:
     - ./docker-compose build registryproxy
     - ./docker-compose build router
     - sleep 3
-    - ./docker-compose up -d 
+    - ./docker-compose up -d
     - ./docker-compose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose start backend
     - ./docker-compose run registryproxy /bin/bash -c "npm install && npm test"
@@ -44,7 +44,7 @@ deployment:
       - docker push tutum.co/kevinsimper/blackbeardapp_backend
       - docker tag blackbeardapp_registryproxy tutum.co/kevinsimper/blackbeardapp_registryproxy
       - docker push tutum.co/kevinsimper/blackbeardapp_registryproxy
-      - ./docker-compose run -e NODE_ENV=production backend node migrate.js
+      - ./docker-compose run -e NODE_ENV=production -e DATABASE_URL=$DATABASE_URL backend node migrate.js
 experimental:
   notify:
     branches:
