@@ -64,19 +64,7 @@ lab.experiment('Testing Billing service', function() {
     })
   })
   lab.test('Test billing', function(done) {
-    var token = request({
-      method: 'POST',
-      uri: appUrl + '/login',
-      json: true,
-      body: {
-        email: 'user@blackbeard.io',
-        password: 'password'
-      }
-    }).spread(function (response, body) {
-      return body.token
-    })
-
-    return request({
+    request({
       method: 'POST',
       uri: appUrl + '/login',
       json: true,
