@@ -405,10 +405,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'POST',
     path: '/users/{user}/apps',
-    config: {
-      auth: 'jwt',
-      handler: appRoutes.postApp
-    }
+    config: appRoutes.postApp
   })
   server.route({
     method: 'DELETE',

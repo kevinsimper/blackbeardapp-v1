@@ -61,6 +61,7 @@ lab.experiment('/app', function() {
         name: 'testapp',
         image: image._id
       }
+
       return request({
         method: 'POST',
         uri: appUrl + '/users/me/apps',
