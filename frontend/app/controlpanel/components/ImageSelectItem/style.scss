@@ -1,0 +1,11 @@
+.ImageSelectItem {
+  padding: 20px 10px;
+  cursor: pointer;
+}
+.ImageSelectItem--unselected:hover {
+  background-color: #ECECEC;
+}
+.ImageSelectItem--selected {
+  background-color: #25A233;
+  color: white;
+}

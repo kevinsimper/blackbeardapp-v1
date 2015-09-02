@@ -12,6 +12,8 @@
 @import "components/Select/style.scss";
 @import "components/ErrorMessage/style.scss";
 @import "components/TextArea/style.scss";
+@import "components/ImagesSelect/style.scss";
+@import "components/ImageSelectItem/style.scss";
 
 $layoutWidth: 1100px;
 
@@ -34,7 +36,7 @@ img {
 }
 
 a {
-  color: #111111; 
+  color: #111111;
 }
 a:hover {
   text-decoration: none;

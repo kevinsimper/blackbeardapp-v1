@@ -1,19 +1,19 @@
 var React = require('react')
 var Button = require('../Button/')
-var Select = require('../Select/')
+var ImageSelectItem = require('../ImageSelectItem/')
 
 var ImagesSelect = React.createClass({
-  onChange: function(e) {
-    this.props.onChange(e.target.value)
+  onChange: function(imageId) {
+    this.props.onChange(imageId)
   },
   render: function() {
+    var self = this
     return (
-      <Select onChange={this.onChange}>
-        <option value=''>- Choose Image -</option>
+      <div className='ImagesSelect'>
         {this.props.images.map(function(image) {
-          return <option value={image._id}>{image.name}</option>
+          return <ImageSelectItem key={image._id} image={image} selected={self.props.value === image._id} onClick={self.onChange.bind(null, image._id)}/>
         })}
-      </Select>
+      </div>
     )
   }
 })
