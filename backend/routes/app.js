@@ -59,7 +59,7 @@ exports.postApp = {
       }
 
       // Cleanse name
-      name = name.replace(/[^a-zA-Z_]/g, '')
+      name = name.replace(/[^a-zA-Z0-9-]/g, '')
 
       var newApp = new App({
         name: name,
@@ -73,7 +73,7 @@ exports.postApp = {
       reply(app[0])
     }).error(function(err) {
       request.log(err)
-      reply(Boom.badRequest(err))
+      reply(Boom.badRequest(err.cause))
     }).catch(function(err) {
       request.log(err)
       reply(Boom.badImplementation('There was a problem with the database'))

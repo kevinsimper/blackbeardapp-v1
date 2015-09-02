@@ -65,14 +65,14 @@ lab.experiment('/app', function() {
           'Authorization': token
         },
         body: {
-          name: 'testa!!!@#!@#pp_new',
+          name: 'testa!!!@#!@#pp-new',
           image: image._id
         },
         json: true
       })
     }).spread(function (response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body.name, 'to be', 'testapp_new')
+      expect(body.name, 'to be', 'testapp-new')
       appId = body._id
     })
 
@@ -84,13 +84,13 @@ lab.experiment('/app', function() {
           'Authorization': token
         },
         body: {
-          name: 'testapp_new',
+          name: 'testapp-new',
           image: image._id
         },
         json: true
       })
     }).spread(function(response, body) {
-      expect(body.message, 'to be', 'OperationalError: There is already an App with this name')
+      expect(body.message, 'to be', 'There is already an App with this name')
 
       done()
     })
