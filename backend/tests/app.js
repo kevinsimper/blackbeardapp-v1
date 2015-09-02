@@ -65,7 +65,7 @@ lab.experiment('/app', function() {
           'Authorization': token
         },
         body: {
-          name: 'testapp_new',
+          name: 'testa!!!@#!@#pp_new',
           image: image._id
         },
         json: true
@@ -224,7 +224,7 @@ lab.experiment('/app/containers', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
-        expect(body.name, 'to be', requestData.name)
+        expect(body.name, 'to be', 'TestAppContainer')
         appId = body._id
         done()
       })

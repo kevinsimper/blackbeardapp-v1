@@ -4,8 +4,8 @@ var _ = require('lodash')
 var User = require('../models/User')
 var UserRoles = require('../models/roles/')
 var App = require('../models/App')
-var Image = Promise.promisifyAll(require('../models/Image'))
-var Billing = Promise.promisifyAll(require('../services/Billing'))
+var Image = require('../models/Image')
+var Billing = require('../services/Billing')
 var Container = require('../models/Container')
 var moment = require('moment')
 var Boom = require('boom')
@@ -57,6 +57,9 @@ exports.postApp = {
       if (app.length) {
         throw new Promise.OperationalError('There is already an App with this name')
       }
+
+      // Cleanse name
+      name = name.replace(/[^a-zA-Z_]/g, '')
 
       var newApp = new App({
         name: name,
