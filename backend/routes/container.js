@@ -90,7 +90,7 @@ exports.getContainers = function(request, reply) {
   })
 }
 
-exports.deleteContainers = function(request, reply) {
+exports.deleteContainer = function(request, reply) {
   var app = request.params.app
   var containerId = request.params.container
   var role = request.auth.credentials.role
@@ -102,18 +102,16 @@ exports.deleteContainers = function(request, reply) {
     }
 
     reply({
+      // This should remove container from cluster
       message: 'Container successfully removed.'
     })
   }
 
-  Container.findOneByRole(containerId, role, function(err, container) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-
-    // Set container to deleted
-    container.delete(deleteCallback)
+  Container.findOneByRole(containerId, role).then(function (container) {
+    return container.delete(deleteCallback)
+  }).catch(function(err) {
+    request.log(['mongo'], err)
+    return reply(Boom.badImplementation())
   })
 }
 

@@ -452,7 +452,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/users/{user}/apps/{app}/containers/{container}',
     config: {
       auth: 'jwt',
-      handler: containerRoutes.deleteContainers
+      handler: containerRoutes.deleteContainer
     }
   })
   server.route({

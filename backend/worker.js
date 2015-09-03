@@ -83,4 +83,18 @@ Promise.all([mongo, rabbitmq]).then(function () {
         }
       })
   })
+
+  Queue.consume('container-kill', function (message, ack) {
+    var ClusterService = require('./services/Cluster')
+    var Container = require('./models/Container')
+    var App = require('./models/App')
+    var Image = require('./models/Image')
+    var User = require('./models/User')
+    var sequest = require('sequest')
+
+    var container = Container.findOne({_id: message.containerId})
+
+    // This is the container kill function that will from he provided container find out what cluster it is running on and kill it
+    // after this it will run ack()
+  })
 })
