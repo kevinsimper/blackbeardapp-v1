@@ -79,31 +79,8 @@ exports.getContainers = function(request, reply) {
     }))
   })
 
-  var clusterContainer = containers.then(function (containers) {
-    return Promise.all(containers.map(function (container) {
-      if(!container.cluster) {
-        throw new Promise.OperationalError('No cluster attached')
-      }
-      return ClusterService.lookupContainer(container.cluster, container.containerHash)
-    }))
-  }).then(function (containersInfo) {
-    return Promise.all(containersInfo.map(function (containerInfo) {
-      var ports = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
-      return {
-        ip: containerInfo.NetworkSettings.Ports[ports[0]][0].HostIp,
-        port: containerInfo.NetworkSettings.Ports[ports[0]][0].HostPort
-      }
-    }))
-  }).error(function (err) {
-    if(process.env.NODE_ENV === 'production') {
-      throw err
-    } else {
-      console.warn(err.stack)
-    }
-  })
-
-  Promise.all([containerObjects, clusterContainer]).spread(function (containers, clusterContainer) {
-    reply(_.merge(containers, clusterContainer))
+  containerObjects.then(function (containers) {
+    reply(containers)
   }).error(function (err) {
     request.log(['mongo'], err.message)
     return reply(Boom.notFound())
