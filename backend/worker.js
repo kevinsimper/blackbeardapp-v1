@@ -51,13 +51,23 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var clusterContainerId = Promise.all([cluster, user, image, pullImage]).spread(function (cluster, user, image, pullImage) {
       return ClusterService.createContainer(cluster, registry + '/' + user.username + '/' + image.name + ':latest')
     })
+
+    var containerInfo = Promise.all([cluster, clusterContainerId]).spread(function (cluster, clusterContainerId) {
+      return ClusterService.lookupContainer(cluster, clusterContainerId)
+    })
+
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {
         return ClusterService.startContainer(cluster, clusterContainerId)
       })
 
-    var savedDetails = Promise.all([container, cluster, clusterContainerId, started])
-      .spread(function (container, cluster, clusterContainerId, started) {
+    var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo])
+      .spread(function (container, cluster, clusterContainerId, started, containerInfo) {
+        var ports = containerInfo.NetworkSettings.Ports
+        var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
+
+        container.ip = ports[portKeys[0]][0].HostIp,
+        container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
         container.containerHash = clusterContainerId
         return container.save()

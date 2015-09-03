@@ -6,6 +6,7 @@ var schema = new mongoose.Schema({
   status: String,
   region: String,
   ip: String,
+  port: Number,
   app: {type: mongoose.Schema.Types.ObjectId, ref: 'container'},
   createdAt: String,
   deleted: { type: Boolean, default: false },
