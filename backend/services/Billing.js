@@ -12,6 +12,8 @@ var CreditCardService = require('../services/CreditCard')
 var Boom = require('boom')
 
 module.exports = {
+  topUpInterval: 1000,
+
   diffHours: function (a, b) {
     return Math.ceil(a.diff(b)/1000/60/60)
   },
@@ -80,38 +82,58 @@ module.exports = {
   },
   chargeHours: function (user, hours) {
     var self = this
-      if (user.creditCards.length === 0) {
-        return 'has no creditcards'
-      }
 
-      var amountUsed = self.calculateHoursPrice() * hours
+    if (user.creditCards.length === 0) {
+      return Promise.resolve('has no creditcards')
+    }
 
-      if (amountUsed > user.credit) {
-        var activeCard = _.find(user.creditCards, function (cc) {
-          return cc.active === true
-        })
+    var amountUsed = self.calculateHoursPrice() * hours
 
-        if (activeCard) {
-          var amount = (amountUsed - user.credit) + 1000
-          return CreditCardService.chargeCreditCard({
-            user: user._id,
-            card: activeCard._id,
-            message: "Automatic Topup",
-            amount: amount
-          }).then(function (result) {
-            if (result && result.paymentId) {
-              return 'did charge'
-            } else {
-              return 'charging error'
-            }
-          }).catch(function(err) {
-            return 'charging error'
-          })
-        } else {
-          return 'no active card'
+    if (amountUsed > user.credit) {
+      var activeCard = _.find(user.creditCards, function (cc) {
+        return cc.active === true
+      })
+
+      if (activeCard) {
+        // This code dictates how much the user is charged.
+        // A note has been placed on the wiki about it here:
+        // https://github.com/kevinsimper/blackbeardapp/wiki/Charging-Users
+        var leftover = user.credit - amountUsed
+        var paymentCount = 0
+        while (leftover < 0) {
+          leftover += self.topUpInterval
+
+          paymentCount++
         }
+
+        var amount = paymentCount*self.topUpInterval
+
+        return CreditCardService.chargeCreditCard({
+          user: user._id,
+          card: activeCard._id,
+          message: "Automatic Topup",
+          amount: amount,
+          balance: (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
+        }).then(function (result) {
+          if (result && result.paymentId) {
+            return 'did charge'
+
+          } else {
+            return 'charging error'
+          }
+        }).catch(function(err) {
+          return 'charging error'
+        })
       } else {
-        return 'did not charge'
+        return 'no active card'
       }
+    } else {
+      // Set virtualcredit
+      user.virtualCredit = user.credit - amountUsed
+
+      return user.saveAsync().spread(function(user) {
+        return 'did not charge'
+      })
+    }
   }
 }

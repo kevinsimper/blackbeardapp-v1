@@ -42,7 +42,7 @@ exports.getAllBilling = function(request, reply) {
     }))
   })
 
-  var charges = Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
+  Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
     return Promise.all(users.map(function(user, i) {
       var hours = _.sum(hoursToBill[i])
       return Billing.chargeHours(user, hours)

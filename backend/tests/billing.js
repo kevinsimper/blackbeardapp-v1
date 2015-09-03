@@ -5,6 +5,7 @@ var Billing = require('../services/Billing')
 var App = require('../models/App')
 var Container = require('../models/Container')
 var moment = require('moment')
+var _ = require('lodash')
 var Promise = require('bluebird')
 var User = Promise.promisifyAll(require('../models/User'))
 var request = Promise.promisify(require('request'))
@@ -64,19 +65,7 @@ lab.experiment('Testing Billing service', function() {
     })
   })
   lab.test('Test billing', function(done) {
-    var token = request({
-      method: 'POST',
-      uri: appUrl + '/login',
-      json: true,
-      body: {
-        email: 'user@blackbeard.io',
-        password: 'password'
-      }
-    }).spread(function (response, body) {
-      return body.token
-    })
-
-    return request({
+    var adminToken = request({
       method: 'POST',
       uri: appUrl + '/login',
       json: true,
@@ -86,7 +75,22 @@ lab.experiment('Testing Billing service', function() {
       }
     }).spread(function (response, body) {
       return body.token
-    }).then(function (adminToken) {
+    })
+
+    var users = adminToken.then(function (adminToken) {
+      return request({
+        method: 'GET',
+        uri: appUrl + '/users',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      })
+    }).spread(function (response, body) {
+      return body
+    })
+
+    var billing = adminToken.then(function (adminToken) {
       return request({
         method: 'GET',
         uri: appUrl + '/billing',
@@ -99,6 +103,39 @@ lab.experiment('Testing Billing service', function() {
       expect(response.statusCode, 'to be', 200)
       // Need to confirm charging was attempted
       expect(body.data, 'to contain', 'did charge')
+
+      return body.data
+    })
+
+    var usersAfter = Promise.all([adminToken, billing]).spread(function(adminToken) {
+      return request({
+        method: 'GET',
+        uri: appUrl + '/users',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      })
+    }).spread(function (response, body) {
+      return body
+    })
+
+    Promise.all([adminToken, billing, users, usersAfter]).spread(function(adminToken, billing, users, usersAfter) {
+      // get virtualcredit
+      var user = _.filter(users, function(user) {
+        return user.email == "user@blackbeard.io"
+      })
+
+      var userAfter = _.filter(usersAfter, function(userAfter) {
+        return userAfter.email == "user@blackbeard.io"
+      })
+
+      expect(user[0].virtualCredit, 'to be greater than', 0)
+      expect(user[0].credit, 'to be greater than', 0)
+      expect(userAfter[0].virtualCredit, 'to be greater than', 0)
+      expect(userAfter[0].credit, 'to be greater than', 0)
+      expect(user[0].virtualCredit, 'not to equal', userAfter[0].virtualCredit)
+
       done()
     })
   })
