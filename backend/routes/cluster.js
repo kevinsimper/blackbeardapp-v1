@@ -160,6 +160,5 @@ exports.getClusterStartContainer = {
       request.log([], err)
       reply(Boom.badImplementation())
     })
-
   }
 }

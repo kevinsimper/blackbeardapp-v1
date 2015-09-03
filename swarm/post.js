@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 
+// Fill out accessToken (from existing login) and ip below with your local configuration
 var accessToken = ''
 var ip = ''
 if(!accessToken) {
