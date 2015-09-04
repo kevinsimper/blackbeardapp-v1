@@ -368,7 +368,7 @@ lab.experiment('/apps/', function () {
       json: true
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body, 'to be non-empty', 'name')
+      expect(body, 'to be non-empty')
       done()
     })
   })
@@ -383,7 +383,8 @@ lab.experiment('/apps/', function () {
       json: true
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body, 'to be non-empty', 'name')
+      expect(body, 'to be non-empty')
+      expect(body[0], 'to satisfy', { name: app })
       done()
     })
   })
@@ -401,7 +402,7 @@ lab.experiment('/apps/', function () {
       json: true
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body, 'to be non-empty', 'name')
+      expect(body.length, 'to be', 1)
       done()
     })
   })
