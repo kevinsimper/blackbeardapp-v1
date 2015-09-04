@@ -93,32 +93,24 @@ exports.deleteContainer = function(request, reply) {
   var containerId = request.params.container
   var role = request.auth.credentials.role
 
-  var deleteCallback = function (err, container) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-
-    // Send to worker queue
-    var sendToWorker = Queue.send('container-kill', {
-      containerId: container.containerHash
-    }).then(function (result) {
-      reply({
-        message: (result) ? 'Container successfully removed.' : 'Container removal failed.'
-      })
-    })
-    .error(function (err) {
-      request.log(['mongo'], err.message)
-      return reply(Boom.notFound())
-    }).catch( function (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    })
-  }
-
   Container.findOneByRole(containerId, role).then(function (container) {
-    return container.delete(deleteCallback)
-  }).catch(function(err) {
+    return Promise.fromNode(function (callback) {
+      container.delete(callback)
+    })
+  }).spread(function (container) {
+    return Queue.send('container-kill', {
+      containerId: container.containerHash
+    })
+  }).then(function (result) {
+    reply({
+      message: (result) ? 'Container successfully removed.' : 'Container removal failed.'
+    })
+  })
+  .error(function (err) {
+    request.log(['mongo'], err.message)
+    return reply(Boom.notFound())
+  })
+  .catch(function(err) {
     request.log(['mongo'], err)
     return reply(Boom.badImplementation())
   })
