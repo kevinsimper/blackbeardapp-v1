@@ -262,7 +262,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'GET',
     path: '/users/{user}/creditlogs',
     config: userRoutes.getCreditLogs
-  }) 
+  })
 
   server.route({
     method: 'POST',
@@ -395,12 +395,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
   server.route({
-    method: 'POST',
+    method: 'GET',
     path: '/apps',
-    config: {
-      auth: 'jwt',
-      handler: appRoutes.search
-    }
+    config: appRoutes.getAllApps
   })
   server.route({
     method: 'POST',

@@ -26,18 +26,33 @@ exports.getApps = function(request, reply) {
   })
 }
 
-exports.search = function(request, reply) {
-  var name = request.payload.name
-
-  App.find({
-    name: name
-  }, function(err, result) {
-    if (err) {
+exports.getAllApps = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    query: {
+      name: Joi.string().min(2),
+      limit: Joi.number()
+    }
+  },
+  handler: function(request, reply) {
+    var query = {}
+    if(request.query.name) {
+      query['name'] = new RegExp(request.query.name, 'i')
+    }
+    var apps = App.find(query)
+    if(request.query.limit) {
+      apps.limit(request.query.limit)
+    }
+    apps.then(function(apps) {
+      reply(apps)
+    }).catch(function (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    reply(result)
-  })
+    })
+  }
 }
 
 exports.postApp = {

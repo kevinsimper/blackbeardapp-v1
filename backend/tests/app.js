@@ -12,7 +12,7 @@ var server = require('../startdev')()
 
 var token = null
 var adminToken = null
-lab.experiment('/app', function() {
+lab.experiment('/users/me/apps', function() {
   var appId = null
   lab.before(function(done) {
     request({
@@ -127,25 +127,6 @@ lab.experiment('/app', function() {
       done()
     })
   })
-  lab.test('Search POST', function(done) {
-    var requestData = {
-      name: 'testapp'
-    }
-    request({
-      method: 'POST',
-      uri: appUrl + '/apps',
-      body: requestData,
-      headers: {
-        'Authorization': token
-      },
-      json: true
-    }, function(error, response, body) {
-
-      expect(response.statusCode, 'to be', 200)
-      expect(body, 'to be non-empty', 'name')
-      done()
-    })
-  })
   lab.test('GET', function(done) {
     request({
       method: 'GET',
@@ -189,7 +170,7 @@ lab.experiment('/app', function() {
   })
 })
 
-lab.experiment('/app/containers', function() {
+lab.experiment('/users/me/apps/containers', function() {
   var appId = null
   var containerId = null
   var imageId
@@ -371,6 +352,58 @@ lab.experiment('/app/containers', function() {
           })
         }
       })
+    })
+  })
+})
+
+lab.experiment('/apps/', function () {
+  var app = 'testapp'
+  lab.test('GET', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/apps',
+      headers: {
+        'Authorization': adminToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body, 'to be non-empty')
+      done()
+    })
+  })
+  lab.test('GET search', function(done) {
+    var querystring = '?name=' + app
+    request({
+      method: 'GET',
+      uri: appUrl + '/apps' + querystring,
+      headers: {
+        'Authorization': adminToken
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body, 'to be non-empty')
+      expect(body[0], 'to satisfy', { name: app })
+      done()
+    })
+  })
+  lab.test('GET search limit', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/apps',
+      headers: {
+        'Authorization': adminToken
+      },
+      qs: {
+        name: app,
+        limit: 1
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body.length, 'to be', 1)
+      done()
     })
   })
 })
