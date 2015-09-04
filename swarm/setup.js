@@ -30,7 +30,7 @@ var fixHosts = function (address) {
   fixHosts.on('close', function (code) {
     console.log("SUCCESSFUL")
     console.log("")
-    console.log("Don't forget to edit your swarm/post.js and backend/fixtures/cluster.js.")
+    console.log("Don't forget to edit your swarm/post.js, remove your clusters document, run swarm/post.js and edit backend/fixtures/cluster.js to contain the new cluster object.")
     console.log("After this you need to run `docker-compose run backend npm run test-cluster`.")
   })
 }

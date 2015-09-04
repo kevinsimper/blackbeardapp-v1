@@ -8,7 +8,7 @@ var mongo = mongoose.connect(config.DATABASE_URL)
 var rabbitmq = Queue.connect()
 
 Promise.all([mongo, rabbitmq]).then(function () {
-  console.log('Worker is running!')
+  console.log('Worker is running!!')
 
   Queue.consume('container-start', function (message, ack) {
     var ClusterService = require('./services/Cluster')
