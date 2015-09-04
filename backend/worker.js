@@ -19,8 +19,10 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var sequest = require('sequest')
 
     var container = Container.findOne({_id: message.containerId})
+
     var cluster = ClusterService.getCluster()
     var app = container.then(function(container) {
+
       return App.findOne({_id: container.app})
     })
     var user = app.then(function (app) {
@@ -64,16 +66,25 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo])
       .spread(function (container, cluster, clusterContainerId, started, containerInfo) {
         var ports = containerInfo.NetworkSettings.Ports
+
+        if (ports === null) {
+          throw new Promise.OperationalError('No container connection details found.')
+        }
         var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
         container.ip = ports[portKeys[0]][0].HostIp,
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
         container.containerHash = clusterContainerId
+
+
         return container.save()
       })
       .then(function (container) {
         ack()
+      })
+      .error(function(err) {
+        console.warn('No cluster attached', err.stack)
       })
       .catch(function (err) {
         if(process.env.NODE_ENV === 'production') {
@@ -92,9 +103,27 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var User = require('./models/User')
     var sequest = require('sequest')
 
-    var container = Container.findOne({_id: message.containerId})
+    // TODO: Choose proper cluster here
+    var cluster = ClusterService.getCluster()
 
-    // This is the container kill function that will from he provided container find out what cluster it is running on and kill it
-    // after this it will run ack()
+    var clusterContainerId = message.containerId
+    var container = Container.findOne({_id: clusterContainerId})
+
+    cluster.then(function(cluster) {
+      ClusterService.killContainer(cluster, clusterContainerId)
+      .then(function(result) {
+        ack()
+      })
+      .error(function(err) {
+        console.warn('No cluster attached', err.stack)
+      })
+      .catch(function (err) {
+        if(process.env.NODE_ENV === 'production') {
+          throw err
+        } else {
+          console.warn('No cluster attached', err.stack)
+        }
+      })
+    })
   })
 })

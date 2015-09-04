@@ -9,7 +9,6 @@ var config = require('../config')
 var ClusterService = require('../services/Cluster')
 var Queue = require('../services/Queue')
 
-
 exports.postContainers = function(request, reply) {
   var appId = request.params.app
   var user = User.getUserIdFromRequest(request)
@@ -91,19 +90,29 @@ exports.getContainers = function(request, reply) {
 }
 
 exports.deleteContainer = function(request, reply) {
-  var app = request.params.app
   var containerId = request.params.container
   var role = request.auth.credentials.role
 
-  var deleteCallback = function (err, result) {
+  var deleteCallback = function (err, container) {
     if (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation('There was a problem with the database'))
     }
 
-    reply({
-      // This should remove container from cluster
-      message: 'Container successfully removed.'
+    // Send to worker queue
+    var sendToWorker = Queue.send('container-kill', {
+      containerId: container.containerHash
+    }).then(function (result) {
+      reply({
+        message: (result) ? 'Container successfully removed.' : 'Container removal failed.'
+      })
+    })
+    .error(function (err) {
+      request.log(['mongo'], err.message)
+      return reply(Boom.notFound())
+    }).catch( function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation('There was a problem with the database'))
     })
   }
 
