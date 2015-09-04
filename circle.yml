@@ -44,6 +44,8 @@ deployment:
       - docker push tutum.co/kevinsimper/blackbeardapp_backend
       - docker tag blackbeardapp_registryproxy tutum.co/kevinsimper/blackbeardapp_registryproxy
       - docker push tutum.co/kevinsimper/blackbeardapp_registryproxy
+      - docker tag blackbeardapp_router tutum.co/kevinsimper/blackbeardapp_router
+      - docker push tutum.co/kevinsimper/blackbeardapp_router
       - ./docker-compose run -e NODE_ENV=production -e DATABASE_URL=$DATABASE_URL backend node migrate.js
 experimental:
   notify:
