@@ -74,6 +74,9 @@ exports.killContainer = function (cluster, containerId) {
   var uri = '/containers/' + containerId + '/kill'
   return this.request(cluster, uri, 'POST')
     .spread(function (response, body) {
-      return response.statusCode == 204 ? 'ok' : 'error'
+      if (response.statusCode != 204) {
+        throw new Error(response.body)
+      }
+      return 'ok'
     })
 }

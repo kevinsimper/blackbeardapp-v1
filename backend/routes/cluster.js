@@ -72,7 +72,6 @@ exports.deleteCluster = {
   }
 }
 
-
 exports.getClusterStatus = {
   auth: 'jwt',
   validate: {

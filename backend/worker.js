@@ -115,7 +115,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         ack()
       })
       .error(function(err) {
-        console.warn('No cluster attached', err.stack)
+        console.warn(err, err.stack)
       })
       .catch(function (err) {
         if(process.env.NODE_ENV === 'production') {

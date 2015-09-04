@@ -103,7 +103,7 @@ exports.deleteContainer = function(request, reply) {
     })
   }).then(function (result) {
     reply({
-      message: (result) ? 'Container successfully removed.' : 'Container removal failed.'
+      message: 'Container successfully removed.'
     })
   })
   .error(function (err) {
