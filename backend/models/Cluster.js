@@ -13,6 +13,7 @@ var schema = new mongoose.Schema({
     sshPublic: String,
     sshPrivate: String
   },
+  memorySize: Number,
   deleted: { type: Boolean, default: false },
   deletedAt: String,
   ip: String

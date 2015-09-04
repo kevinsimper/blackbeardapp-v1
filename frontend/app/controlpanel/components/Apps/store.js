@@ -55,7 +55,7 @@ var store = Reflux.createStore({
   },
   onNewContainer: function(id, container) {
     request
-      .post(config.BACKEND_HOST + '/users/me/apps/' + id + '/containers')
+      .post(config.BACKEND_HOST + '/users/me/apps/' + id + '/container')
       .set('Authorization', localStorage.token)
       .end(function(err, res) {
         if(err) {

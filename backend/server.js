@@ -422,10 +422,10 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'POST',
-    path: '/users/{user}/apps/{app}/containers',
+    path: '/users/{user}/apps/{app}/container',
     config: {
       auth: 'jwt',
-      handler: containerRoutes.postContainers
+      handler: containerRoutes.postContainer
     }
   })
   server.route({
