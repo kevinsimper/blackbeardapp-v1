@@ -1,21 +1,16 @@
-var child_process = require('child_process')
 var debug = require('debug')('router')
 var Promise = require('bluebird')
 var request = Promise.promisify(require('request'))
 var http = require('http')
 var httpProxy = require('http-proxy')
 var _ =  require('lodash')
-
-// Had to add hosts file entry to test this for testcontainer.blackbeard.io
-var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
-  encoding: 'utf8'
-}).trim()
+var config = require('./config')
 
 var proxy = httpProxy.createProxyServer({})
 
 var adminToken = request({
   method: 'POST',
-  uri: 'http://' + ip + ':8000/login',
+  uri: config.BACKEND_HOST + '/login',
   json: true,
   body: {
     email: 'admin@blackbeard.io',
@@ -32,7 +27,7 @@ var getContainers = function () {
   return adminToken.then(function(adminToken) {
     return request({
       method: 'GET',
-      uri: 'http://' + ip + ':8000/apps',
+      uri: config.BACKEND_HOST + '/apps',
       json: true,
       headers: {
         'Authorization': adminToken
@@ -50,7 +45,7 @@ var getContainers = function () {
     }).then(function(app) {
       return request({
         method: 'GET',
-        uri: 'http://' + ip + ':8000/users/' + app.user +  '/apps/' + app._id + '/containers',
+        uri: config.BACKEND_HOST + '/users/' + app.user +  '/apps/' + app._id + '/containers',
         json: true,
         headers: {
           'Authorization': adminToken
