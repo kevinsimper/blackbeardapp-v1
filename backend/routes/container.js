@@ -9,7 +9,6 @@ var config = require('../config')
 var ClusterService = require('../services/Cluster')
 var Queue = require('../services/Queue')
 
-
 exports.postContainers = function(request, reply) {
   var appId = request.params.app
   var user = User.getUserIdFromRequest(request)
@@ -90,30 +89,30 @@ exports.getContainers = function(request, reply) {
   })
 }
 
-exports.deleteContainers = function(request, reply) {
-  var app = request.params.app
+exports.deleteContainer = function(request, reply) {
   var containerId = request.params.container
   var role = request.auth.credentials.role
 
-  var deleteCallback = function (err, result) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-
+  Container.findOneByRole(containerId, role).then(function (container) {
+    return Promise.fromNode(function (callback) {
+      container.delete(callback)
+    })
+  }).spread(function (container) {
+    return Queue.send('container-kill', {
+      containerId: container.containerHash
+    })
+  }).then(function (result) {
     reply({
       message: 'Container successfully removed.'
     })
-  }
-
-  Container.findOneByRole(containerId, role, function(err, container) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-
-    // Set container to deleted
-    container.delete(deleteCallback)
+  })
+  .error(function (err) {
+    request.log(['mongo'], err.message)
+    return reply(Boom.notFound())
+  })
+  .catch(function(err) {
+    request.log(['mongo'], err)
+    return reply(Boom.badImplementation())
   })
 }
 

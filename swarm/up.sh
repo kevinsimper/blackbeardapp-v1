@@ -12,7 +12,7 @@ docker-machine create \
 swarm-master
 
 sleep 3
-docker-machine ssh swarm-master "sudo sh -c \" echo 192.168.59.103 registry.blackbeard.dev >> /etc/hosts\""
+docker-machine ssh swarm-master "sudo sh -c \" echo ----LOCAL_IP---- registry.blackbeard.dev >> /etc/hosts\""
 
 docker-machine create \
 -d virtualbox \
@@ -22,7 +22,7 @@ docker-machine create \
 swarm-agent-00
 
 sleep 3
-docker-machine ssh swarm-agent-00 "sudo sh -c \" echo 192.168.59.103 registry.blackbeard.dev >> /etc/hosts\""
+docker-machine ssh swarm-agent-00 "sudo sh -c \" echo ----LOCAL_IP---- registry.blackbeard.dev >> /etc/hosts\""
 
 docker-machine create \
 -d virtualbox \
@@ -32,4 +32,4 @@ docker-machine create \
 swarm-agent-01
 
 sleep 3
-docker-machine ssh swarm-agent-01 "sudo sh -c \" echo 192.168.59.103 registry.blackbeard.dev >> /etc/hosts\""
+docker-machine ssh swarm-agent-01 "sudo sh -c \" echo ----LOCAL_IP---- registry.blackbeard.dev >> /etc/hosts\""

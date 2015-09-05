@@ -1,14 +1,15 @@
+// This should come directly from mongo
 use blackbeard;
 db.clusters.insert({
   "_id": ObjectId("55d9a1d59fa1480f006f8bbc"),
   "deleted": false,
   "type": "swarm",
   "machines": 3,
-  "ip": "192.168.99.101",
+  "ip": "---CLUSTER-IP---",
   "certificates": {
-    "ca": "INSERT HERE",
-    "cert": "INSERT HERE,
-    "key": "INSERT HERE"
+    "ca": "---CA---",
+    "cert": "---CERT---",
+    "key": "---KEY---"
   },
   "__v": 0
 })

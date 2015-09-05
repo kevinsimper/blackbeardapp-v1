@@ -72,7 +72,6 @@ exports.deleteCluster = {
   }
 }
 
-
 exports.getClusterStatus = {
   auth: 'jwt',
   validate: {
@@ -160,6 +159,5 @@ exports.getClusterStartContainer = {
       request.log([], err)
       reply(Boom.badImplementation())
     })
-
   }
 }
