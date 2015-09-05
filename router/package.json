@@ -1,7 +1,7 @@
 {
   "name": "router",
   "version": "0.0.0",
-  "description": "1. Accept connection 2. Map CNAME using mongo to application 3. Proxy request to application",
+  "description": "Load-balance traffic to containers",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,11 +10,11 @@
   "author": "",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "bluebird": "^2.9.34",
+    "bluebird": "2.9.34",
     "debug": "2.2.0",
     "http-proxy": "1.11.2",
-    "lodash": "^3.10.1",
-    "parseurl": "^1.3.0",
-    "request": "2.60.*"
+    "lodash": "3.10.1",
+    "parseurl": "1.3.0",
+    "request": "2.61.0"
   }
 }

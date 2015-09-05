@@ -85,7 +85,7 @@ http.createServer(function (req, res) {
   getContainers(appname).then(function (containers) {
     var random = _.sample(containers)
     var address = 'http://' + random.ip + ':' + random.port
-    console.log('proxying to ' + address)
+    debug('proxying to ' + address)
     proxy.web(req, res, {
       target: address,
       changeOrigin: true
