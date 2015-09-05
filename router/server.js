@@ -23,7 +23,7 @@ var adminToken = request({
   throw new Error('Could not login to backend!', err)
 })
 
-var getContainers = function () {
+var getContainers = function (appname) {
   return adminToken.then(function(adminToken) {
     return request({
       method: 'GET',
@@ -33,7 +33,7 @@ var getContainers = function () {
         'Authorization': adminToken
       },
       qs: {
-        name: 'kevin',
+        name: appname,
         limit: 1
       }
     }).spread(function (response, body) {
@@ -60,10 +60,29 @@ var getContainers = function () {
   })
 }
 
-http.createServer(function (req, res) {
-  console.log(req.headers.host)
+var parseHost = function (host) {
+  var parsed = {}
+  if(host.indexOf(':')) {
+    var portSplit = host.split(':')
+    parsed.port = portSplit[1]
+    host = portSplit[0]
+  }
+  host = host.split('.')
+  parsed.tld = host.pop()
+  parsed.domain = host.pop()
+  parsed.subdomains = host
+  return parsed
+}
 
-  getContainers().then(function (containers) {
+http.createServer(function (req, res) {
+  var details = parseHost(req.headers.host)
+  // there should be two subdomains
+  // the appname and apps
+  if(details.subdomains.length !== 2) {
+    return res.end('Missing something!')
+  }
+  var appname = details.subdomains[0]
+  getContainers(appname).then(function (containers) {
     var random = _.sample(containers)
     var address = 'http://' + random.ip + ':' + random.port
     console.log('proxying to ' + address)
