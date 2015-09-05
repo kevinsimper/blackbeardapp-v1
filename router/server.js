@@ -38,6 +38,9 @@ var getContainers = function () {
       }
     }).spread(function (response, body) {
       var app = body[0]
+      if(body.length === 0) {
+        throw new Error('No app with that name!')
+      }
       if(!app.containers || app.containers.length === 0) {
         throw new Error('No containers started on that app')
       }
@@ -68,6 +71,8 @@ http.createServer(function (req, res) {
       target: address,
       changeOrigin: true
     })
+  }).catch(function () {
+    res.end('No app with that name!')
   })
 
 }).listen(8500, function() {
