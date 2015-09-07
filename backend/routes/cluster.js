@@ -7,7 +7,16 @@ var ClusterService = require('../services/Cluster')
 var _ = require('lodash')
 
 exports.getClusters = function (request, reply) {
-  Cluster.find().then(function (clusters) {
+  Cluster.find().populate('containers').then(function (clusters) {
+    clusters = _.map(clusters, function (cluster) {
+      var used = _.sum(_.map(cluster.containers, function(container) {
+        return container.memorySize
+      }))
+      cluster = cluster.toObject()
+      cluster.pressure = used / cluster.memory
+      return cluster
+    })
+
     reply(clusters)
   }).catch(function () {
     reply(Boom.badImplementation())
@@ -158,7 +167,7 @@ exports.getClusterUsage = {
         memoryUsed: _.sum(_.map(cluster.containers, function(container) {
           return container.memorySize
         })),
-        limit: cluster.containerLimit,
+        limit: cluster.memory,
         count: cluster.containers.length
       })
     }).error(function (err) {

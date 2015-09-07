@@ -48,7 +48,7 @@ var Clusters = React.createClass({
                 <tr>
                   <td>{item.type}</td>
                   <td>{item.machines}</td>
-                  <td>{Math.round((item.containers.length / item.containerLimit)*100) || '-'}</td>
+                  <td>{Math.round(item.pressure*100) || '-'}</td>
                   <td>{item.deleted && 'Yes'}</td>
                   <td>
                     <Button size='small' onClick={handler}>View</Button>
@@ -62,5 +62,5 @@ var Clusters = React.createClass({
     )
   }
 })
-
+//
 module.exports = Clusters

@@ -16,7 +16,7 @@ var schema = new mongoose.Schema({
   containers: [{type: mongoose.Schema.Types.ObjectId, ref: 'container'}],
   deleted: { type: Boolean, default: false },
   deletedAt: String,
-  containerLimit: { type: Number, default: 4 },
+  memory: { type: Number, default: 2048 },
   ip: String
 })
 
