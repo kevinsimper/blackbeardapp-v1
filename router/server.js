@@ -1,65 +1,97 @@
-var Hapi = require('hapi')
-var child_process = require('child_process')
 var debug = require('debug')('router')
-var request = require('request')
-var Boom = require('boom')
+var Promise = require('bluebird')
+var request = Promise.promisify(require('request'))
+var http = require('http')
+var httpProxy = require('http-proxy')
+var _ =  require('lodash')
+var config = require('./config')
 
-var server = new Hapi.Server()
-server.connection({
-    port: '8500'
+var proxy = httpProxy.createProxyServer({})
+
+var adminToken = request({
+  method: 'POST',
+  uri: config.BACKEND_HOST + '/login',
+  json: true,
+  body: {
+    email: 'admin@blackbeard.io',
+    password: 'password'
+  }
+}).spread(function(response, body) {
+  return body.token
+}).catch(function (err) {
+  console.log(err)
+  throw new Error('Could not login to backend!', err)
 })
 
-// Had to add hosts file entry to test this for testcontainer.blackbeard.io
-
-var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
-  encoding: 'utf8'
-})
-
-var mapper = function (req, callback) {
-  var requestedCname = null
-  var requestedHostnameSplit = req.info.host.split('.')
-  if (requestedHostnameSplit && requestedHostnameSplit.length) {
-    requestedCname = requestedHostnameSplit[0]
-  }
-
-  if (!requestedCname) {
-      return Boom.badRequest("Could not extract CNAME from requested URI.")
-  }
-
-  if (process.env.NODE_ENV != 'production') {
-    if (req.path == 'testcontainer') {
-      return callback(null, 'http://blackbeard.io:80');
-    } else {
-      return Boom.notFound('Could not find any running containers matching this CNAME.')
-    }
-  } else {
-    request({
+var getContainers = function (appname) {
+  return adminToken.then(function(adminToken) {
+    return request({
       method: 'GET',
-      uri: ip + ':8000/apps/search',
+      uri: config.BACKEND_HOST + '/apps',
       json: true,
-      body: requestedCname
-    },
-    function(error, response, body) {
-      if (error) {
-        return Boom.badImplementation()
+      headers: {
+        'Authorization': adminToken
+      },
+      qs: {
+        name: appname,
+        limit: 1
       }
-      var containers = body.containers
-      if (containers.length > 0) {
-        // Which container to use? Which instance?
-        var container = containers[Math.floor(Math.random() * containers.length)]
-        return callback(null, "http://"+container.ip);
+    }).spread(function (response, body) {
+      var app = body[0]
+      if(body.length === 0) {
+        throw new Error('No app with that name!')
       }
-       return Boom.notFound('Could not find any running containers matching this CNAME.')
-     })
-   }
+      if(!app.containers || app.containers.length === 0) {
+        throw new Error('No containers started on that app')
+      }
+      return request({
+        method: 'GET',
+        uri: config.BACKEND_HOST + '/users/' + app.user +  '/apps/' + app._id + '/containers',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      })
+    }).spread(function (resp, body) {
+      return body
+    })
+  })
 }
 
-server.route({
-    method: '*',
-    path: '/{p*}',
-    handler: { proxy: { mapUri: mapper } }
-});
+var parseHost = function (host) {
+  var parsed = {}
+  if(host.indexOf(':')) {
+    var portSplit = host.split(':')
+    parsed.port = portSplit[1]
+    host = portSplit[0]
+  }
+  host = host.split('.')
+  parsed.tld = host.pop()
+  parsed.domain = host.pop()
+  parsed.subdomains = host
+  return parsed
+}
 
-server.start(function() {
-    console.log('Server running at:', server.info.uri);
-});
+http.createServer(function (req, res) {
+  var details = parseHost(req.headers.host)
+  // there should be two subdomains
+  // the appname and apps
+  if(details.subdomains.length !== 2) {
+    return res.end('Missing something!')
+  }
+  var appname = details.subdomains[0]
+  getContainers(appname).then(function (containers) {
+    var random = _.sample(containers)
+    var address = 'http://' + random.ip + ':' + random.port
+    debug('proxying to ' + address)
+    proxy.web(req, res, {
+      target: address,
+      changeOrigin: true
+    })
+  }).catch(function () {
+    res.end('No app with that name!')
+  })
+
+}).listen(8500, function() {
+  console.log('Router is listening!')
+})
