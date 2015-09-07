@@ -54,14 +54,15 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return ClusterService.createContainer(cluster, registry + '/' + user.username + '/' + image.name + ':latest')
     })
 
-    var containerInfo = Promise.all([cluster, clusterContainerId]).spread(function (cluster, clusterContainerId) {
-      return ClusterService.lookupContainer(cluster, clusterContainerId)
-    })
 
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {
         return ClusterService.startContainer(cluster, clusterContainerId)
       })
+
+    var containerInfo = Promise.all([cluster, clusterContainerId, started]).spread(function (cluster, clusterContainerId) {
+      return ClusterService.lookupContainer(cluster, clusterContainerId)
+    })
 
     var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo])
       .spread(function (container, cluster, clusterContainerId, started, containerInfo) {
