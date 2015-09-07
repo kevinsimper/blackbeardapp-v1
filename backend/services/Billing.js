@@ -9,6 +9,7 @@ var Payment = Promise.promisifyAll(require('../models/Payment'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
+var Payment = Promise.promisifyAll(require('../models/Payment'))
 var Boom = require('boom')
 
 module.exports = {
@@ -80,6 +81,85 @@ module.exports = {
       }
     })
   },
+  chargeCreditCard: function (options) {
+    var self = this
+
+    var userId = options.user
+    var cardId = options.card
+    var chargeName = options.message
+    var chargeAmount = options.amount
+    var remoteAddr = options.remoteAddr || '127.0.0.1'
+    var balance = options.balance
+
+    var creditcard = CreditCard.findOne({_id: cardId})
+    var user = User.findOne({_id: userId})
+
+    // User _must_ exist
+    return user.then(function(user) {
+      if (!user) {
+        throw new Promise.OperationalError("User not found")
+      }
+
+      var card
+      var newCharge = creditcard.then(function(creditcard) {
+        if (!creditcard) {
+          throw new Promise.OperationalError("Credit card not found")
+        }
+
+        card = creditcard
+
+        return CreditCardService.charge({
+          amount: chargeAmount,
+          currency: "usd",
+          source: creditcard.token,
+          description: chargeName
+        })
+      })
+
+      var charge = null
+      return newCharge.then(function (newCharge) {
+        if (!newCharge) {
+          throw new Promise.OperationalError("Charge failed")
+        }
+
+        charge = newCharge
+        user.credit = balance
+        user.virtualCredit = balance
+
+        return user.save()
+      }).then(function (savedUser) {
+        if (!savedUser) {
+          throw new Promise.OperationalError("User save failed")
+        }
+
+        // Now save a Payment entry
+        var newPayment = new Payment({
+          amount: charge.amount,
+          creditCard: card._id,
+          chargeId: charge.id,
+          user: savedUser._id,
+          timestamp: Math.round(Date.now() / 1000),
+          ip: remoteAddr,
+          status: Payment.status.SUCCESS
+        })
+
+        return newPayment.save()
+      }).then(function (savedPayment) {
+        if (!savedPayment) {
+          throw new Promise.OperationalError("Payment save failed")
+        }
+
+        return {
+          message: 'Payment successfully made.',
+          paymentId: savedPayment._id
+        }
+      }).error(function (err) {
+        return err
+      }).catch(function (err) {
+        return new Error('Payment failed')
+      })
+    })
+  },
   chargeHours: function (user, hours) {
     var self = this
 
@@ -108,7 +188,7 @@ module.exports = {
 
         var amount = paymentCount*self.topUpInterval
 
-        return CreditCardService.chargeCreditCard({
+        return self.chargeCreditCard({
           user: user._id,
           card: activeCard._id,
           message: "Automatic Topup",
