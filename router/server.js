@@ -44,8 +44,6 @@ var getContainers = function (appname) {
       if(!app.containers || app.containers.length === 0) {
         throw new Error('No containers started on that app')
       }
-      return app
-    }).then(function(app) {
       return request({
         method: 'GET',
         uri: config.BACKEND_HOST + '/users/' + app.user +  '/apps/' + app._id + '/containers',
@@ -53,9 +51,9 @@ var getContainers = function (appname) {
         headers: {
           'Authorization': adminToken
         }
-      }).spread(function (resp, body) {
-        return body
       })
+    }).spread(function (resp, body) {
+      return body
     })
   })
 }
