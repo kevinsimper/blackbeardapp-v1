@@ -13,3 +13,11 @@ if(process.env.NODE_ENV == 'production') {
 } else {
   exports.RABBITMQ_URL = 'amqp://' + process.env.RABBITMQ_PORT.replace('tcp://', '')
 }
+
+if(process.env.NODE_ENV == 'production') {
+  exports.REGISTRY_URL = process.env.REGISTRY_URL
+} else if(process.env.NODE_ENV === 'development' && (typeof process.env.REGISTRY_URL !== 'undefined')) {
+  exports.REGISTRY_URL = process.env.REGISTRY_URL
+} else {
+  exports.REGISTRY_URL = 'registry.blackbeard.dev:9500'
+}

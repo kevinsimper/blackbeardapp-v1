@@ -34,13 +34,13 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var registry = 'registry.blackbeard.dev:9500'
+    var registry = config.REGISTRY_URL
     var pullImage = Promise.all([cluster, image, user]).spread(function (cluster, image, user) {
       var fullPath = registry + '/' + user.username + '/' + image.name
       console.log('pull path', fullPath)
       return new Promise(function (resolve, reject) {
         sequest('docker@' + cluster.ip, {
-          command: 'docker login -u blackbeard -p password -e kevin.simper@gmail.com registry.blackbeard.dev:9500 && docker pull ' + fullPath,
+          command: 'docker login -u blackbeard -p password -e kevin.simper@gmail.com ' + registry + ' && docker pull ' + fullPath,
           privateKey: cluster.certificates.sshPrivate
         }, function (err, stdout) {
           console.log(err)
@@ -72,7 +72,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         }
         var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
-        container.ip = ports[portKeys[0]][0].HostIp,
+        container.ip = ports[portKeys[0]][0].HostIp
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
         container.containerHash = clusterContainerId
