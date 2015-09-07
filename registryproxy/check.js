@@ -36,6 +36,9 @@ exports.checkCredentials = function(credentials) {
 
 exports.checkPath = function (user, path) {
   return new Promise(function (resolve, reject) {
+    if(user === 'worker') {
+      resolve(true)
+    }
     var pathArray = path.split('/')
     // if this is empty that means that they are trying
     // to get /v2/ and that is okay!
