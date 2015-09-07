@@ -37,14 +37,18 @@ exports.checkPath = function (user, path) {
     // to get /v2/ and that is okay!
     if (pathArray[2].length === 0) {
       debug('Path allowed')
-      resolve()
+      resolve(true)
     }
     if (pathArray[2] === user) {
       debug('Path allowed')
-      resolve()
+      if(pathArray[3].length === 0) {
+        reject(new Error('You have to specify a image name!'))
+      } else {
+        resolve(true)
+      }
     } else {
       debug('Path forbidden!')
-      reject()
+      reject(new Error('Path forbidden!'))
     }
   })
 }
