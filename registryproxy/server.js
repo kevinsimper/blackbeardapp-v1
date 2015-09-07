@@ -4,36 +4,16 @@ var app = express()
 var https = require('https')
 var http = require('http')
 var fs = require('fs')
-var child_process = require('child_process')
 var auth = require('basic-auth')
 var proxy = require('request')
 var request = Promise.promisify(require('request'))
 var debug = require('debug')('proxy')
+var config = require('./config')
 
-var port = 9500
 var options = {
   key: fs.readFileSync(__dirname + '/registry.blackbeard.dev.key', 'utf8'),
   cert: fs.readFileSync(__dirname + '/registry.blackbeard.dev.crt', 'utf8')
 }
-
-var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
-  encoding: 'utf8'
-})
-
-var REGISTRY_HOST
-if (process.env.REGISTRY_HOST && process.env.NODE_ENV === 'production') {
-  REGISTRY_HOST = process.env.REGISTRY_HOST
-} else {
-  REGISTRY_HOST = 'http://' + ip.trim() + ':5000'
-}
-
-var BACKEND_HOST
-if (process.env.BACKEND_HOST && process.env.NODE_ENV === 'production') {
-  BACKEND_HOST = process.env.BACKEND_HOST
-} else {
-  BACKEND_HOST = 'http://' + ip.trim() + ':8000'
-}
-console.log(BACKEND_HOST)
 
 var checkCredentials = function(credentials) {
   return new Promise(function(resolve, reject) {
@@ -42,7 +22,7 @@ var checkCredentials = function(credentials) {
     }
     request({
       method: 'POST',
-      uri: BACKEND_HOST + '/registrylogin',
+      uri: config.BACKEND_HOST + '/registrylogin',
       json: true,
       headers: {
         'x-login-from': 'registry'
@@ -96,8 +76,8 @@ app.all('/v2/*', function(req, res) {
     }
 
     return checkPath(credentials.name, req.originalUrl).then(function () {
-      var url = REGISTRY_HOST + req.originalUrl
-      var host = req.headers['Host']
+      var url = config.REGISTRY_HOST + req.originalUrl
+      var host = req.headers.Host
       if (process.env.NODE_ENV === 'production') {
         host = 'registry.blackbeard.io'
       }
