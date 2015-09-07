@@ -11,7 +11,8 @@ var schema = new mongoose.Schema({
     cert: String,
     key: String,
     sshPublic: String,
-    sshPrivate: String
+    sshPrivate: String,
+    sshUser: String
   },
   deleted: { type: Boolean, default: false },
   deletedAt: String,

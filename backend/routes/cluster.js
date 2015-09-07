@@ -23,7 +23,8 @@ exports.postCluster = {
       key: Joi.string(),
       ip: Joi.string(),
       sshPublic: Joi.string(),
-      sshPrivate: Joi.string()
+      sshPrivate: Joi.string(),
+      sshUser: Joi.string()
     }
   },
   handler: function (request, reply) {
@@ -35,6 +36,7 @@ exports.postCluster = {
     var ip = request.payload.ip
     var sshPublic = request.payload.sshPublic
     var sshPrivate = request.payload.sshPrivate
+    var sshUser = request.payload.sshUser
 
     new Cluster({
       type: type,
@@ -44,7 +46,8 @@ exports.postCluster = {
         cert: cert,
         key: key,
         sshPublic: sshPublic,
-        sshPrivate: sshPrivate
+        sshPrivate: sshPrivate,
+        sshUser: sshUser
       },
       ip: ip
     }).saveAsync().then(function (cluster) {
