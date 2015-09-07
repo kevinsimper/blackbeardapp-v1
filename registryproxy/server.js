@@ -61,7 +61,7 @@ app.all('/v2/*', function(req, res) {
           // PING BACKEND - NEW CONTAINER UPLOADED
           request({
             method: 'POST',
-            uri: BACKEND_HOST + '/webhook/notify/image',
+            uri: config.BACKEND_HOST + '/webhook/notify/image',
             json: true,
             body: {
               user: user,
