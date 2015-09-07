@@ -90,6 +90,7 @@ db.clusters.insert({
   "deleted": false,
   "machines": 2,
   "containers": [ObjectId("555cb1e2fc27fe6f5f540001")],
+  "containerLimit": 2,
   "certificates": {
     "ca": "ca",
     "cert": "cert",

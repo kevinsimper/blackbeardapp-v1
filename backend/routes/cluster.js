@@ -25,7 +25,8 @@ exports.postCluster = {
       key: Joi.string(),
       ip: Joi.string(),
       sshPublic: Joi.string(),
-      sshPrivate: Joi.string()
+      sshPrivate: Joi.string(),
+      containerLimit: Joi.number()
     }
   },
   handler: function (request, reply) {
@@ -37,6 +38,7 @@ exports.postCluster = {
     var ip = request.payload.ip
     var sshPublic = request.payload.sshPublic
     var sshPrivate = request.payload.sshPrivate
+    var containerLimit = request.payload.containerLimit
 
     new Cluster({
       type: type,
@@ -48,7 +50,8 @@ exports.postCluster = {
         sshPublic: sshPublic,
         sshPrivate: sshPrivate
       },
-      ip: ip
+      ip: ip,
+      containerLimit: containerLimit
     }).saveAsync().then(function (cluster) {
       reply(cluster)
     }).catch(function (err) {
@@ -151,9 +154,13 @@ exports.getClusterUsage = {
         throw new Promise.OperationalError('does not exist!')
       }
 
-      reply(_.sum(_.map(cluster.containers, function(container) {
-        return container.memorySize
-      })))
+      reply({
+        memoryUsed: _.sum(_.map(cluster.containers, function(container) {
+          return container.memorySize
+        })),
+        limit: cluster.containerLimit,
+        count: cluster.containers.length
+      })
     }).error(function (err) {
       request.log(err)
       reply(Boom.notFound())
