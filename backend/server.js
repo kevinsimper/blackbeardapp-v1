@@ -551,6 +551,11 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'GET',
+    path: '/clusters/{cluster}/usage',
+    config: clusterRoutes.getClusterUsage
+  })
+  server.route({
+    method: 'GET',
     path: '/clusters/{cluster}/containers',
     config: clusterRoutes.getClusterContainers
   })

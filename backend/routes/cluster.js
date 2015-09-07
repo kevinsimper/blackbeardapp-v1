@@ -1,8 +1,10 @@
 var Boom = require('boom')
 var Joi = require('joi')
-var Cluster = require('../models/Cluster')
 var Promise = require('bluebird')
+var Cluster = require('../models/Cluster')
+var Container = require('../models/Container')
 var ClusterService = require('../services/Cluster')
+var _ = require('lodash')
 
 exports.getClusters = function (request, reply) {
   Cluster.find().then(function (clusters) {
@@ -122,6 +124,36 @@ exports.getClusterContainers = {
       return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
+    }).error(function (err) {
+      request.log(err)
+      reply(Boom.notFound())
+    }).catch(function (err) {
+      request.log(err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
+exports.getClusterUsage = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      cluster: Joi.string()
+    }
+  },
+  handler: function (request, reply) {
+    var id = request.params.cluster
+    Cluster.findOne({_id: id}).populate('containers').then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('does not exist!')
+      }
+
+      reply(_.sum(_.map(cluster.containers, function(container) {
+        return container.memorySize
+      })))
     }).error(function (err) {
       request.log(err)
       reply(Boom.notFound())

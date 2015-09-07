@@ -84,12 +84,26 @@ db.supports.insert({
   "ip": "127.0.0.1",
   "__v": 0
 });
+db.clusters.insert({
+  "_id": ObjectId("555cb1e2fc27fe6f5f540002"),
+  "type": "swarm",
+  "deleted": false,
+  "machines": 2,
+  "containers": [ObjectId("555cb1e2fc27fe6f5f540001")],
+  "certificates": {
+    "ca": "ca",
+    "cert": "cert",
+    "key": "key"
+  }
+})
 db.containers.insert({
   "_id": ObjectId("555cb1e2fc27fe6f5f540001"),
   "region": "eu",
   "status": "UP",
   "createdAt": "1432138210",
   "deleted": false,
+  "memorySize": 512,
   "app": ObjectId("559396bf05974b0c00b6b284"),
+  "cluster": ObjectId("555cb1e2fc27fe6f5f540002"),
   "__v": 0
 });

@@ -42,6 +42,7 @@ lab.experiment('/clusters', function() {
         done()
       })
   })
+  var cluster = null
   lab.test('POST /', function (done) {
     request({
       method: 'POST',
@@ -58,10 +59,26 @@ lab.experiment('/clusters', function() {
         key: 'key file'
       }
     }).spread(function (response, body) {
+      cluster = body[0]._id
       expect(response.statusCode, 'to be', 200)
       done()
     }).catch(function (err) {
       console.log(err)
     })
+  })
+  var CLUSTER_FIXTURE_ID = "555cb1e2fc27fe6f5f540002"
+  lab.test('GET cluster usage', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/clusters/' + CLUSTER_FIXTURE_ID + '/usage',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      },
+      function(error, response, body) {
+        expect(body, 'to be', 512)
+        done()
+      })
   })
 })
