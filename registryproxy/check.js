@@ -8,6 +8,10 @@ exports.checkCredentials = function(credentials) {
     if (!credentials) {
       return resolve(false)
     }
+    if(credentials.name === 'worker' &&
+      credentials.pass === config.WORKER_PASSWORD) {
+      return resolve(true)
+    }
     request({
       method: 'POST',
       uri: config.BACKEND_HOST + '/registrylogin',

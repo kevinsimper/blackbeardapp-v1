@@ -21,3 +21,11 @@ if(process.env.NODE_ENV == 'production') {
 } else {
   exports.REGISTRY_URL = 'registry.blackbeard.dev:9500'
 }
+
+if(process.env.NODE_ENV == 'production') {
+  exports.WORKER_PASSWORD = process.env.WORKER_PASSWORD
+} else if(process.env.NODE_ENV === 'development' && (typeof process.env.WORKER_PASSWORD !== 'undefined')) {
+  exports.WORKER_PASSWORD = process.env.WORKER_PASSWORD
+} else {
+  exports.WORKER_PASSWORD = 'development'
+}

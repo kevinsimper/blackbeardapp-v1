@@ -40,7 +40,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
       console.log('pull path', fullPath)
       return new Promise(function (resolve, reject) {
         sequest(cluster.certificates.sshUser + '@' + cluster.ip, {
-          command: 'docker login -u blackbeard -p password -e kevin.simper@gmail.com ' + registry + ' && docker pull ' + fullPath,
+          command: 'docker login -u worker -p ' + config.WORKER_PASSWORD + ' -e kevin.simper@gmail.com ' + registry + ' && docker pull ' + fullPath,
           privateKey: cluster.certificates.sshPrivate
         }, function (err, stdout) {
           console.log(err)
