@@ -34,13 +34,13 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var registry = 'registry.blackbeard.dev:9500'
+    var registry = config.REGISTRY_URL
     var pullImage = Promise.all([cluster, image, user]).spread(function (cluster, image, user) {
       var fullPath = registry + '/' + user.username + '/' + image.name
       console.log('pull path', fullPath)
       return new Promise(function (resolve, reject) {
-        sequest('docker@' + cluster.ip, {
-          command: 'docker login -u blackbeard -p password -e kevin.simper@gmail.com registry.blackbeard.dev:9500 && docker pull ' + fullPath,
+        sequest(cluster.certificates.sshUser + '@' + cluster.ip, {
+          command: 'docker login -u worker -p ' + config.WORKER_PASSWORD + ' -e kevin.simper@gmail.com ' + registry + ' && docker pull ' + fullPath,
           privateKey: cluster.certificates.sshPrivate
         }, function (err, stdout) {
           console.log(err)
@@ -54,14 +54,15 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return ClusterService.createContainer(cluster, registry + '/' + user.username + '/' + image.name + ':latest')
     })
 
-    var containerInfo = Promise.all([cluster, clusterContainerId]).spread(function (cluster, clusterContainerId) {
-      return ClusterService.lookupContainer(cluster, clusterContainerId)
-    })
 
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {
         return ClusterService.startContainer(cluster, clusterContainerId)
       })
+
+    var containerInfo = Promise.all([cluster, clusterContainerId, started]).spread(function (cluster, clusterContainerId) {
+      return ClusterService.lookupContainer(cluster, clusterContainerId)
+    })
 
     var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo])
       .spread(function (container, cluster, clusterContainerId, started, containerInfo) {
@@ -72,7 +73,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         }
         var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
-        container.ip = ports[portKeys[0]][0].HostIp,
+        container.ip = ports[portKeys[0]][0].HostIp
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
         container.containerHash = clusterContainerId

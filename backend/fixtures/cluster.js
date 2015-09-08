@@ -9,7 +9,10 @@ db.clusters.insert({
   "certificates": {
     "ca": "---CA---",
     "cert": "---CERT---",
-    "key": "---KEY---"
+    "key": "---KEY---",
+    "sshPublic": "---KEY---",
+    "sshPrivate": "---KEY---",
+    "sshUser": "---KEY---"
   },
   "__v": 0
 })

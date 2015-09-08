@@ -56,7 +56,8 @@ process.stdin.on('end', function() {
     cert: certPem,
     key: keyPem,
     sshPrivate: idRSA,
-    sshPublic: idRSAPub
+    sshPublic: idRSAPub,
+    sshUser: 'docker'
   }))
 
   req.end()
