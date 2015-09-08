@@ -8,20 +8,7 @@ var config = require('./config')
 
 var proxy = httpProxy.createProxyServer({})
 
-var adminToken = request({
-  method: 'POST',
-  uri: config.BACKEND_HOST + '/login',
-  json: true,
-  body: {
-    email: 'admin@blackbeard.io',
-    password: 'password'
-  }
-}).spread(function(response, body) {
-  return body.token
-}).catch(function (err) {
-  console.log(err)
-  throw new Error('Could not login to backend!', err)
-})
+var adminToken = config.ADMIN_TOKEN
 
 var getContainers = function (appname) {
   return adminToken.then(function(adminToken) {
@@ -37,6 +24,7 @@ var getContainers = function (appname) {
         limit: 1
       }
     }).spread(function (response, body) {
+      debug('apps search', body)
       var app = body[0]
       if(body.length === 0) {
         throw new Error('No app with that name!')
@@ -53,6 +41,7 @@ var getContainers = function (appname) {
         }
       })
     }).spread(function (resp, body) {
+      debug('containers', body)
       return body
     })
   })
@@ -88,7 +77,9 @@ http.createServer(function (req, res) {
       target: address,
       changeOrigin: true
     })
-  }).catch(function () {
+  }).catch(function (err) {
+    debug('could not find', appname)
+    debug('error', err)
     res.end('No app with that name!')
   })
 
