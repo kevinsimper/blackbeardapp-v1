@@ -27,7 +27,7 @@ test:
     - ./docker-compose build backend
     - ./docker-compose build registryproxy
     - ./docker-compose build router
-    - sleep 3
+    - sleep 10
     - ./docker-compose up -d
     - ./docker-compose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose start backend
