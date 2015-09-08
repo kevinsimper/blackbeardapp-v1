@@ -41,8 +41,9 @@ exports.createContainer = function (cluster, image) {
   return self.request(cluster, uri, 'POST', {
     Image: image,
     HostConfig: {
-      'PublishAllPorts': true
-    }
+      'PublishAllPorts': true,
+      'Memory': 1024 * 1024 * 512
+    },
   }).spread(function (response, body) {
     return body.Id
   })
