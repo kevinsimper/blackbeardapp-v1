@@ -10,7 +10,7 @@ exports.getClusters = function (request, reply) {
   Cluster.find().populate('containers').then(function (clusters) {
     clusters = _.map(clusters, function (cluster) {
       var used = _.sum(_.map(cluster.containers, function(container) {
-        return container.memorySize
+        return container.memory
       }))
       cluster = cluster.toObject()
       cluster.pressure = used / cluster.memory
@@ -165,7 +165,7 @@ exports.getClusterUsage = {
 
       reply({
         memoryUsed: _.sum(_.map(cluster.containers, function(container) {
-          return container.memorySize
+          return container.memory
         })),
         limit: cluster.memory,
         count: cluster.containers.length

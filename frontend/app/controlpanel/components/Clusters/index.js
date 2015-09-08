@@ -62,5 +62,4 @@ var Clusters = React.createClass({
     )
   }
 })
-//
 module.exports = Clusters
