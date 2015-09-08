@@ -42,7 +42,7 @@ exports.createContainer = function (cluster, image) {
     Image: image,
     HostConfig: {
       'PublishAllPorts': true,
-      'Memory': 1024 * 1024 * 512
+      'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512 
     },
   }).spread(function (response, body) {
     return body.Id

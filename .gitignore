@@ -31,3 +31,4 @@ config/development.yml
 npm-debug.log
 
 backend/tests/server
+backend/fixtures/cluster.js
