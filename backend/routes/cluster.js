@@ -7,7 +7,7 @@ var ClusterService = require('../services/Cluster')
 var _ = require('lodash')
 
 exports.getClusters = function (request, reply) {
-  Cluster.find().populate('containers').then(function (clusters) {
+  Cluster.find({type: {'$ne': 'test_swarm'}}).populate('containers').then(function (clusters) {
     clusters = _.map(clusters, function (cluster) {
       var used = _.sum(_.map(cluster.containers, function(container) {
         return container.memory

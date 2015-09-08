@@ -39,6 +39,8 @@ lab.experiment('/clusters', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
+        expect(body.length, 'to be', 0)
+
         done()
       })
   })

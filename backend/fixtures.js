@@ -86,7 +86,7 @@ db.supports.insert({
 });
 db.clusters.insert({
   "_id": ObjectId("555cb1e2fc27fe6f5f540002"),
-  "type": "swarm",
+  "type": "test_swarm",
   "deleted": false,
   "machines": 2,
   "containers": [ObjectId("555cb1e2fc27fe6f5f540001")],
