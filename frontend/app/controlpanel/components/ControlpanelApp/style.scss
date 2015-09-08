@@ -16,5 +16,8 @@
 }
 .ControlpanelApp__Content {
   flex: 7;
-  padding: 20px;
+  padding: 1rem;
+  @media(min-width: 500px) {
+    padding: 2rem;
+  }
 }
