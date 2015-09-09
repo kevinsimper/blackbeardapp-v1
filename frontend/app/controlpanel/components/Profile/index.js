@@ -54,28 +54,39 @@ var Profile = React.createClass({
   render: function() {
     return (
       <div>
-        <form onSubmit={this.onSubmit}>
-          <h1>Profile</h1>
-          <h2>Personal</h2>
-          <div>Name</div>
-          <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
-          <div>E-mail</div>
-          <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
-          <div>
-            <Button type='submit'>Update</Button>
-          </div>
-          {this.state.loading && <div>Loading...</div>}
-          {this.state.message}
-        </form>
-        <h2>Information</h2>
-          <div>Current Balance</div>
-          ${this.state.credit/100}
-          <div>Registration Date</div>
-          {moment.unix(this.state.timestamp).format()}
-        <Creditcards/>
-        <CreditcardsFormular/>
-        <VoucherClaim/>
-        <PreviousPayments/>
+        <div className='Profile__block'>
+          <form onSubmit={this.onSubmit}>
+            <h1>Profile</h1>
+            <div>Name</div>
+            <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
+            <div>E-mail</div>
+            <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
+            <div>
+              <Button type='submit'>Update</Button>
+            </div>
+            {this.state.loading && <div>Loading...</div>}
+            {this.state.message}
+          </form>
+        </div>
+        <div className='Profile__block'>
+          <h2>Information</h2>
+            <div>Current Balance</div>
+            <div>${this.state.credit / 100}</div>
+            <div>Registration Date</div>
+            <div>{moment.unix(this.state.timestamp).format()}</div>
+        </div>
+        <div className='Profile__block'>
+          <VoucherClaim/>
+        </div>
+        <div className='Profile__block'>
+          <Creditcards/>
+        </div>
+        <div className='Profile__block'>
+          <CreditcardsFormular/>
+        </div>
+        <div className='Profile__block'>
+          <PreviousPayments/>
+        </div>
       </div>
     );
   }

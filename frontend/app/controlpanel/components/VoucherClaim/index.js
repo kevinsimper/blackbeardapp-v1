@@ -62,7 +62,7 @@ var VoucherClaim = React.createClass({
 
     return (
       <div className='VoucherClaim'>
-        <h1>Claim a Voucher</h1>
+        <h2>Claim a Voucher</h2>
         <Input type='voucher' placeholder='Voucher' value={this.state.email} onChange={this.handleVoucher}/>
         <div>
           <Button onClick={this.onClickRequest}>Claim</Button>
