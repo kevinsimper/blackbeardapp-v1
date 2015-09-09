@@ -72,6 +72,9 @@ var Containers = React.createClass({
             }
           </tbody>
         </Table>
+        <div>
+          <span style={{textAlign: 'right'}}>Estimated Monthly Cost: <span style={{marginLeft:10}}>${runningContainers.length * 7}</span></span>
+        </div>
         <div style={{margin: '15px 0px'}}>
           <Button size='small' onClick={this.onClickShowHistory}>
             {(this.state.history) ? 'Hide history' : 'Show history'}
