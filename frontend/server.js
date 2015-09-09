@@ -16,11 +16,15 @@ app.set('views', './views')
 app.use(express.static('public'))
 
 app.get('/', function(req, res) {
-  res.render('index')
+  res.render('index', {
+    NODE_ENV: process.env.NODE_ENV
+  })
 })
 
 app.get('/signup', function (req, res) {
-  res.render('signup')
+  res.render('signup', {
+    NODE_ENV: process.env.NODE_ENV
+  })
 })
 
 app.get('/controlpanel', function(req, res) {
