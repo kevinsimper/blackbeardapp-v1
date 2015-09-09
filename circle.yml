@@ -23,16 +23,21 @@ test:
   override:
     - sudo service mongodb stop
     - sudo service rabbitmq-server stop
-    - ./docker-compose build frontend
-    - ./docker-compose build backend
-    - ./docker-compose build registryproxy
-    - ./docker-compose build router
+    - ./docker-compose --verbose build frontend
+    - ./docker-compose --verbose build backend
+    - ./docker-compose --verbose build registryproxy
+    - ./docker-compose --verbose build router
     - sleep 10
-    - ./docker-compose up -d
-    - ./docker-compose run backend /bin/bash -c "npm install && npm test"
-    - ./docker-compose start backend
-    - ./docker-compose run registryproxy /bin/bash -c "npm install && npm test"
-    - ./docker-compose run frontend /bin/bash -c "npm install && npm run build && npm test"
+    - docker images
+    - docker ps
+    - ./docker-compose --verbose up -d
+    - sleep 10
+    - docker images
+    - docker ps
+    - ./docker-compose --verbose run backend /bin/bash -c "npm install && npm test"
+    - ./docker-compose --verbose start backend
+    - ./docker-compose --verbose run registryproxy /bin/bash -c "npm install && npm test"
+    - ./docker-compose --verbose run frontend /bin/bash -c "npm install && npm run build && npm test"
 deployment:
   production:
     branch: master
@@ -46,7 +51,7 @@ deployment:
       - docker push tutum.co/kevinsimper/blackbeardapp_registryproxy
       - docker tag blackbeardapp_router tutum.co/kevinsimper/blackbeardapp_router
       - docker push tutum.co/kevinsimper/blackbeardapp_router
-      - ./docker-compose run -e NODE_ENV=production -e DATABASE_URL=$DATABASE_URL backend node migrate.js
+      - ./docker-compose --verbose run -e NODE_ENV=production -e DATABASE_URL=$DATABASE_URL backend node migrate.js
 experimental:
   notify:
     branches:
