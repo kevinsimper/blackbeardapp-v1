@@ -22,6 +22,7 @@ var ClusterShow = require('./components/ClusterShow/')
 var Vouchers = require('./components/Vouchers/')
 var VoucherShow = require('./components/VoucherShow/')
 var VoucherCreate = require('./components/VoucherCreate/')
+var Registry = require('./components/Registry/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -48,6 +49,7 @@ var routes = (
     <Route path='/vouchers' handler={Vouchers}/>
     <Route path='/vouchers/create' handler={VoucherCreate}/>
     <Route path='/vouchers/:id' handler={VoucherShow}/>
+    <Route path='/registry' handler={Registry}/>
   </Route>
 )
 
