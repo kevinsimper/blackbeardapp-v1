@@ -24,7 +24,9 @@ app.get('/signup', function (req, res) {
 })
 
 app.get('/controlpanel', function(req, res) {
-  res.render('controlpanel/index')
+  res.render('controlpanel/index', {
+    NODE_ENV: process.env.NODE_ENV
+  })
 })
 
 app.get('/blog/', function (req, res) {

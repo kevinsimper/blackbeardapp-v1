@@ -2,11 +2,27 @@ var Reflux = require('reflux')
 var request = require('superagent')
 var actions = require('./actions')
 var config = require('../../config')
+var once = require('lodash/function/once')
 
 var _profile = {
   name: '',
   email: ''
 }
+
+var startIntercom = once(function (profile) {
+  if(!window.Intercom) {
+    return false
+  }
+  var intercomSettings = {
+    email: profile.email,
+    created_at: profile.timestamp,
+    user_id: profile._id
+  }
+  if(profile.name) {
+    intercomSettings.name = profile.name
+  }
+  Intercom('update', intercomSettings)
+})
 
 var store = Reflux.createStore({
   listenables: actions,
@@ -22,6 +38,8 @@ var store = Reflux.createStore({
   },
   onLoadCompleted: function(profile) {
     _profile = profile
+
+    startIntercom(profile)
     this.trigger(profile)
   },
   onUpdate: function(profile) {
