@@ -2,6 +2,7 @@ var React = require('react')
 var request = require('superagent')
 var config = require('../../config')
 var Table = require('../Table/')
+var TimeSince = require('../TimeSince/')
 
 var Registry = React.createClass({
   getInitialState: function () {
@@ -29,6 +30,9 @@ var Registry = React.createClass({
             <tr>
               <th>#</th>
               <th>Image</th>
+              <th>Tags</th>
+              <th>Time Since</th>
+              <th>SHA</th>
             </tr>
           </thead>
           <tbody>
@@ -36,7 +40,18 @@ var Registry = React.createClass({
               return (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{image}</td>
+                  <td>{image.name}</td>
+                  {image.tags.map(function (tag) {
+                    return (
+                      <div>
+                        <td>:{tag.tag}</td>
+                        <td>
+                          <TimeSince timestamp={Date.parse(tag.history[0].v1Compatibility.created) / 1000} />
+                        </td>
+                        <td>{tag.history[0].v1Compatibility.id.substring(0, 12)}</td>
+                      </div>
+                    )
+                  })}
                 </tr>
               )
             })}
