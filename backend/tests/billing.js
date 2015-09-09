@@ -16,6 +16,21 @@ var appUrl = helpers.appUrl()
 var server = require('../startdev')()
 
 lab.experiment('Testing Billing service', function() {
+  var adminToken = ''
+  lab.before(function (done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'admin@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function (response, body) {
+      adminToken = body.token
+      done()
+    })
+  })
   lab.test('Verify date ranges', function(done) {
 
     var start = moment('2015-08', "YYYY-MM")
@@ -64,50 +79,34 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
+
   lab.test('Test billing', function(done) {
-    var adminToken = request({
-      method: 'POST',
-      uri: appUrl + '/login',
+    var user = request({
+      method: 'GET',
+      uri: appUrl + '/users',
       json: true,
-      body: {
-        email: 'admin@blackbeard.io',
-        password: 'password'
+      headers: {
+        'Authorization': adminToken
       }
     }).spread(function (response, body) {
-      return body.token
+      return _.findWhere(body, {email: 'user@blackbeard.io'})
     })
 
-    var users = adminToken.then(function (adminToken) {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/users',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
-    }).spread(function (response, body) {
-      return body
-    })
-
-    var billing = adminToken.then(function (adminToken) {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/billing',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
+    var billing = request({
+      method: 'GET',
+      uri: appUrl + '/billing',
+      json: true,
+      headers: {
+        'Authorization': adminToken
+      }
     }).spread(function (response, body) {
       expect(response.statusCode, 'to be', 200)
       // Need to confirm charging was attempted
       expect(body.data, 'to contain', 'did charge')
-
       return body.data
     })
 
-    var usersAfter = Promise.all([adminToken, billing]).spread(function(adminToken) {
+    var userAfter = billing.then(function() {
       return request({
         method: 'GET',
         uri: appUrl + '/users',
@@ -115,27 +114,17 @@ lab.experiment('Testing Billing service', function() {
         headers: {
           'Authorization': adminToken
         }
+      }).spread(function (response, body) {
+        return _.findWhere(body, {email: 'user@blackbeard.io'})
       })
-    }).spread(function (response, body) {
-      return body
     })
 
-    Promise.all([adminToken, billing, users, usersAfter]).spread(function(adminToken, billing, users, usersAfter) {
-      // get virtualcredit
-      var user = _.filter(users, function(user) {
-        return user.email == "user@blackbeard.io"
-      })
-
-      var userAfter = _.filter(usersAfter, function(userAfter) {
-        return userAfter.email == "user@blackbeard.io"
-      })
-
-      expect(user[0].virtualCredit, 'to be greater than', 0)
-      expect(user[0].credit, 'to be greater than', 0)
-      expect(userAfter[0].virtualCredit, 'to be greater than', 0)
-      expect(userAfter[0].credit, 'to be greater than', 0)
-      expect(user[0].virtualCredit, 'not to equal', userAfter[0].virtualCredit)
-
+    Promise.all([billing, user, userAfter]).spread(function(billing, user, userAfter) {
+      expect(user.virtualCredit, 'to be greater than', 0)
+      expect(user.credit, 'to be greater than', 0)
+      expect(userAfter.virtualCredit, 'to be greater than', 0)
+      expect(userAfter.credit, 'to be greater than', 0)
+      expect(user.virtualCredit, 'not to equal', userAfter.virtualCredit)
       done()
     })
   })
