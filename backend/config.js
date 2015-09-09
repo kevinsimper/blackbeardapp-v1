@@ -23,6 +23,19 @@ if(process.env.NODE_ENV == 'production') {
 }
 
 if(process.env.NODE_ENV == 'production') {
+  exports.REGISTRY_FULLURL = process.env.REGISTRY_FULLURL
+} else if(process.env.NODE_ENV === 'development' && (typeof process.env.REGISTRY_FULLURL !== 'undefined')) {
+  exports.REGISTRY_FULLURL = process.env.REGISTRY_FULLURL
+} else {
+  var child_process = require('child_process')
+  var ip = child_process.execSync('/sbin/ip route|awk \'/default/ { print $3 }\'', {
+    encoding: 'utf8'
+  }).trim()
+  exports.REGISTRY_FULLURL = 'http://' + ip + ':5000'
+}
+
+
+if(process.env.NODE_ENV == 'production') {
   exports.WORKER_PASSWORD = process.env.WORKER_PASSWORD
 } else if(process.env.NODE_ENV === 'development' && (typeof process.env.WORKER_PASSWORD !== 'undefined')) {
   exports.WORKER_PASSWORD = process.env.WORKER_PASSWORD

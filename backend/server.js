@@ -28,6 +28,7 @@ var clusterRoutes = require('./routes/cluster')
 var voucherRoutes = require('./routes/voucher')
 var billingRoutes = require('./routes/billing')
 var containerRoutes = require('./routes/container')
+var registryRoutes = require('./routes/registry')
 
 var server = new Hapi.Server({
   connections: {
@@ -558,6 +559,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     method: 'GET',
     path: '/clusters/{cluster}/startcontainer',
     config: clusterRoutes.getClusterStartContainer
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/registry/images',
+    config: registryRoutes.getRegistryAllImages
   })
 })
 
