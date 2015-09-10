@@ -1,2 +1,4 @@
-zip -r billing.zip billing/
-iron worker upload --zip billing.zip -name cron-billing iron/images:node-0.12 sh -c 'node request'
+pushd billing
+zip -r data.zip .
+popd
+iron worker upload --zip billing/data.zip --name cron-billing5 iron/images:node-0.12 node request
