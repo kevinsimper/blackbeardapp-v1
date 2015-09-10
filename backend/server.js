@@ -527,13 +527,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'GET',
     path: '/clusters',
-    config: {
-      auth: 'jwt',
-      app: {
-        level: 'ADMIN'
-      },
-      handler: clusterRoutes.getClusters
-    }
+    config: clusterRoutes.getClusters
   })
   server.route({
     method: 'POST',
