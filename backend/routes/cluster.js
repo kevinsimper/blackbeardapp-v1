@@ -6,25 +6,34 @@ var Container = require('../models/Container')
 var ClusterService = require('../services/Cluster')
 var _ = require('lodash')
 
-exports.getClusters = function (request, reply) {
-  Cluster.find({type: {'$ne': 'test_swarm'}}).populate('containers').then(function (clusters) {
-    clusters = _.map(clusters, function (cluster) {
-      var used = _.sum(_.map(cluster.containers, function(container) {
-        return container.memory
-      }))
-      cluster = cluster.toObject()
-      cluster.pressure = used / cluster.memory
-      return cluster
-    })
+exports.getClusters = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  handler: function (request, reply) {
+    Cluster.find({type: {'$ne': 'test_swarm'}}).populate('containers').then(function (clusters) {
+      clusters = _.map(clusters, function (cluster) {
+        var used = _.sum(_.map(cluster.containers, function(container) {
+          return container.memory
+        }))
+        cluster = cluster.toObject()
+        cluster.pressure = used / cluster.memory
+        return cluster
+      })
 
-    reply(clusters)
-  }).catch(function () {
-    reply(Boom.badImplementation())
-  })
+      reply(clusters)
+    }).catch(function () {
+      reply(Boom.badImplementation())
+    })
+  }
 }
 
 exports.postCluster = {
   auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
   validate: {
     payload: {
       type: Joi.string().required(),
@@ -74,6 +83,9 @@ exports.postCluster = {
 
 exports.deleteCluster = {
   auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
   handler: function (request, reply) {
     var id = request.params.id
     Cluster.findOne({_id: id}).then(function (cluster) {
@@ -91,6 +103,9 @@ exports.deleteCluster = {
 
 exports.getClusterStatus = {
   auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
   validate: {
     params: {
       cluster: Joi.string()
