@@ -69,11 +69,14 @@ module.exports = {
       cvv: card.cvv
     }
 
-    var user
-    var userP = User.findById(userId)
+    var user = User.findById(userId).then(function (user) {
+      if(!user) {
+        return Promise.OperationalError('No user found!')
+      }
+      return user
+    })
 
-    return userP.then(function(u) {
-      user = u
+    var stripeToken = user.then(function() {
       return self.create({
         card: {
           number: creditcard.creditcard,
@@ -82,24 +85,27 @@ module.exports = {
           cvc: creditcard.cvv
         }
       })
-    }).then(function(token) {
-      var newCreditCard = new CreditCard({
+    })
+    var newCreditcard = Promise.all([stripeToken, user]).spread(function(stripeToken, user) {
+      return new CreditCard({
         name: creditcard.name,
-        token: token.id,
-        number: token.card.last4,
-        brand: token.card.brand,
+        token: stripeToken.id,
+        number: stripeToken.card.last4,
+        brand: stripeToken.card.brand,
         active: (user.creditCards.length === 0)
-      })
+      }).save()
+    })
 
-      return newCreditCard.save()
-    }).then(function(creditCard) {
+    var savedUser = Promise.all([user, newCreditcard]).spread(function(user, creditCard) {
       user.creditCards.push(creditCard._id)
       return user.save()
-    }).then(function(creditCard) {
+    })
+
+    return Promise.all([savedUser, newCreditcard]).spread(function(creditCard, newCreditcard) {
       return {
-        name: creditCard.name,
-        number: creditCard.number,
-        brand: creditCard.brand
+        name: newCreditcard.name,
+        number: newCreditcard.number,
+        brand: newCreditcard.brand
       }
     })
   },
