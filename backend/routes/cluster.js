@@ -1,11 +1,22 @@
 var Boom = require('boom')
 var Joi = require('joi')
-var Cluster = require('../models/Cluster')
 var Promise = require('bluebird')
+var Cluster = require('../models/Cluster')
+var Container = require('../models/Container')
 var ClusterService = require('../services/Cluster')
+var _ = require('lodash')
 
 exports.getClusters = function (request, reply) {
-  Cluster.find().then(function (clusters) {
+  Cluster.find({type: {'$ne': 'test_swarm'}}).populate('containers').then(function (clusters) {
+    clusters = _.map(clusters, function (cluster) {
+      var used = _.sum(_.map(cluster.containers, function(container) {
+        return container.memory
+      }))
+      cluster = cluster.toObject()
+      cluster.pressure = used / cluster.memory
+      return cluster
+    })
+
     reply(clusters)
   }).catch(function () {
     reply(Boom.badImplementation())
@@ -16,7 +27,7 @@ exports.postCluster = {
   auth: 'jwt',
   validate: {
     payload: {
-      type: Joi.string(),
+      type: Joi.string().required(),
       machines: Joi.number(),
       ca: Joi.string(),
       cert: Joi.string(),
@@ -24,7 +35,8 @@ exports.postCluster = {
       ip: Joi.string(),
       sshPublic: Joi.string(),
       sshPrivate: Joi.string(),
-      sshUser: Joi.string()
+      sshUser: Joi.string(),
+      memory: Joi.number()
     }
   },
   handler: function (request, reply) {
@@ -37,6 +49,7 @@ exports.postCluster = {
     var sshPublic = request.payload.sshPublic
     var sshPrivate = request.payload.sshPrivate
     var sshUser = request.payload.sshUser
+    var memory = request.payload.memory
 
     new Cluster({
       type: type,
@@ -49,9 +62,10 @@ exports.postCluster = {
         sshPrivate: sshPrivate,
         sshUser: sshUser
       },
-      ip: ip
+      ip: ip,
+      memory: memory
     }).saveAsync().then(function (cluster) {
-      reply(cluster)
+      reply(cluster[0])
     }).catch(function (err) {
       reply(Boom.badImplementation())
     })
@@ -125,6 +139,40 @@ exports.getClusterContainers = {
       return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
+    }).error(function (err) {
+      request.log(err)
+      reply(Boom.notFound())
+    }).catch(function (err) {
+      request.log(err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
+exports.getClusterUsage = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      cluster: Joi.string()
+    }
+  },
+  handler: function (request, reply) {
+    var id = request.params.cluster
+    Cluster.findOne({_id: id}).populate('containers').then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('does not exist!')
+      }
+
+      reply({
+        memoryUsed: _.sum(_.map(cluster.containers, function(container) {
+          return container.memory
+        })),
+        limit: cluster.memory,
+        count: cluster.containers.length
+      })
     }).error(function (err) {
       request.log(err)
       reply(Boom.notFound())

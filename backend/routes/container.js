@@ -9,23 +9,27 @@ var config = require('../config')
 var ClusterService = require('../services/Cluster')
 var Queue = require('../services/Queue')
 
-exports.postContainers = function(request, reply) {
+exports.postContainer = function(request, reply) {
   var appId = request.params.app
   var user = User.getUserIdFromRequest(request)
   var region = request.payload.region
 
   var app = App.findById(appId)
+
   var container = app.then(function(app) {
     if(!app) {
       throw new Promise.OperationalError('could not find app')
     }
+    // NOTE: Memory limit here is defaulted to 512mb
     return new Container({
       region: region,
       status: Container.status.UP,
       app: app,
+      memory: 512,
       createdAt: Math.round(Date.now() / 1000)
     }).save()
   })
+
   var savingApp = Promise.all([app, container]).spread(function (app, container) {
     app.containers.push(container)
     return app.save()

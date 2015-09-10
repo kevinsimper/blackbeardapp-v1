@@ -39,9 +39,12 @@ lab.experiment('/clusters', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
+        expect(body.length, 'to be', 0)
+
         done()
       })
   })
+  var cluster = null
   lab.test('POST /', function (done) {
     request({
       method: 'POST',
@@ -55,13 +58,33 @@ lab.experiment('/clusters', function() {
         machines: 2,
         ca: 'ca certificate',
         cert: 'certificate',
-        key: 'key file'
+        key: 'key file',
+        memory: 2048
       }
     }).spread(function (response, body) {
+      cluster = body._id
       expect(response.statusCode, 'to be', 200)
+      expect(body, 'to satisfy', {
+        type: 'swarm'
+      })
       done()
     }).catch(function (err) {
       console.log(err)
     })
+  })
+  var CLUSTER_FIXTURE_ID = "555cb1e2fc27fe6f5f540002"
+  lab.test('GET cluster usage', function(done) {
+    request({
+        method: 'GET',
+        uri: appUrl + '/clusters/' + CLUSTER_FIXTURE_ID + '/usage',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      },
+      function(error, response, body) {
+        expect(body, 'to equal', { memoryUsed: 512, limit: 2048, count: 1 })
+        done()
+      })
   })
 })
