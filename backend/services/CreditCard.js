@@ -117,73 +117,55 @@ module.exports = {
     var remoteAddr = options.remoteAddr || '127.0.0.1'
     var balance = options.balance
 
-    var creditcard = CreditCard.findOne({_id: cardId})
-    var user = User.findOne({_id: userId})
-
-    // User _must_ exist
-    return user.then(function(user) {
+    var creditcard = CreditCard.findOne({_id: cardId}).then(function(creditcard) {
+      if (!creditcard) {
+        throw new Promise.OperationalError("Credit card not found")
+      }
+      return creditcard
+    })
+    var user = User.findOne({_id: userId}).then(function (user) {
       if (!user) {
         throw new Promise.OperationalError("User not found")
       }
+      return user
+    })
 
-      var card
-      var newCharge = creditcard.then(function(creditcard) {
-        if (!creditcard) {
-          throw new Promise.OperationalError("Credit card not found")
-        }
-
-        card = creditcard
-
-        return self.charge({
-          amount: chargeAmount,
-          currency: "usd",
-          source: creditcard.token,
-          description: chargeName
-        })
+    var newCharge = creditcard.then(function(creditcard) {
+      return self.charge({
+        amount: chargeAmount,
+        currency: "usd",
+        source: creditcard.token,
+        description: chargeName
       })
+    })
 
-      var charge = null
-      return newCharge.then(function (newCharge) {
-        if (!newCharge) {
-          throw new Promise.OperationalError("Charge failed")
-        }
+    var savedUser = Promise.all([newCharge, user]).spread(function (newCharge, user) {
+      user.credit = balance
+      user.virtualCredit = balance
+      return user.save()
+    })
 
-        charge = newCharge
-        user.credit = balance
-        user.virtualCredit = balance
-
-        return user.save()
-      }).then(function (savedUser) {
-        if (!savedUser) {
-          throw new Promise.OperationalError("User save failed")
-        }
-
-        // Now save a Payment entry
-        var newPayment = new Payment({
-          amount: charge.amount,
-          creditCard: card._id,
-          chargeId: charge.id,
+    var savedNewPayment = Promise.all([savedUser, creditcard, newCharge])
+      .spread(function (savedUser, creditcard, newCharge) {
+        return new Payment({
+          amount: newCharge.amount,
+          creditCard: creditcard._id,
+          chargeId: newCharge.id,
           user: savedUser._id,
           timestamp: Math.round(Date.now() / 1000),
           ip: remoteAddr,
           status: Payment.status.SUCCESS
-        })
-
-        return newPayment.save()
-      }).then(function (savedPayment) {
-        if (!savedPayment) {
-          throw new Promise.OperationalError("Payment save failed")
-        }
-
-        return {
-          message: 'Payment successfully made.',
-          paymentId: savedPayment._id
-        }
-      }).error(function (err) {
-        return err
-      }).catch(function (err) {
-        return new Error('Payment failed')
+        }).save()
       })
+
+    return savedNewPayment.then(function (savedPayment) {
+      return {
+        message: 'Payment successfully made.',
+        paymentId: savedPayment._id
+      }
+    }).catch(function (err) {
+      console.log(err.stack)
+      return err
     })
   }
 }
