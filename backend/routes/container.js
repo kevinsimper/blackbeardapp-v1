@@ -25,7 +25,7 @@ exports.postContainer = function(request, reply) {
       region: region,
       status: Container.status.UP,
       app: app,
-      memoryLimit: 512,
+      memory: 512,
       createdAt: Math.round(Date.now() / 1000)
     }).save()
   })

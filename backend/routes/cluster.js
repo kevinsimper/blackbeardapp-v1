@@ -27,7 +27,7 @@ exports.postCluster = {
   auth: 'jwt',
   validate: {
     payload: {
-      type: Joi.string(),
+      type: Joi.string().required(),
       machines: Joi.number(),
       ca: Joi.string(),
       cert: Joi.string(),
@@ -35,7 +35,7 @@ exports.postCluster = {
       ip: Joi.string(),
       sshPublic: Joi.string(),
       sshPrivate: Joi.string(),
-      containerLimit: Joi.number()
+      memory: Joi.number()
     }
   },
   handler: function (request, reply) {
@@ -47,7 +47,7 @@ exports.postCluster = {
     var ip = request.payload.ip
     var sshPublic = request.payload.sshPublic
     var sshPrivate = request.payload.sshPrivate
-    var containerLimit = request.payload.containerLimit
+    var memory = request.payload.memory
 
     new Cluster({
       type: type,
@@ -60,9 +60,9 @@ exports.postCluster = {
         sshPrivate: sshPrivate
       },
       ip: ip,
-      containerLimit: containerLimit
+      memory: memory
     }).saveAsync().then(function (cluster) {
-      reply(cluster)
+      reply(cluster[0])
     }).catch(function (err) {
       reply(Boom.badImplementation())
     })
