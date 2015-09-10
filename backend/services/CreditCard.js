@@ -2,7 +2,6 @@ var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
 var Payment = Promise.promisifyAll(require('../models/Payment'))
-var Boom = require('boom')
 
 module.exports = {
   charge: function(options) {
@@ -57,20 +56,17 @@ module.exports = {
   saveCreditCard: function (userId, card) {
     var self = this
     if (!userId) {
-      return Boom.notFound('The specified user could not be found.')
+      return Promise.reject('The specified user could not be found.')
     }
-
+    if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
+      return Promise.reject('Incomplete creditcard details.')
+    }
     var creditcard = {
       name: card.name,
       creditcard: card.creditcard,
       expiryMonth: card.expiryMonth,
       expiryYear: card.expiryYear,
       cvv: card.cvv
-    }
-
-    // Validate credit card
-    if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
-      return Boom.notAcceptable('Incomplete creditcard details.')
     }
 
     var user
