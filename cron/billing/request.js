@@ -9,7 +9,8 @@ request({
   headers: {
     'User-Agent': 'iron.io',
     'Authorization': token
-  }
+  },
+  json: true
 }, function (err, response, body) {
   if(err) {
     console.log(err)
