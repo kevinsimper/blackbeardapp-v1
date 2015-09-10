@@ -2,7 +2,6 @@ var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
 var Payment = Promise.promisifyAll(require('../models/Payment'))
-var Boom = require('boom')
 
 module.exports = {
   charge: function(options) {
@@ -57,9 +56,11 @@ module.exports = {
   saveCreditCard: function (userId, card) {
     var self = this
     if (!userId) {
-      return Boom.notFound('The specified user could not be found.')
+      return Promise.reject('The specified user could not be found.')
     }
-
+    if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
+      return Promise.reject('Incomplete creditcard details.')
+    }
     var creditcard = {
       name: card.name,
       creditcard: card.creditcard,
@@ -68,16 +69,14 @@ module.exports = {
       cvv: card.cvv
     }
 
-    // Validate credit card
-    if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
-      return Boom.notAcceptable('Incomplete creditcard details.')
-    }
+    var user = User.findById(userId).then(function (user) {
+      if(!user) {
+        return Promise.OperationalError('No user found!')
+      }
+      return user
+    })
 
-    var user
-    var userP = User.findById(userId)
-
-    return userP.then(function(u) {
-      user = u
+    var stripeToken = user.then(function() {
       return self.create({
         card: {
           number: creditcard.creditcard,
@@ -86,24 +85,27 @@ module.exports = {
           cvc: creditcard.cvv
         }
       })
-    }).then(function(token) {
-      var newCreditCard = new CreditCard({
+    })
+    var newCreditcard = Promise.all([stripeToken, user]).spread(function(stripeToken, user) {
+      return new CreditCard({
         name: creditcard.name,
-        token: token.id,
-        number: token.card.last4,
-        brand: token.card.brand,
+        token: stripeToken.id,
+        number: stripeToken.card.last4,
+        brand: stripeToken.card.brand,
         active: (user.creditCards.length === 0)
-      })
+      }).save()
+    })
 
-      return newCreditCard.save()
-    }).then(function(creditCard) {
+    var savedUser = Promise.all([user, newCreditcard]).spread(function(user, creditCard) {
       user.creditCards.push(creditCard._id)
       return user.save()
-    }).then(function(creditCard) {
+    })
+
+    return Promise.all([savedUser, newCreditcard]).spread(function(creditCard, newCreditcard) {
       return {
-        name: creditCard.name,
-        number: creditCard.number,
-        brand: creditCard.brand
+        name: newCreditcard.name,
+        number: newCreditcard.number,
+        brand: newCreditcard.brand
       }
     })
   },
@@ -117,73 +119,55 @@ module.exports = {
     var remoteAddr = options.remoteAddr || '127.0.0.1'
     var balance = options.balance
 
-    var creditcard = CreditCard.findOne({_id: cardId})
-    var user = User.findOne({_id: userId})
-
-    // User _must_ exist
-    return user.then(function(user) {
+    var creditcard = CreditCard.findOne({_id: cardId}).then(function(creditcard) {
+      if (!creditcard) {
+        throw new Promise.OperationalError("Credit card not found")
+      }
+      return creditcard
+    })
+    var user = User.findOne({_id: userId}).then(function (user) {
       if (!user) {
         throw new Promise.OperationalError("User not found")
       }
+      return user
+    })
 
-      var card
-      var newCharge = creditcard.then(function(creditcard) {
-        if (!creditcard) {
-          throw new Promise.OperationalError("Credit card not found")
-        }
-
-        card = creditcard
-
-        return self.charge({
-          amount: chargeAmount,
-          currency: "usd",
-          source: creditcard.token,
-          description: chargeName
-        })
+    var newCharge = creditcard.then(function(creditcard) {
+      return self.charge({
+        amount: chargeAmount,
+        currency: "usd",
+        source: creditcard.token,
+        description: chargeName
       })
+    })
 
-      var charge = null
-      return newCharge.then(function (newCharge) {
-        if (!newCharge) {
-          throw new Promise.OperationalError("Charge failed")
-        }
+    var savedUser = Promise.all([newCharge, user]).spread(function (newCharge, user) {
+      user.credit = balance
+      user.virtualCredit = balance
+      return user.save()
+    })
 
-        charge = newCharge
-        user.credit = balance
-        user.virtualCredit = balance
-
-        return user.save()
-      }).then(function (savedUser) {
-        if (!savedUser) {
-          throw new Promise.OperationalError("User save failed")
-        }
-
-        // Now save a Payment entry
-        var newPayment = new Payment({
-          amount: charge.amount,
-          creditCard: card._id,
-          chargeId: charge.id,
+    var savedNewPayment = Promise.all([savedUser, creditcard, newCharge])
+      .spread(function (savedUser, creditcard, newCharge) {
+        return new Payment({
+          amount: newCharge.amount,
+          creditCard: creditcard._id,
+          chargeId: newCharge.id,
           user: savedUser._id,
           timestamp: Math.round(Date.now() / 1000),
           ip: remoteAddr,
           status: Payment.status.SUCCESS
-        })
-
-        return newPayment.save()
-      }).then(function (savedPayment) {
-        if (!savedPayment) {
-          throw new Promise.OperationalError("Payment save failed")
-        }
-
-        return {
-          message: 'Payment successfully made.',
-          paymentId: savedPayment._id
-        }
-      }).error(function (err) {
-        return err
-      }).catch(function (err) {
-        return new Error('Payment failed')
+        }).save()
       })
+
+    return savedNewPayment.then(function (savedPayment) {
+      return {
+        message: 'Payment successfully made.',
+        paymentId: savedPayment._id
+      }
+    }).catch(function (err) {
+      console.log(err.stack)
+      return err
     })
   }
 }
