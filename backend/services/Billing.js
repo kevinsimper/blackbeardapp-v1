@@ -17,6 +17,11 @@ module.exports = {
   diffHours: function (a, b) {
     return Math.ceil(a.diff(b)/1000/60/60)
   },
+  isAppCurrentlyRunning: function (app) {
+    return (_.size(_.filter(app.containers, function (container) {
+      return container.deletedAt !== undefined
+    })) > 0)
+  },
   /**
   * Takes app and date range. From this all containers are retrieved and the
   * amount of hours the containers are online are summed up.
@@ -30,6 +35,7 @@ module.exports = {
       var hours = 0
 
       app.containers.forEach(function (container, i) {
+        var current = 0
         var createdDate = moment.unix(container.createdAt)
 
         var deletedAt = moment()
@@ -44,21 +50,25 @@ module.exports = {
             // Stopped within month
             if (createdDate.isBefore(start)) {
               // Started before start of period
-              hours += self.diffHours(deletedAt, start)
+              current = self.diffHours(deletedAt, start)
             } else {
               // Started at start of period
-              hours += self.diffHours(deletedAt, createdDate)
+              current = self.diffHours(deletedAt, createdDate)
             }
           } else {
             // Stopped after end of month
             if (createdDate.isBefore(start)) {
               // Created before start so full month
-              hours += self.diffHours(end, start)
+              current = self.diffHours(end, start)
             } else {
               // from midway through to end of month
-              hours += self.diffHours(end, createdDate)
+              current = self.diffHours(end, createdDate)
             }
           }
+        }
+
+        if ((current != 1) || (!self.isAppCurrentlyRunning(app))) {
+          hours += current
         }
       })
 
