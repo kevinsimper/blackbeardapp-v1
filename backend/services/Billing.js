@@ -63,12 +63,12 @@ module.exports = {
           }
         }
 
-        if ((current == 1) && (AppService.isCurrentlyRunning(app))) {
-          // In this scenario the container has just been started
-          // so we are not increasing the total of hours
-        } else {
-          hours += current
+        if (AppService.isCurrentlyRunning(app)) {
+          // App is currently running so we shouldn't count current hour
+          current -= 1
         }
+
+        hours += current
       })
 
       resolve(hours)
