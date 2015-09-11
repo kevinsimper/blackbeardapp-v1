@@ -9,6 +9,7 @@ var Payment = Promise.promisifyAll(require('../models/Payment'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
+var AppService = require('../services/App')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
 var Boom = require('boom')
 
@@ -16,11 +17,6 @@ module.exports = {
   topUpInterval: 1000,
   diffHours: function (a, b) {
     return Math.ceil(a.diff(b)/1000/60/60)
-  },
-  isAppCurrentlyRunning: function (app) {
-    return (_.size(_.filter(app.containers, function (container) {
-      return container.deletedAt !== undefined
-    })) > 0)
   },
   /**
   * Takes app and date range. From this all containers are retrieved and the
@@ -67,7 +63,10 @@ module.exports = {
           }
         }
 
-        if ((current != 1) || (!self.isAppCurrentlyRunning(app))) {
+        if ((current == 1) && (AppService.isCurrentlyRunning(app))) {
+          // In this scenario the container has just been started
+          // so we are not increasing the total of hours
+        } else {
           hours += current
         }
       })

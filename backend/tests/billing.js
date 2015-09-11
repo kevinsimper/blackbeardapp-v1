@@ -74,8 +74,7 @@ lab.experiment('Testing Billing service', function() {
     test.containers = containers
 
     Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      // TODO: Fix this test
-      // expect(hours, 'to be', 1)
+      expect(hours, 'to be', 1)
 
       done()
     })
