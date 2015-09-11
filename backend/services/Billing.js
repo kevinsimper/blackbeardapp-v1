@@ -9,15 +9,18 @@ var Payment = Promise.promisifyAll(require('../models/Payment'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
+var Payment = Promise.promisifyAll(require('../models/Payment'))
 var Boom = require('boom')
 
 module.exports = {
   topUpInterval: 1000,
-
   diffHours: function (a, b) {
     return Math.ceil(a.diff(b)/1000/60/60)
   },
   /**
+  * Takes app and date range. From this all containers are retrieved and the
+  * amount of hours the containers are online are summed up.
+  *
   * @param {moment} start
   * @param {moment} end
   */
@@ -62,10 +65,16 @@ module.exports = {
       resolve(hours)
     })
   },
+  /**
+   * At this stage calculateHoursPrice is hardcoded to be 7 dollars per month divided by 30 days and 24 hours.
+   */
   calculateHoursPrice: function () {
     // 7 dollars divided by a full month of hours (in cents)
     return ((7 / 30) * 24) * 100
   },
+  /**
+   * Get last successful payment of user.
+   */
   getLastPayment: function (user) {
     return Payment.findOne({
       user: user,
@@ -80,21 +89,63 @@ module.exports = {
       }
     })
   },
-  chargeHours: function (user, hours) {
+  /**
+   * Helper function to set credit of user and return promise to save.
+   */
+  setCredit: function (user, credit, virtualCredit) {
+    user.credit = credit
+    user.virtualCredit = virtualCredit
+
+    return user.save()
+  },
+  /**
+   * Report payment is the saving of the Payment object after a credit card charge.
+   */
+  reportPayment: function(charge, creditCard, user, remoteAddr) {
+    // Now save a Payment entry
+    var payment = new Payment({
+      amount: charge.amount,
+      creditCard: creditCard._id,
+      chargeId: charge.id,
+      user: user._id,
+      timestamp: Math.round(Date.now() / 1000),
+      ip: remoteAddr,
+      status: Payment.status.SUCCESS
+    })
+
+    return payment.save()
+  },
+  /**
+   * Actually charge houres if the user requires a topup. Update virtualcredit.
+   */
+  chargeHours: function (options) {
     var self = this
 
+    var user = options.user
+    var hours = options.hours
+    var chargeName = options.name
+
+    if (!user) {
+      throw new Promise.OperationalError("User not found")
+    }
+
+    if (!chargeName) {
+      throw new Promise.OperationalError("A description must be provided for the charge")
+    }
+
     if (user.creditCards.length === 0) {
-      return Promise.resolve('has no creditcards')
+      return Promise.resolve('no active card')
     }
 
     var amountUsed = self.calculateHoursPrice() * hours
 
+    // If the user has used more than their available credit then topup
     if (amountUsed > user.credit) {
-      var activeCard = _.find(user.creditCards, function (cc) {
+      var creditcard = _.find(user.creditCards, function (cc) {
         return cc.active === true
       })
 
-      if (activeCard) {
+      if (creditcard) {
         // This code dictates how much the user is charged.
         // A note has been placed on the wiki about it here:
         // https://github.com/kevinsimper/blackbeardapp/wiki/Charging-Users
@@ -107,21 +158,42 @@ module.exports = {
         }
 
         var amount = paymentCount*self.topUpInterval
+        var remoteAddr = options.remoteAddr || '127.0.0.1'
+        var balance = (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
 
-        return CreditCardService.chargeCreditCard({
-          user: user._id,
-          card: activeCard._id,
-          message: "Automatic Topup",
+        // Charge user's credit card
+        var chargeCreditCard = CreditCardService.charge({
           amount: amount,
-          balance: (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
-        }).then(function (result) {
-          if (result && result.paymentId) {
-            return 'did charge'
+          currency: "usd",
+          source: creditcard.token,
+          description: chargeName
+        })
 
-          } else {
-            return 'charging error'
+        // Set user's new credit
+        var userUpdate = chargeCreditCard.then(function (chargeCreditCard) {
+          if (!chargeCreditCard) {
+            throw new Promise.OperationalError("Charge failed")
           }
-        }).catch(function(err) {
+
+          return self.setCredit(user, balance, balance)
+        })
+
+        return Promise.all([userUpdate, creditcard, chargeCreditCard]).spread(function (userUpdate, creditcard, chargeCreditCard) {
+          if (!userUpdate) {
+            throw new Promise.OperationalError("User save failed")
+          }
+
+          // Report payment as Payment object
+          return self.reportPayment(chargeCreditCard, creditcard, userUpdate, remoteAddr)
+        }).then(function (savedPayment) {
+          if (!savedPayment) {
+            throw new Promise.OperationalError("Payment save failed")
+          }
+
+          return 'did charge'
+        }).error(function (err) {
+          return 'charging error'
+        }).catch(function (err) {
           return 'charging error'
         })
       } else {

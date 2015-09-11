@@ -177,15 +177,13 @@ exports.postCreditCardPayment = function (request, reply) {
 
 // /user/XX/creditcards POST
 exports.postCreditCards = function (request, reply) {
-  var newCreditCard = null
-  var currentUser = null
-
   if (request.params.user !== 'me') {
     return reply(Boom.unauthorized('Can\'t access other users!'))
   }
-  var id = User.getUserIdFromRequest(request)
 
-  var creditcard = {
+  var userId = User.getUserIdFromRequest(request)
+
+  var card = {
     name: request.payload.name,
     creditcard: request.payload.creditcard,
     expiryMonth: request.payload.expiryMonth,
@@ -193,78 +191,7 @@ exports.postCreditCards = function (request, reply) {
     cvv: request.payload.cvv
   }
 
-  var updateCallback = function (err, user) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database.'))
-    }
-    reply({
-      name: newCreditCard.name,
-      number: newCreditCard.number,
-      brand: newCreditCard.brand
-    })
-  }
-
-  var newCardCallback = function (err, creditCard) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database.'))
-    }
-
-    currentUser.creditCards.push(creditCard._id)
-
-    currentUser.save(updateCallback)
-  }
-
-  User.findOne({_id: id}, function (err, user) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database.'))
-    }
-
-    currentUser = user
-
-    if (!user) {
-      return reply(Boom.notFound('The specified user could not be found.'))
-    }
-
-    // Validate credit card
-    if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
-      return reply(Boom.notAcceptable('Incomplete creditcard details.'))
-    }
-
-    // Now save to StripeAPI
-    CreditCardService.create({
-      card: {
-        number: creditcard.creditcard,
-        exp_month: creditcard.expiryMonth,
-        exp_year: creditcard.expiryYear,
-        cvc: creditcard.cvv
-      }
-    }).then(function (token) {
-      newCreditCard = new CreditCard({
-        name: creditcard.name,
-        token: token.id,
-        number: token.card.last4,
-        brand: token.card.brand,
-        active: (user.creditCards.length === 0)
-      })
-
-      newCreditCard.save(newCardCallback)
-    }).catch(function (err) {
-      if ('code' in err) {
-        //return reply(Boom.badRequest(err.message, {
-        //  rawType: err.rawType,
-        //  code: err.code,
-        //  param: err.param
-        //}))
-        // Because Boom is crap the data sent with this exception is ignored so
-        return reply(Boom.badRequest(err.message))
-      }
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database.'))
-    })
-  })
+  return reply(CreditCardService.save(userId, card))
 }
 
 // /user/XX/creditcards DELETE
