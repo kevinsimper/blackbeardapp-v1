@@ -96,26 +96,26 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
-  // lab.test('Verify multiple containers', function(done) {
-  //   var start = moment(new Date()).subtract(1, 'day')
-  //   var end = moment(new Date()).add(1, 'month')
+  lab.test('Verify multiple containers', function(done) {
+    var start = moment(new Date()).subtract(1, 'day')
+    var end = moment(new Date()).add(1, 'month')
 
-  //   var oneAndHalfHoursAgo = moment(new Date()).subtract(1.5, 'hour')
-  //   var tenHoursAgo = moment(new Date()).subtract(10, 'hour')
-  //   var containers = [
-  //     new Container({createdAt: oneAndHalfHoursAgo.unix()}),
-  //     new Container({createdAt: tenHoursAgo.unix(), deletedAt: oneAndHalfHoursAgo.format("YYYY-MM-DD HH:mm:ss")})
-  //   ]
-  //   var app = new App({name: "testApp"})
-  //   var test = app.toObject()
-  //   test.containers = containers
+    var oneAndHalfHoursAgo = moment(new Date()).subtract(1.5, 'hour')
+    var tenHoursAgo = moment(new Date()).subtract(10, 'hour')
+    var containers = [
+      new Container({createdAt: oneAndHalfHoursAgo.unix()}),
+      new Container({createdAt: tenHoursAgo.unix(), deletedAt: oneAndHalfHoursAgo.format("YYYY-MM-DD HH:mm:ss")})
+    ]
+    var app = new App({name: "testApp"})
+    var test = app.toObject()
+    test.containers = containers
 
-  //   Billing.getAppBillableHours(test, start, end).then(function(hours) {
-  //     expect(hours, 'to be', 1+9)
+    Billing.getAppBillableHours(test, start, end).then(function(hours) {
+      expect(hours, 'to be', 1+9)
 
-  //     done()
-  //   })
-  // })
+      done()
+    })
+  })
   lab.test('Test billing', function(done) {
     var users = []
     users[0] = request({

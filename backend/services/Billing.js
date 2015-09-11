@@ -9,7 +9,7 @@ var Payment = Promise.promisifyAll(require('../models/Payment'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
-var AppService = require('../services/App')
+var ContainerService = require('../services/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
 var Boom = require('boom')
 
@@ -63,7 +63,7 @@ module.exports = {
           }
         }
 
-        if (AppService.isCurrentlyRunning(app)) {
+        if (ContainerService.isCurrentlyRunning(container)) {
           // App is currently running so we shouldn't count current hour
           current -= 1
         }
