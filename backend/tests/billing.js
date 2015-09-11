@@ -79,9 +79,9 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
+    var users = []
 
   lab.test('Test billing', function(done) {
-    var users = []
     users[0] = request({
       method: 'GET',
       uri: appUrl + '/users',
@@ -90,7 +90,9 @@ lab.experiment('Testing Billing service', function() {
         'Authorization': adminToken
       }
     }).spread(function (response, body) {
-      return body
+      return _.filter(body, function(user) {
+        return user.email == "user@blackbeard.io"
+      })
     })
 
     // STOP the fixture container
@@ -124,8 +126,6 @@ lab.experiment('Testing Billing service', function() {
 
     // Billing for 1 hour occurs here randomly so stopped the container
     var billing2 = billing.then(function () {
-      console.log('billing request made2')
-
       return request({
         method: 'GET',
         uri: appUrl + '/billing',
@@ -135,8 +135,6 @@ lab.experiment('Testing Billing service', function() {
         }
       })
     }).spread(function (response, body) {
-      console.log('billing response2')
-
       expect(response.statusCode, 'to be', 200)
       // Need to confirm no charge was made here
       expect(body.data, 'to contain', 'did not charge')
@@ -154,10 +152,13 @@ lab.experiment('Testing Billing service', function() {
         }
       })
     }).spread(function (response, body) {
-      return body
+      return _.filter(body, function(user) {
+        return user.email == "user@blackbeard.io"
+      })
     })
 
-    var newContainer = users[1].then(function () {
+    var newContainers = []
+    newContainers[0] = users[1].then(function () {
       return request({
         method: 'POST',
         uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers',
@@ -170,59 +171,86 @@ lab.experiment('Testing Billing service', function() {
         }
       })
     }).spread(function (response, body) {
+      return body
+    })
+
+    newContainers[1] = newContainers[0].then(function () {
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          region: 'eu'
+        }
+      })
+    }).spread(function (response, body) {
+      return body
+    })
+
+    newContainers[2] = newContainers[1].then(function () {
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          region: 'eu'
+        }
+      })
+    }).spread(function (response, body) {
+      return body
+    })
+
+    newContainers[2].then(function() {done()})
+  })
+  lab.test('Test billing', function(done) {
+    setTimeout(function() {done()}, 1000)
+  })
+  lab.test('Test billing', function(done) {
+    var billing3 = request({
+      method: 'GET',
+      uri: appUrl + '/billing',
+      json: true,
+      headers: {
+        'Authorization': adminToken
+      }
+    }).spread(function (response, body) {
+      expect(response.statusCode, 'to be', 200)
+      // Need to confirm charging was attempted
+      //expect(body.data, 'to contain', 'did charge')
+
+      return body.data
+    })
+
+    users[2] = billing3.then(function() {
+      return request({
+        method: 'GET',
+        uri: appUrl + '/users',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        }
+      })
+    }).spread(function (response, body) {
+      return _.filter(body, function(user) {
+        return user.email == "user@blackbeard.io"
+      })
+    })
+
+    Promise.all([users[0], users[1], users[2], billing3]).spread(function(userBefore, userMid, userAfter) {
+      expect(userBefore[0].virtualCredit, 'to be greater than', 0)
+      expect(userBefore[0].credit, 'to be greater than', 0)
+      expect(userMid[0].virtualCredit, 'to be greater than', 0)
+      expect(userMid[0].credit, 'to be greater than', 0)
+      expect(userAfter[0].virtualCredit, 'to be greater than', 0)
+      expect(userAfter[0].credit, 'to be greater than', 0)
+
       done()
     })
   })
 })
-      // setTimeout(function() {
-      //   var billing3 = request({
-      //     method: 'GET',
-      //     uri: appUrl + '/billing',
-      //     json: true,
-      //     headers: {
-      //       'Authorization': adminToken
-      //     }
-      //   }).spread(function (response, body) {
-      //     expect(response.statusCode, 'to be', 200)
-      //     // Need to confirm charging was attempted
-      //     expect(body.data, 'to contain', 'did charge')
-
-      //     return body.data
-      //   })
-
-      //   users[2] = billing3.then(function() {
-      //     return request({
-      //       method: 'GET',
-      //       uri: appUrl + '/users',
-      //       json: true,
-      //       headers: {
-      //         'Authorization': adminToken
-      //       }
-      //     })
-      //   }).spread(function (response, body) {
-      //     return body
-      //   })
-
-      //   Promise.all([users[0], users[1], users[2], billing3]).spread(function(usersBefore, usersMid, usersAfter) {
-      //     // get virtualcredit
-      //     var user = _.filter(usersBefore, function(user) {
-      //       return user.email == "user@blackbeard.io"
-      //     })
-
-      //     var userMid = _.filter(usersMid, function(user) {
-      //       return user.email == "user@blackbeard.io"
-      //     })
-
-      //     var userAfter = _.filter(usersAfter, function(userAfter) {
-      //       return userAfter.email == "user@blackbeard.io"
-      //     })
-
-      //     expect(user[0].virtualCredit, 'to be greater than', 0)
-      //     expect(user[0].credit, 'to be greater than', 0)
-      //     // usersMid here
-      //     expect(userAfter[0].virtualCredit, 'to be greater than', 0)
-      //     expect(userAfter[0].credit, 'to be greater than', 0)
-
-      //     done()
-      //   })
-      // }, 1000)

@@ -62,7 +62,6 @@ module.exports = {
         }
       })
 
-      console.log("RESOLVING WITH", hours)
       resolve(hours)
     })
   },
@@ -140,16 +139,11 @@ module.exports = {
 
     var amountUsed = self.calculateHoursPrice() * hours
 
-    console.log("amountUsed", amountUsed, user.credit)
     // If the user has used more than their available credit then topup
     if (amountUsed > user.credit) {
       var creditcard = _.find(user.creditCards, function (cc) {
         return cc.active === true
       })
-
-      console.log("DADD")
-      console.log(user.creditCards)
-      console.log(creditcard)
 
       if (creditcard) {
         // This code dictates how much the user is charged.
