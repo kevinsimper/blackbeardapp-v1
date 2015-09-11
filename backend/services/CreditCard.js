@@ -1,7 +1,6 @@
 var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
-var Boom = require('boom')
 
 module.exports = {
   charge: function(options) {
@@ -57,7 +56,7 @@ module.exports = {
     var self = this
 
     if (!userId) {
-      return Boom.notFound('The specified user could not be found.')
+      throw new Promise.OperationalError('The specified user could not be found.')
     }
 
     var creditcard = {
@@ -70,7 +69,7 @@ module.exports = {
 
     // Validate credit card
     if (!creditcard.name || !creditcard.creditcard || !creditcard.expiryMonth || !creditcard.expiryYear || !creditcard.cvv) {
-      return Boom.notAcceptable('Incomplete creditcard details.')
+      throw new Promise.OperationalError('Incomplete creditcard details.')
     }
 
     var user = User.findById(userId)
@@ -90,18 +89,9 @@ module.exports = {
         cvc: creditcard.cvv
       }
     }).error(function (err) {
-      if ('code' in err) {
-        //return reply(Boom.badRequest(err.message, {
-        //  rawType: err.rawType,
-        //  code: err.code,
-        //  param: err.param
-        //}))
-        // Because Boom is crap the data sent with this exception is ignored so
-        return Boom.badRequest(err.message)
-      }
-      return Boom.badImplementation('There was a problem with the database.', err)
+      throw new Promise.OperationalError(err)
     }).catch(function (err) {
-      return Boom.badImplementation('There was a problem with the database.', err)
+      throw new Promise.OperationalError(err)
     })
 
     var creditCard = Promise.all([user, token]).spread(function(user, token) {
@@ -128,7 +118,7 @@ module.exports = {
         brand: creditCard.brand
       }
     }).catch(function (err) {
-      return Boom.badImplementation('There was a problem with the database.', err)
+      return err
     })
   }
 }

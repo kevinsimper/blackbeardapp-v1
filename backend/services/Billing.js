@@ -62,6 +62,7 @@ module.exports = {
         }
       })
 
+      console.log("RESOLVING WITH", hours)
       resolve(hours)
     })
   },
@@ -118,22 +119,39 @@ module.exports = {
   /**
    * Actually charge houres if the user requires a topup. Update virtualcredit.
    */
-  chargeHours: function (user, hours) {
+  chargeHours: function (options) {
     var self = this
 
+    var user = options.user
+    var hours = options.hours
+    var chargeName = options.name
+
+    if (!user) {
+      throw new Promise.OperationalError("User not found")
+    }
+
+    if (!chargeName) {
+      throw new Promise.OperationalError("A description must be provided for the charge")
+    }
+
     if (user.creditCards.length === 0) {
-      return Promise.resolve('has no creditcards')
+      return Promise.resolve('no active card')
     }
 
     var amountUsed = self.calculateHoursPrice() * hours
 
+    console.log("amountUsed", amountUsed, user.credit)
     // If the user has used more than their available credit then topup
     if (amountUsed > user.credit) {
-      var activeCard = _.find(user.creditCards, function (cc) {
+      var creditcard = _.find(user.creditCards, function (cc) {
         return cc.active === true
       })
 
-      if (activeCard) {
+      console.log("DADD")
+      console.log(user.creditCards)
+      console.log(creditcard)
+
+      if (creditcard) {
         // This code dictates how much the user is charged.
         // A note has been placed on the wiki about it here:
         // https://github.com/kevinsimper/blackbeardapp/wiki/Charging-Users
@@ -146,33 +164,12 @@ module.exports = {
         }
 
         var amount = paymentCount*self.topUpInterval
-
-        var options = {
-          user: user,
-          card: activeCard,
-          message: "Automatic Topup",
-          amount: amount,
-          balance: (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
-        }
-
-        var user = options.user
-        var creditcard = options.card
-        var chargeName = options.message
-        var chargeAmount = options.amount
         var remoteAddr = options.remoteAddr || '127.0.0.1'
-        var balance = options.balance
-
-        if (!user) {
-          throw new Promise.OperationalError("User not found")
-        }
-
-        if (!creditcard) {
-          throw new Promise.OperationalError("Credit card not found")
-        }
+        var balance = (user.credit - amountUsed)+(paymentCount*self.topUpInterval)
 
         // Charge user's credit card
         var chargeCreditCard = CreditCardService.charge({
-          amount: chargeAmount,
+          amount: amount,
           currency: "usd",
           source: creditcard.token,
           description: chargeName

@@ -45,7 +45,10 @@ exports.getAllBilling = function(request, reply) {
   Promise.all([users, hoursToBill]).spread(function(users, hoursToBill) {
     return Promise.all(users.map(function(user, i) {
       var hours = _.sum(hoursToBill[i])
-      return Billing.chargeHours(user, hours)
+      return Billing.chargeHours({user: user,
+        hours: hours,
+        name: "Automatic Topup"
+      })
     }))
   }).then(function(charges) {
     reply({
