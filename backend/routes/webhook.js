@@ -59,7 +59,7 @@ exports.postNotifyImage = function(request, reply) {
     // to find active usernames
     reply("ok")
   }).catch(function(e) {
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }

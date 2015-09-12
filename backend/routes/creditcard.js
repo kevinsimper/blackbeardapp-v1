@@ -20,7 +20,7 @@ exports.getCreditCards = function (request, reply) {
     return reply(creditCards)
   })
   .catch(function(err) {
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }
@@ -35,7 +35,7 @@ exports.getCreditCard = function (request, reply) {
   }).catch(function(CastError, e) {
     reply(Boom.notFound())
   }).catch(function(err) {
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }
@@ -77,7 +77,7 @@ exports.postCreditCardActivate = function (request, reply) {
       message: 'Credit card set to active.',
     })
   }).catch(function (err) {
-    request.log(err)
+    request.log(['error'], err)
     return reply(Boom.badImplementation('There was a problem with the database.'))
   })
 }

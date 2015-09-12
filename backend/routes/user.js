@@ -77,7 +77,7 @@ exports.postUserUsername = function(request, reply) {
     }
   })
   .catch(function(err) {
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 

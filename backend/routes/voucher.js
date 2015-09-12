@@ -74,10 +74,10 @@ exports.generateVoucher = {
     return newVoucherWithCode.then(function(voucher) {
       reply(voucher)
     }).error(function (err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badRequest())
     }).catch(function(err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }
@@ -88,7 +88,7 @@ exports.getVouchers = function(request, reply) {
   vouchers.then(function (vouchers) {
     reply(vouchers)
   }).catch(function(err) {
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }
@@ -108,7 +108,7 @@ exports.getUsedVouchers = {
       })
       reply(voucherClaimant)
     }).catch(function(err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }
@@ -136,7 +136,7 @@ exports.verifyVoucher = function(request, reply) {
       status: status
     })
   }).catch(function(err) {
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }
@@ -206,13 +206,13 @@ exports.claimVoucher = {
         status: 'OK'
       })
     }).error(function (err) {
-      request.log(err)
+      request.log(['error'], err)
       reply({
         status: 'FAIL',
         error: err
       })
     }).catch(function(err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }

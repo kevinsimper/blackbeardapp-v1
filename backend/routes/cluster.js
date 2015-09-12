@@ -124,10 +124,10 @@ exports.getClusterStatus = {
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
-      request.log([], err)
+      request.log(['error'], err)
       reply(Boom.notFound())
     }).catch(function (err) {
-      request.log([], err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }
@@ -155,10 +155,10 @@ exports.getClusterContainers = {
     }).spread(function (response, body) {
       reply(body)
     }).error(function (err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.notFound())
     }).catch(function (err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }
@@ -189,10 +189,10 @@ exports.getClusterUsage = {
         count: cluster.containers.length
       })
     }).error(function (err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.notFound())
     }).catch(function (err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }
@@ -222,7 +222,7 @@ exports.getClusterStartContainer = {
     Promise.all([containerId, startContainer]).spread(function(containerId, startContainer) {
       reply(containerId)
     }).catch(function (err) {
-      request.log([], err)
+      request.log(['error'], err)
       reply(Boom.badImplementation())
     })
   }

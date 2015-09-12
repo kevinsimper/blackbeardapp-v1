@@ -46,7 +46,7 @@ exports.postContainer = function(request, reply) {
   .spread(function (container, savedApp, savedDetails) {
     reply(container)
   }).error(function (err) {
-    request.log(['mongo'], err.message)
+    request.log(['mongo'], err)
     return reply(Boom.notFound())
   }).catch( function (err) {
     request.log(['mongo'], err)
@@ -85,7 +85,7 @@ exports.getContainers = function(request, reply) {
   containerObjects.then(function (containers) {
     reply(containers)
   }).error(function (err) {
-    request.log(['mongo'], err.message)
+    request.log(['mongo'], err)
     return reply(Boom.notFound())
   }).catch( function (err) {
     request.log(['mongo'], err)
@@ -111,7 +111,7 @@ exports.deleteContainer = function(request, reply) {
     })
   })
   .error(function (err) {
-    request.log(['mongo'], err.message)
+    request.log(['mongo'], err)
     return reply(Boom.notFound())
   })
   .catch(function(err) {
