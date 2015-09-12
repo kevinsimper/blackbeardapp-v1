@@ -6,6 +6,7 @@ var Boom = require('boom')
 exports.postNotifyImage = function(request, reply) {
   var username = request.payload.user
   var name = request.payload.name
+  var dockerContentDigest = request.payload.dockerContentDigest
 
   var user = User.findOneAsync({username: username})
 
@@ -23,6 +24,7 @@ exports.postNotifyImage = function(request, reply) {
         user: user._id,
         name: name,
         createdAt: timestamp,
+        dockerContentDigest: dockerContentDigest
       })
     } else {
       return image
@@ -31,7 +33,8 @@ exports.postNotifyImage = function(request, reply) {
 
   checkImage.then(function (image) {
     image.logs.push({
-      timestamp: timestamp
+      timestamp: timestamp,
+      dockerContentDigest: dockerContentDigest
     })
     return image.save()
   }).then(function() {

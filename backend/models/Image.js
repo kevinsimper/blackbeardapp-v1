@@ -7,8 +7,10 @@ var schema = new mongoose.Schema({
   modifiedAt: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
   logs: [{
-    timestamp: String
-  }]
+    timestamp: String,
+    dockerContentDigest: String
+  }],
+  dockerContentDigest: String
 })
 
 schema.statics.findByUserAndRole = function (user, role, cb) {
