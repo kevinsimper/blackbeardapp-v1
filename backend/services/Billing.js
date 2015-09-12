@@ -9,6 +9,7 @@ var Payment = Promise.promisifyAll(require('../models/Payment'))
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
+var ContainerService = require('../services/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
 var Boom = require('boom')
 
@@ -30,6 +31,7 @@ module.exports = {
       var hours = 0
 
       app.containers.forEach(function (container, i) {
+        var current = 0
         var createdDate = moment.unix(container.createdAt)
 
         var deletedAt = moment()
@@ -44,22 +46,29 @@ module.exports = {
             // Stopped within month
             if (createdDate.isBefore(start)) {
               // Started before start of period
-              hours += self.diffHours(deletedAt, start)
+              current = self.diffHours(deletedAt, start)
             } else {
               // Started at start of period
-              hours += self.diffHours(deletedAt, createdDate)
+              current = self.diffHours(deletedAt, createdDate)
             }
           } else {
             // Stopped after end of month
             if (createdDate.isBefore(start)) {
               // Created before start so full month
-              hours += self.diffHours(end, start)
+              current = self.diffHours(end, start)
             } else {
               // from midway through to end of month
-              hours += self.diffHours(end, createdDate)
+              current = self.diffHours(end, createdDate)
             }
           }
         }
+
+        if (ContainerService.isCurrentlyRunning(container)) {
+          // App is currently running so we shouldn't count current hour
+          current -= 1
+        }
+
+        hours += current
       })
 
       resolve(hours)

@@ -32,7 +32,6 @@ lab.experiment('Testing Billing service', function() {
     })
   })
   lab.test('Verify date ranges', function(done) {
-
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
 
@@ -79,9 +78,46 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
-    var users = []
+  lab.test('Verify container that just started ignored', function(done) {
+    var start = moment(new Date()).subtract(1, 'day')
+    var end = moment(new Date()).add(1, 'month')
 
+    var fiveMinAgo = moment(new Date()).subtract(5, 'minute').unix()
+    var containers = [
+      new Container({createdAt: fiveMinAgo})
+    ]
+    var app = new App({name: "testApp"})
+    var test = app.toObject()
+    test.containers = containers
+
+    Billing.getAppBillableHours(test, start, end).then(function(hours) {
+      expect(hours, 'to be', 0)
+
+      done()
+    })
+  })
+  lab.test('Verify multiple containers', function(done) {
+    var start = moment(new Date()).subtract(1, 'day')
+    var end = moment(new Date()).add(1, 'month')
+
+    var oneAndHalfHoursAgo = moment(new Date()).subtract(1.5, 'hour')
+    var tenHoursAgo = moment(new Date()).subtract(10, 'hour')
+    var containers = [
+      new Container({createdAt: oneAndHalfHoursAgo.unix()}),
+      new Container({createdAt: tenHoursAgo.unix(), deletedAt: oneAndHalfHoursAgo.format("YYYY-MM-DD HH:mm:ss")})
+    ]
+    var app = new App({name: "testApp"})
+    var test = app.toObject()
+    test.containers = containers
+
+    Billing.getAppBillableHours(test, start, end).then(function(hours) {
+      expect(hours, 'to be', 1+9)
+
+      done()
+    })
+  })
   lab.test('Test billing', function(done) {
+    var users = []
     users[0] = request({
       method: 'GET',
       uri: appUrl + '/users',
@@ -95,19 +131,7 @@ lab.experiment('Testing Billing service', function() {
       })
     })
 
-    // STOP the fixture container
-    var stopContainer = users[0].then(function(users) {
-      return request({
-        method: 'DELETE',
-        uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers/555cb1e2fc27fe6f5f540001',
-        headers: {
-          Authorization: adminToken
-        },
-        json: true
-      })
-    })      
-
-    var billing = stopContainer.then(function (users) {
+    var billing = users[0].then(function (users) {
       return request({
         method: 'GET',
         uri: appUrl + '/billing',
@@ -157,98 +181,11 @@ lab.experiment('Testing Billing service', function() {
       })
     })
 
-    var newContainers = []
-    newContainers[0] = users[1].then(function () {
-      return request({
-        method: 'POST',
-        uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        },
-        body: {
-          region: 'eu'
-        }
-      })
-    }).spread(function (response, body) {
-      return body
-    })
-
-    newContainers[1] = newContainers[0].then(function () {
-      return request({
-        method: 'POST',
-        uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        },
-        body: {
-          region: 'eu'
-        }
-      })
-    }).spread(function (response, body) {
-      return body
-    })
-
-    newContainers[2] = newContainers[1].then(function () {
-      return request({
-        method: 'POST',
-        uri: appUrl + '/users/559396be05974b0c00b6b282/apps/559396bf05974b0c00b6b284/containers',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        },
-        body: {
-          region: 'eu'
-        }
-      })
-    }).spread(function (response, body) {
-      return body
-    })
-
-    newContainers[2].then(function() {done()})
-  })
-  lab.test('Test billing', function(done) {
-    setTimeout(function() {done()}, 1000)
-  })
-  lab.test('Test billing', function(done) {
-    var billing3 = request({
-      method: 'GET',
-      uri: appUrl + '/billing',
-      json: true,
-      headers: {
-        'Authorization': adminToken
-      }
-    }).spread(function (response, body) {
-      expect(response.statusCode, 'to be', 200)
-      // Need to confirm charging was attempted
-      //expect(body.data, 'to contain', 'did charge')
-
-      return body.data
-    })
-
-    users[2] = billing3.then(function() {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/users',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
-    }).spread(function (response, body) {
-      return _.filter(body, function(user) {
-        return user.email == "user@blackbeard.io"
-      })
-    })
-
-    Promise.all([users[0], users[1], users[2], billing3]).spread(function(userBefore, userMid, userAfter) {
-      expect(userBefore[0].virtualCredit, 'to be greater than', 0)
-      expect(userBefore[0].credit, 'to be greater than', 0)
-      expect(userMid[0].virtualCredit, 'to be greater than', 0)
-      expect(userMid[0].credit, 'to be greater than', 0)
-      expect(userAfter[0].virtualCredit, 'to be greater than', 0)
-      expect(userAfter[0].credit, 'to be greater than', 0)
+    Promise.all([users[0], users[1]]).spread(function(user, userAfter) {
+      expect(user[0].virtualCredit, 'to be', 500)
+      expect(user[0].credit, 'to be', 500)
+      expect(userAfter[0].virtualCredit, 'not to equal', 0)
+      expect(userAfter[0].credit, 'not to equal', 0)
 
       done()
     })
