@@ -83,12 +83,10 @@ module.exports = {
     })
 
     var token = self.create({
-      card: {
-        number: creditcard.creditcard,
-        exp_month: creditcard.expiryMonth,
-        exp_year: creditcard.expiryYear,
-        cvc: creditcard.cvv
-      }
+      creditcard: creditcard.creditcard,
+      expiryMonth: creditcard.expiryMonth,
+      expiryYear: creditcard.expiryYear,
+      cvv: creditcard.cvv
     }).error(function (err) {
       throw new Promise.OperationalError(err)
     }).catch(function (err) {
