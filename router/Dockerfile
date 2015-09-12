@@ -1,4 +1,4 @@
-FROM node:0.12
+FROM node:4.0
 
 RUN apt-get update -y && apt-get upgrade -y
 
