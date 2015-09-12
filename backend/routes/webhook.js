@@ -9,56 +9,38 @@ exports.postNotifyImage = function(request, reply) {
 
   var user = User.findOneAsync({username: username})
 
-  var findImage = user.then(function(foundUser) {
+  var timestamp = Math.round(Date.now() / 1000)
+
+  var image = user.then(function(foundUser) {
     if (!foundUser) {
       throw new Promise.OperationalError("User not found")
+    }
+    return Image.findOne({ name: name })
+  })
+  var checkImage = Promise.all([user, image]).spread(function (user, image) {
+    if(!image) {
+      return new Image({
+        user: user._id,
+        name: name,
+        createdAt: timestamp,
+      })
     } else {
-      return Image.findOneAsync({ name: name })
+      return image
     }
   })
 
-  Promise.all([user, findImage]).spread(function(user, image) {
-    if (!image) {
-      // Create image
-      var newImage = new Image({
-        user: user._id,
-        name: name,
-        createdAt: Math.round(Date.now() / 1000),
-        modifiedAt: Math.round(Date.now() / 1000)
-      })
-
-      return new Promise(function (resolve, reject) {
-        newImage.save(function (err, savedImage) {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(savedImage)
-          }
-        })
-      })
-    } else {
-      var modifiedTime = Math.round(Date.now() / 1000)
-      image.modifiedAt = modifiedTime
-      image.logs.push({timestamp: modifiedTime})
-      image.user = user
-
-      return new Promise(function (resolve, reject) {
-        image.save(function (err, savedImage) {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(savedImage)
-          }
-        })
-      })
-    }
-  }).then(function(image) {
+  checkImage.then(function (image) {
+    image.logs.push({
+      timestamp: timestamp
+    })
+    return image.save()
+  }).then(function() {
     reply("ok")
-  }).error(function (e) {
+  }).error(function () {
     // Not outputting error on purpose to stop people hitting the API
     // to find active usernames
     reply("ok")
-  }).catch(function(e) {
+  }).catch(function(err) {
     request.log(err)
     reply(Boom.badImplementation())
   })
