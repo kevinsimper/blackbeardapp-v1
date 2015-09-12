@@ -8,10 +8,10 @@ module.exports = {
       if (process.env.NODE_ENV === 'production') {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
         stripe.charges.create({
-          amount: amount,
+          amount: options.amount,
           currency: "usd",
-          source: creditCard.token,
-          description: name
+          source: options.token,
+          description: options.name
         }).then(function (newCharge) {
           resolve(newCharge)
         }).catch(function (error) {
@@ -25,7 +25,7 @@ module.exports = {
       }
     })
   },
-  create: function (options) {
+  create: function (creditcard) {
     return new Promise(function (resolve, reject) {
       if (process.env.NODE_ENV === 'production') {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
