@@ -1,3 +1,5 @@
+require('./shim')
+
 var options = {
   opsInterval: 1000,
   reporters: [
