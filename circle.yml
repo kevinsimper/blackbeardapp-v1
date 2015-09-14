@@ -23,14 +23,14 @@ dependencies:
     - mkdir -p ~/docker; docker save mongo > ~/docker/mongo.tar
     - mkdir -p ~/docker; docker save node > ~/docker/node.tar
     - mkdir -p ~/docker; docker save registry > ~/docker/registry.tar
-test:
-  override:
-    - sudo service mongodb stop
-    - sudo service rabbitmq-server stop
     - ./docker-compose --verbose build frontend
     - ./docker-compose --verbose build backend
     - ./docker-compose --verbose build registryproxy
     - ./docker-compose --verbose build router
+test:
+  override:
+    - sudo service mongodb stop
+    - sudo service rabbitmq-server stop
     - sleep 10
     - docker images
     - docker ps
