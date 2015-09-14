@@ -16,6 +16,12 @@ var options = {
 }
 
 var server = require('./server')
+
+var debug = false
+if(debug || process.env.DEBUG === 'true') {
+  server._settings.debug.request.push('info', 'error', 'mongo')
+}
+
 server.register({
   register: require('good'),
   options: options
