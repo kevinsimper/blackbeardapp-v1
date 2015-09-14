@@ -27,6 +27,10 @@ dependencies:
     - ./docker-compose --verbose build backend
     - ./docker-compose --verbose build registryproxy
     - ./docker-compose --verbose build router
+    - pushd frontend/ && npm install && popd
+    - pushd backend/ && npm install && popd
+    - pushd registryproxy/ && npm install && popd
+    - pushd router/ && npm install && popd
 test:
   override:
     - sudo service mongodb stop
