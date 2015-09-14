@@ -3,8 +3,7 @@ var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
 
 // Show mocked responses only if you are in development environment AND you aren't currently testing stripe
-var showMockedResponse = ((process.env.NODE_ENV !== 'production') ||
-  ((process.env.NODE_ENV !== 'production') && !process.env.STRIPE_TEST))
+var showMockedResponse = ((process.env.NODE_ENV === 'development') && !process.env.STRIPE_TEST)
 
 module.exports = {
   charge: function(options) {
@@ -63,12 +62,13 @@ module.exports = {
       })
     })
   },
-  create: function (creditcard) {
+  create: function (customer, creditcard) {
     return new Promise(function (resolve, reject) {
       if (!showMockedResponse) {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-        stripe.tokens.create({
-          card: {
+        stripe.customers.createSource(customer, {
+          source: {
+            object: "card",
             number: creditcard.creditcard,
             exp_month: creditcard.expiryMonth,
             exp_year: creditcard.expiryYear,
@@ -81,11 +81,12 @@ module.exports = {
         })
       } else {
         resolve({
-          id: 'tok_fake9999999999',
-          card: {
-            last4: '1234',
-            brand: 'VISA',
-          }
+          id: 'card_6z26Z7gMSba2xv',
+          object: 'card',
+          last4: '4242',
+          brand: 'Visa',
+          exp_month: 11,
+          exp_year: 2016,
         })
       }
     })
@@ -142,12 +143,13 @@ module.exports = {
     })
 
     // Here need to add credit card to existing customer token (user.stripeToken)
-
-    var token = self.create({
-      creditcard: creditcard.creditcard,
-      expiryMonth: creditcard.expiryMonth,
-      expiryYear: creditcard.expiryYear,
-      cvv: creditcard.cvv
+    var token = userToken.then(function(userToken) {
+      return self.create(userToken.stripeToken, {
+        creditcard: creditcard.creditcard,
+        expiryMonth: creditcard.expiryMonth,
+        expiryYear: creditcard.expiryYear,
+        cvv: creditcard.cvv
+      })
     }).error(function (err) {
       throw new Promise.OperationalError(err)
     }).catch(function (err) {
@@ -158,8 +160,8 @@ module.exports = {
       var newCreditCard = new CreditCard({
         name: creditcard.name,
         token: token.id,
-        number: token.card.last4,
-        brand: token.card.brand,
+        number: token.last4,
+        brand: token.brand,
         active: (user.creditCards.length === 0)
       })
 
