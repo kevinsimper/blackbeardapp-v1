@@ -44,25 +44,7 @@ module.exports = {
       })
     })
   },
-  listCards: function (user) {
-    if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
-      throw new Error('Wrong Stripe API key.')
-    }
-
-    if (!user.stripeToken) {
-      throw new Error('User is not associated with a Stripe account.')
-    }
-
-    return new Promise(function (resolve, reject) {
-      var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-      stripe.customers.listCards(user.stripeToken).then(function (cards) {
-        resolve(cards)
-      }).catch(function (error) {
-        reject(error)
-      })
-    })
-  },
-  create: function (customer, creditcard) {
+  sourceCreate: function (customer, creditcard) {
     return new Promise(function (resolve, reject) {
       if (!showMockedResponse) {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
@@ -144,7 +126,7 @@ module.exports = {
 
     // Here need to add credit card to existing customer token (user.stripeToken)
     var token = userToken.then(function(userToken) {
-      return self.create(userToken.stripeToken, {
+      return self.sourceCreate(userToken.stripeToken, {
         creditcard: creditcard.creditcard,
         expiryMonth: creditcard.expiryMonth,
         expiryYear: creditcard.expiryYear,
