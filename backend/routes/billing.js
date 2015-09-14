@@ -59,7 +59,7 @@ exports.getAllBilling = function(request, reply) {
       data: charges
     })
   }).catch(function (err) {
-    request.log([], err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }

@@ -1,3 +1,5 @@
+require('./shim')
+
 var options = {
   opsInterval: 1000,
   reporters: [
@@ -12,7 +14,7 @@ var options = {
 if(process.env.NODE_ENV === 'development') {
   options.reporters.push({
     reporter: require('good-console'),
-    events: {log: '*', response: '*', request: '*'}
+    events: {log: '*', response: '*'}
   })
 }
 

@@ -87,10 +87,10 @@ exports.postApp = {
     }).then(function(app) {
       reply(app[0])
     }).error(function(err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badRequest(err.cause))
     }).catch(function(err) {
-      request.log(err)
+      request.log(['error'], err)
       reply(Boom.badImplementation('There was a problem with the database'))
     })
   }

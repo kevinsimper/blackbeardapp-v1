@@ -30,13 +30,21 @@ var billingRoutes = require('./routes/billing')
 var containerRoutes = require('./routes/container')
 var registryRoutes = require('./routes/registry')
 
-var server = new Hapi.Server({
+console.log('NODE_ENV', process.env.NODE_ENV)
+
+var serverOptions = {
   connections: {
     routes: {
       cors: true
     }
   }
-})
+}
+if(process.env.NODE_ENV === 'development') {
+  serverOptions.debug = {
+    request: ['error', 'mongo', 'info']
+  }
+}
+var server = new Hapi.Server(serverOptions)
 
 var port = 8000
 server.connection({ port: port })

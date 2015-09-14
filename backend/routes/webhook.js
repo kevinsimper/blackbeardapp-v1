@@ -69,10 +69,10 @@ exports.postNotifyImage = function(request, reply) {
   }).error(function (err) {
     // Not outputting error on purpose to stop people hitting the API
     // to find active usernames
+    request.log(['error'], err)
     reply("ok")
   }).catch(function(err) {
-    console.log('simper', err)
-    request.log(err)
+    request.log(['error'], err)
     reply(Boom.badImplementation())
   })
 }
