@@ -7,11 +7,12 @@ module.exports = {
     return new Promise(function (resolve, reject) {
       if (process.env.NODE_ENV === 'production') {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+
         stripe.charges.create({
           amount: options.amount,
-          currency: "usd",
-          source: options.token,
-          description: options.name
+          currency: options.currency,
+          source: options.source,
+          description: options.description
         }).then(function (newCharge) {
           resolve(newCharge)
         }).catch(function (error) {
