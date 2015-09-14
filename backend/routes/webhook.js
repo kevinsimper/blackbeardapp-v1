@@ -44,6 +44,7 @@ exports.postNotifyImage = function(request, reply) {
     if(image.dockerContentDigest === dockerContentDigest) {
       return Image.status.EXISTS
     } else {
+      image.dockerContentDigest = dockerContentDigest
       return Image.status.UPDATED
     }
   })
