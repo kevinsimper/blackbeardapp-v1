@@ -180,7 +180,7 @@ lab.experiment('/users/{id}/creditcards', function () {
       },
       function (error, response, body) {
         expect(response.statusCode, 'to be', 200)
-        expect(body[0].number, 'to be', '1234')
+        expect(body[0].number, 'to be', '4242')
         creditCardId = body[1]._id
         done()
       })
@@ -196,7 +196,7 @@ lab.experiment('/users/{id}/creditcards', function () {
         json: true
       },
       function (error, response, body) {
-        expect(body.number, 'to be', '1234')
+        expect(body.number, 'to be', '4242')
         done()
       })
   })
