@@ -6,6 +6,10 @@ machine:
 dependencies:
   cache_directories:
     - "~/docker"
+    - "frontend/node_modules"
+    - "backend/node_modules"
+    - "registryproxy/node_modules"
+    - "router/node_modules"
   override:
     - if [[ -e ~/docker/mongo.tar ]]; then docker load -i ~/docker/mongo.tar; fi
     - if [[ -e ~/docker/node.tar ]]; then docker load -i ~/docker/node.tar; fi
@@ -14,7 +18,7 @@ dependencies:
     - chmod +x ./docker-compose
     - mv config/development.yml.sample config/development.yml
     - docker pull mongo:latest
-    - docker pull node:0.12
+    - docker pull node:4.0
     - docker pull registry:2
     - mkdir -p ~/docker; docker save mongo > ~/docker/mongo.tar
     - mkdir -p ~/docker; docker save node > ~/docker/node.tar
