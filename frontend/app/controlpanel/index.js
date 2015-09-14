@@ -23,6 +23,7 @@ var Vouchers = require('./components/Vouchers/')
 var VoucherShow = require('./components/VoucherShow/')
 var VoucherCreate = require('./components/VoucherCreate/')
 var Registry = require('./components/Registry/')
+var CreditLogs = require('./components/CreditLogs/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -41,8 +42,10 @@ var routes = (
     <Route path='/preusers' handler={PreUsersList}/>
     <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>
-    <Route path='/users' handler={Users}/>
-    <Route path='/users/:id' handler={UserShow}/>
+    <Route name='user' path='/users'>
+      <Route path='/users' handler={Users}/>
+      <Route name="UserShow" path=':id' handler={UserShow}/>
+    </Route>
     <Route path='/logs' handler={Logs}/>
     <Route path='/clusters' handler={Clusters}/>
     <Route path='/clusters/:id' handler={ClusterShow}/>
@@ -50,6 +53,7 @@ var routes = (
     <Route path='/vouchers/create' handler={VoucherCreate}/>
     <Route path='/vouchers/:id' handler={VoucherShow}/>
     <Route path='/registry' handler={Registry}/>
+    <Route path='/creditlogs' handler={CreditLogs}/>
   </Route>
 )
 

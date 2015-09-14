@@ -270,7 +270,13 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'GET',
     path: '/users/{user}/creditlogs',
-    config: userRoutes.getCreditLogs
+    config: billingRoutes.getCreditLogs
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/creditlogs',
+    config: billingRoutes.getAllCreditLogs
   })
 
   server.route({

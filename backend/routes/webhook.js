@@ -2,63 +2,76 @@ var Promise = require('bluebird')
 var Image = Promise.promisifyAll(require('../models/Image'))
 var User = Promise.promisifyAll(require('../models/User'))
 var Boom = require('boom')
+var Queue = require('../services/Queue')
 
 exports.postNotifyImage = function(request, reply) {
   var username = request.payload.user
   var name = request.payload.name
+  var dockerContentDigest = request.payload.dockerContentDigest
 
-  var user = User.findOneAsync({username: username})
-
-  var findImage = user.then(function(foundUser) {
-    if (!foundUser) {
+  var user = User.findOneAsync({username: username}).then(function(user) {
+    if (!user) {
       throw new Promise.OperationalError("User not found")
+    }
+    return user
+  })
+
+  var timestamp = Math.round(Date.now() / 1000)
+
+  var image = user.then(function() {
+    return Image.findOne({ name: name })
+  })
+  var checkImage = Promise.all([user, image]).spread(function (user, image) {
+    if(!image) {
+      return new Image({
+        user: user._id,
+        name: name,
+        createdAt: timestamp,
+        dockerContentDigest: dockerContentDigest
+      })
     } else {
-      return Image.findOneAsync({ name: name })
+      return image
     }
   })
 
-  Promise.all([user, findImage]).spread(function(user, image) {
-    if (!image) {
-      // Create image
-      var newImage = new Image({
-        user: user._id,
-        name: name,
-        createdAt: Math.round(Date.now() / 1000),
-        modifiedAt: Math.round(Date.now() / 1000)
-      })
-
-      return new Promise(function (resolve, reject) {
-        newImage.save(function (err, savedImage) {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(savedImage)
-          }
-        })
-      })
+  var status = checkImage.then(function (image) {
+    // If image does not have a id defined and therefore
+    // have no way to determine if it has been updated.
+    if(!image.dockerContentDigest) {
+      image.dockerContentDigest = dockerContentDigest
+      return Image.status.UPDATED
+    }
+    if(image.dockerContentDigest === dockerContentDigest) {
+      return Image.status.EXISTS
     } else {
-      var modifiedTime = Math.round(Date.now() / 1000)
-      image.modifiedAt = modifiedTime
-      image.logs.push({timestamp: modifiedTime})
-      image.user = user
+      image.dockerContentDigest = dockerContentDigest
+      return Image.status.UPDATED
+    }
+  })
 
-      return new Promise(function (resolve, reject) {
-        image.save(function (err, savedImage) {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(savedImage)
-          }
-        })
+  var sendToWorker = Promise.all([checkImage, status]).spread(function (image, status) {
+    if(status === Image.status.UPDATED) {
+      return Queue.send('image-redeploy', {
+        image: image._id
       })
     }
-  }).then(function(image) {
+  })
+
+  Promise.all([checkImage, status, sendToWorker]).spread(function (image, status) {
+    image.logs.push({
+      timestamp: timestamp,
+      dockerContentDigest: dockerContentDigest,
+      status: status
+    })
+    return image.save()
+  }).then(function() {
     reply("ok")
-  }).error(function (e) {
+  }).error(function (err) {
     // Not outputting error on purpose to stop people hitting the API
     // to find active usernames
+    request.log(['error'], err)
     reply("ok")
-  }).catch(function(e) {
+  }).catch(function(err) {
     request.log(['error'], err)
     reply(Boom.badImplementation())
   })

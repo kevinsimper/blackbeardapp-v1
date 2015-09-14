@@ -57,6 +57,7 @@ app.all('/v2/*', function(req, res) {
         if(response.statusCode === 201 && req.method === 'PUT') {
           var user = req.originalUrl.split('/')[2]
           var name = req.originalUrl.split('/')[3]
+          var dockerContentDigest = response.headers['docker-content-digest']
 
           // PING BACKEND - NEW CONTAINER UPLOADED
           request({
@@ -65,7 +66,8 @@ app.all('/v2/*', function(req, res) {
             json: true,
             body: {
               user: user,
-              name: name
+              name: name,
+              dockerContentDigest: dockerContentDigest
             }
           })
           debug(random, 'webhook triggered', user, name)

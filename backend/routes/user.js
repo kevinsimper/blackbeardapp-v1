@@ -8,8 +8,6 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
-var Voucher = require('../models/Voucher')
-var VoucherClaimant = require('../models/VoucherClaimant')
 var Log = require('../models/Log')
 var Joi = require('joi')
 
@@ -285,41 +283,6 @@ exports.getUserPayments = function(request, reply) {
 
     return reply(payments)
   })
-}
-
-exports.getCreditLogs = {
-  auth: 'jwt',
-  handler: function(request, reply) {
-    var userId = User.getUserIdFromRequest(request)
-    var role = request.auth.credentials.role
-
-    var voucherClaimants = VoucherClaimant.find({user: userId}).populate('voucher')
-    var payments = Payment.findByUserAndRole(userId, role)
-
-    Promise.all([voucherClaimants, payments]).spread(function(voucherClaimants, payments) {
-      var combined = []
-      _.each(payments, function(payment) {
-        combined.push({
-          timestamp: payment.timestamp,
-          amount: payment.amount,
-          status: payment.status,
-          source: 'Credit Card'
-        })
-      })
-      _.each(voucherClaimants, function(voucherClaimant) {
-        combined.push({
-          timestamp: voucherClaimant.claimedAt,
-          amount: voucherClaimant.voucher.amount,
-          status: 'SUCCESS',
-          source: 'Voucher '+voucherClaimant.voucher.code
-        })
-      })
-
-      return reply(_.sortBy(combined, function(n) {
-        return n.timestamp;
-      }))
-    })
-  }
 }
 
 exports.getUserLogs = function (request, reply) {
