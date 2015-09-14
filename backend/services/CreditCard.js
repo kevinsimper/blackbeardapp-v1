@@ -2,32 +2,34 @@ var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
 
+// Show mocked responses only if you are in development environment AND you aren't currently testing stripe
+var showMockedResponse = ((process.env.NODE_ENV !== 'production') ||
+  ((process.env.NODE_ENV !== 'production') && !process.env.STRIPE_TEST))
+
 module.exports = {
   charge: function(options) {
-    if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
-      throw new Error('Wrong Stripe API key.')
-    }
-
     return new Promise(function (resolve, reject) {
-      var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-
-      stripe.charges.create({
-        amount: options.amount,
-        currency: options.currency,
-        source: options.source,
-        description: options.description
-      }).then(function (newCharge) {
-        resolve(newCharge)
-      }).catch(function (error) {
-        reject(error)
-      })
+      if (!showMockedResponse) {
+        var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+        stripe.charges.create({
+          amount: options.amount,
+          currency: options.currency,
+          source: options.source,
+          description: options.description
+        }).then(function (newCharge) {
+          resolve(newCharge)
+        }).catch(function (error) {
+          reject(error)
+        })  
+      } else {
+        resolve({
+          amount: options.amount,
+          id: 'charge_fake9999999999'
+        }) 
+      }
     })
   },
   customerCreate: function (user) {
-    if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
-      throw new Error('Wrong Stripe API key.')
-    }
-
     return new Promise(function (resolve, reject) {
       var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
       stripe.customers.create({
@@ -43,24 +45,49 @@ module.exports = {
       })
     })
   },
-  create: function (creditcard) {
+  listCards: function (user) {
     if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
       throw new Error('Wrong Stripe API key.')
     }
+
+    if (!user.stripeToken) {
+      throw new Error('User is not associated with a Stripe account.')
+    }
+
     return new Promise(function (resolve, reject) {
       var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-      stripe.tokens.create({
-        card: {
-          number: creditcard.creditcard,
-          exp_month: creditcard.expiryMonth,
-          exp_year: creditcard.expiryYear,
-          cvc: creditcard.cvv
-        }
-      }).then(function (token) {
-        resolve(token)
+      stripe.customers.listCards(user.stripeToken).then(function (cards) {
+        resolve(cards)
       }).catch(function (error) {
         reject(error)
       })
+    })
+  },
+  create: function (creditcard) {
+    return new Promise(function (resolve, reject) {
+      if (!showMockedResponse) {
+        var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+        stripe.tokens.create({
+          card: {
+            number: creditcard.creditcard,
+            exp_month: creditcard.expiryMonth,
+            exp_year: creditcard.expiryYear,
+            cvc: creditcard.cvv
+          }
+        }).then(function (token) {
+          resolve(token)
+        }).catch(function (error) {
+          reject(error)
+        })
+      } else {
+        resolve({
+          id: 'tok_fake9999999999',
+          card: {
+            last4: '1234',
+            brand: 'VISA',
+          }
+        })
+      }
     })
   },
   save: function (userId, card) {
