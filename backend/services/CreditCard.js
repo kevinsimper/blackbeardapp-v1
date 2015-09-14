@@ -4,53 +4,63 @@ var User = Promise.promisifyAll(require('../models/User'))
 
 module.exports = {
   charge: function(options) {
-    return new Promise(function (resolve, reject) {
-      if (process.env.NODE_ENV === 'production') {
-        var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+    if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
+      throw new Error('Wrong Stripe API key.')
+    }
 
-        stripe.charges.create({
-          amount: options.amount,
-          currency: options.currency,
-          source: options.source,
-          description: options.description
-        }).then(function (newCharge) {
-          resolve(newCharge)
-        }).catch(function (error) {
-          reject(error)
-        })
-      } else {
-        resolve({
-          amount: options.amount,
-          id: 'charge_fake9999999999'
-        })
-      }
+    return new Promise(function (resolve, reject) {
+      var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+
+      stripe.charges.create({
+        amount: options.amount,
+        currency: options.currency,
+        source: options.source,
+        description: options.description
+      }).then(function (newCharge) {
+        resolve(newCharge)
+      }).catch(function (error) {
+        reject(error)
+      })
+    })
+  },
+  customerCreate: function (user) {
+    if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
+      throw new Error('Wrong Stripe API key.')
+    }
+
+    return new Promise(function (resolve, reject) {
+      var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+      stripe.customers.create({
+        description: "User "+user.email,
+        email: user.email,
+        metadata: {
+          id: user.id
+        }
+      }).then(function (customer) {
+        resolve(customer)
+      }).catch(function (error) {
+        reject(error)
+      })
     })
   },
   create: function (creditcard) {
+    if ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_SECRET.substr(0, 8) != "sk_test_")) {
+      throw new Error('Wrong Stripe API key.')
+    }
     return new Promise(function (resolve, reject) {
-      if (process.env.NODE_ENV === 'production') {
-        var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-        stripe.tokens.create({
-          card: {
-            number: creditcard.creditcard,
-            exp_month: creditcard.expiryMonth,
-            exp_year: creditcard.expiryYear,
-            cvc: creditcard.cvv
-          }
-        }).then(function (token) {
-          resolve(token)
-        }).catch(function (error) {
-          reject(error)
-        })
-      } else {
-        resolve({
-          id: 'tok_fake9999999999',
-          card: {
-            last4: '1234',
-            brand: 'VISA',
-          }
-        })
-      }
+      var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+      stripe.tokens.create({
+        card: {
+          number: creditcard.creditcard,
+          exp_month: creditcard.expiryMonth,
+          exp_year: creditcard.expiryYear,
+          cvc: creditcard.cvv
+        }
+      }).then(function (token) {
+        resolve(token)
+      }).catch(function (error) {
+        reject(error)
+      })
     })
   },
   save: function (userId, card) {
@@ -81,6 +91,30 @@ module.exports = {
 
       return user
     })
+
+    var stripeCustomer = user.then(function(user) {
+      if (!user.stripeToken) {
+        return self.customerCreate(user)
+      }
+      throw new Promise.OperationalError('User already created so skip this step.')
+    }).then(function(stripeUser) {
+      return stripeUser.id
+    }).error(function (err) {
+      // Skip
+      return false
+    }).catch(function (err) {
+      throw new Promise.OperationalError(err)
+    })
+
+    var userToken = Promise.all([user, stripeCustomer]).spread(function(user, stripeCustomer) {
+      if (stripeCustomer !== false) {
+        user.stripeToken = stripeCustomer
+      }
+
+      return user.save()
+    })
+
+    // Here need to add credit card to existing customer token (user.stripeToken)
 
     var token = self.create({
       creditcard: creditcard.creditcard,
