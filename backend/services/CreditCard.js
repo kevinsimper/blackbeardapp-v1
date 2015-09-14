@@ -13,7 +13,7 @@ module.exports = {
         stripe.charges.create({
           amount: options.amount,
           currency: options.currency,
-          source: options.source,
+          customer: options.customer,
           description: options.description
         }).then(function (newCharge) {
           resolve(newCharge)

@@ -174,7 +174,7 @@ module.exports = {
         var chargeCreditCard = CreditCardService.charge({
           amount: amount,
           currency: "usd",
-          source: creditcard.token,
+          customer: user.stripeToken,
           description: chargeName
         })
 
