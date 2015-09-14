@@ -2,8 +2,8 @@ var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
 
-// Show mocked responses only if you are in development environment AND you aren't currently testing stripe
-var showMockedResponse = ((process.env.NODE_ENV === 'development') && !process.env.STRIPE_TEST)
+// Show mocked responses only if you are in development/test environment AND you aren't currently testing stripe
+var showMockedResponse = ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_TEST === undefined))
 
 module.exports = {
   charge: function(options) {
@@ -30,18 +30,24 @@ module.exports = {
   },
   customerCreate: function (user) {
     return new Promise(function (resolve, reject) {
-      var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-      stripe.customers.create({
-        description: "User "+user.email,
-        email: user.email,
-        metadata: {
-          id: user.id
-        }
-      }).then(function (customer) {
-        resolve(customer)
-      }).catch(function (error) {
-        reject(error)
-      })
+      if (!showMockedResponse) {
+        var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+        stripe.customers.create({
+          description: "User "+user.email,
+          email: user.email,
+          metadata: {
+            id: user.id
+          }
+        }).then(function (customer) {
+          resolve(customer)
+        }).catch(function (error) {
+          reject(error)
+        })
+      } else {
+        resolve({
+          id: 'cus12312313'
+        })
+      }
     })
   },
   sourceCreate: function (customer, creditcard) {
