@@ -7,8 +7,11 @@ var schema = new mongoose.Schema({
   modifiedAt: String,
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
   logs: [{
-    timestamp: String
-  }]
+    timestamp: String,
+    dockerContentDigest: String,
+    status: String
+  }],
+  dockerContentDigest: String
 })
 
 schema.statics.findByUserAndRole = function (user, role, cb) {
@@ -33,3 +36,8 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
 }
 
 module.exports = mongoose.model('image', schema)
+
+module.exports.status = {
+  'EXISTS': 'EXISTS',
+  'UPDATED': 'UPDATED'
+}
