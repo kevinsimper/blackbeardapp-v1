@@ -153,17 +153,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return App.find({image: image._id}).populate('containers')
     })
 
-    var adminToken = request({
-      method: 'POST',
-      uri: config.BACKEND_URL + '/login',
-      json: true,
-      body: {
-        email: 'admin@blackbeard.io',
-        password: 'password'
-      }
-    }).spread(function(response, body) {
-      return body.token
-    })
+    var adminToken = config.ADMIN_TOKEN()
 
     var containers = Promise.all([apps, adminToken]).spread(function (apps, adminToken) {
       return Promise.map(apps, function (app) {
