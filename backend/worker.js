@@ -3,6 +3,7 @@ var Promise = require('bluebird')
 Promise.promisifyAll(require("mongoose"))
 var config = require('./config')
 var Queue = require('./services/Queue')
+var request = Promise.promisify(require('request'))
 
 var mongo = mongoose.connect(config.DATABASE_URL)
 var rabbitmq = Queue.connect()
@@ -51,16 +52,27 @@ Promise.all([mongo, rabbitmq]).then(function () {
     })
 
     var clusterContainerId = Promise.all([cluster, user, image, pullImage]).spread(function (cluster, user, image, pullImage) {
-      return ClusterService.createContainer(cluster, registry + '/' + user.username + '/' + image.name + ':latest')
+      var image = registry + '/' + user.username + '/' + image.name + ':latest'
+      console.log('image to start', image)
+      return ClusterService.createContainer(cluster, image).then(function(clusterContainerId) {
+        console.log('clusterContainerId', clusterContainerId)
+        return clusterContainerId
+      })
     })
 
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {
-        return ClusterService.startContainer(cluster, clusterContainerId)
+        return ClusterService.startContainer(cluster, clusterContainerId).then(function(started) {
+          console.log('started', started)
+          return started
+        })
       })
 
     var containerInfo = Promise.all([cluster, clusterContainerId, started]).spread(function (cluster, clusterContainerId) {
-      return ClusterService.lookupContainer(cluster, clusterContainerId)
+      return ClusterService.lookupContainer(cluster, clusterContainerId).then(function (containerInfo) {
+        console.log('containerInfo', containerInfo)
+        return containerInfo
+      })
     })
 
     var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo])
