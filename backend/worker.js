@@ -54,7 +54,6 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return ClusterService.createContainer(cluster, registry + '/' + user.username + '/' + image.name + ':latest')
     })
 
-
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {
         return ClusterService.startContainer(cluster, clusterContainerId)
@@ -77,7 +76,6 @@ Promise.all([mongo, rabbitmq]).then(function () {
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
         container.containerHash = clusterContainerId
-
 
         return container.save()
       })
