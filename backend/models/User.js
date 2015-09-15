@@ -12,6 +12,7 @@ var schema = new mongoose.Schema({
   timestamp: String,
   resetToken: String,
   resetExpiry: String,
+  stripeToken: String,
   creditCards: [{type: mongoose.Schema.Types.ObjectId, ref: 'creditcard'}],
   role: String,
   ip: String,
@@ -42,7 +43,7 @@ schema.statics.findOneByRole = function (id, role, cb) {
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('resetToken', 'resetExpiry', 'deleted')
+    fields.push('resetToken', 'resetExpiry', 'stripeToken', 'deleted', 'deletedAt')
     // Show deleted to admins
     conditions = {}
   }

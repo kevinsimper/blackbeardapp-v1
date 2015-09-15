@@ -2,35 +2,61 @@ var Promise = require('bluebird')
 var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var User = Promise.promisifyAll(require('../models/User'))
 
+// Show mocked responses only if you are in development/test environment AND you aren't currently testing stripe
+var showMockedResponse = ((process.env.NODE_ENV !== 'production') && (process.env.STRIPE_TEST === undefined))
+
 module.exports = {
   charge: function(options) {
     return new Promise(function (resolve, reject) {
-      if (process.env.NODE_ENV === 'production') {
+      if (!showMockedResponse) {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
         stripe.charges.create({
           amount: options.amount,
-          currency: "usd",
-          source: options.token,
-          description: options.name
+          currency: options.currency,
+          customer: options.customer,
+          description: options.description
         }).then(function (newCharge) {
           resolve(newCharge)
+        }).catch(function (error) {
+          reject(error)
+        })  
+      } else {
+        resolve({
+          amount: options.amount,
+          id: 'charge_fake9999999999'
+        }) 
+      }
+    })
+  },
+  customerCreate: function (user) {
+    return new Promise(function (resolve, reject) {
+      if (!showMockedResponse) {
+        var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
+        stripe.customers.create({
+          description: "User "+user.email,
+          email: user.email,
+          metadata: {
+            id: user.id
+          }
+        }).then(function (customer) {
+          resolve(customer)
         }).catch(function (error) {
           reject(error)
         })
       } else {
         resolve({
-          amount: options.amount,
-          id: 'charge_fake9999999999'
+          id: 'cus12312313'
         })
       }
     })
   },
-  create: function (creditcard) {
+  sourceCreate: function (customer, creditcard) {
     return new Promise(function (resolve, reject) {
-      if (process.env.NODE_ENV === 'production') {
+      if (!showMockedResponse) {
         var stripe = Promise.promisifyAll(require('stripe')(process.env.STRIPE_SECRET))
-        stripe.tokens.create({
-          card: {
+        stripe.customers.createSource(customer, {
+          source: {
+            object: "card",
             number: creditcard.creditcard,
             exp_month: creditcard.expiryMonth,
             exp_year: creditcard.expiryYear,
@@ -43,11 +69,12 @@ module.exports = {
         })
       } else {
         resolve({
-          id: 'tok_fake9999999999',
-          card: {
-            last4: '1234',
-            brand: 'VISA',
-          }
+          id: 'card_6z26Z7gMSba2xv',
+          object: 'card',
+          last4: '4242',
+          brand: 'Visa',
+          exp_month: 11,
+          exp_year: 2016,
         })
       }
     })
@@ -81,13 +108,36 @@ module.exports = {
       return user
     })
 
-    var token = self.create({
-      card: {
-        number: creditcard.creditcard,
-        exp_month: creditcard.expiryMonth,
-        exp_year: creditcard.expiryYear,
-        cvc: creditcard.cvv
+    var stripeCustomer = user.then(function(user) {
+      if (!user.stripeToken) {
+        return self.customerCreate(user)
       }
+      throw new Promise.OperationalError('User already created so skip this step.')
+    }).then(function(stripeUser) {
+      return stripeUser.id
+    }).error(function (err) {
+      // Skip
+      return false
+    }).catch(function (err) {
+      throw new Promise.OperationalError(err)
+    })
+
+    var userToken = Promise.all([user, stripeCustomer]).spread(function(user, stripeCustomer) {
+      if (stripeCustomer !== false) {
+        user.stripeToken = stripeCustomer
+      }
+
+      return user.save()
+    })
+
+    // Here need to add credit card to existing customer token (user.stripeToken)
+    var token = userToken.then(function(userToken) {
+      return self.sourceCreate(userToken.stripeToken, {
+        creditcard: creditcard.creditcard,
+        expiryMonth: creditcard.expiryMonth,
+        expiryYear: creditcard.expiryYear,
+        cvv: creditcard.cvv
+      })
     }).error(function (err) {
       throw new Promise.OperationalError(err)
     }).catch(function (err) {
@@ -98,8 +148,8 @@ module.exports = {
       var newCreditCard = new CreditCard({
         name: creditcard.name,
         token: token.id,
-        number: token.card.last4,
-        brand: token.card.brand,
+        number: token.last4,
+        brand: token.brand,
         active: (user.creditCards.length === 0)
       })
 
