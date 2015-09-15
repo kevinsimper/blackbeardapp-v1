@@ -1,10 +1,10 @@
 var Promise = require('bluebird')
 var Boom = require('boom')
-var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
+var CreditCard = require('../models/CreditCard')
 var stripe = require('stripe')(process.env.STRIPE_SECRET)
 var _ = require('lodash')
-var User = Promise.promisifyAll(require('../models/User'))
-var Payment = Promise.promisifyAll(require('../models/Payment'))
+var User = require('../models/User')
+var Payment = require('../models/Payment')
 var roles = require('../models/roles/')
 var CreditCardService = require('../services/CreditCard')
 
@@ -196,26 +196,20 @@ exports.postCreditCards = function (request, reply) {
 
 // /user/XX/creditcards DELETE
 exports.deleteCreditCards = function (request, reply) {
-  var id = User.getUserIdFromRequest(request)
+  var user = User.getUserIdFromRequest(request)
+  var id = request.params.creditcard
 
-  var creditCardId = request.params.creditcard
-
-  var deleteCallback = function (err, result) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
+  var card = CreditCard.findById(id)
+  card.then(function(card) {
+    return Promise.fromNode(function (callback) {
+      card.delete(callback)
+    })
+  }).then(function (card) {
     reply({
       message: 'Creditcard successfully removed.'
     })
-  }
-
-  CreditCard.findById(creditCardId, function (err, card) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-
-    card.delete(deleteCallback)
+  }).catch(function(err) {
+    request.log(['mongo'], err)
+    return reply(Boom.badImplementation('There was a problem with the database'))
   })
 }
