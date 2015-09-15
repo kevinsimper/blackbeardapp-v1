@@ -125,4 +125,55 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
   })
+
+  Queue.consume('image-redeploy', function (message, ack) {
+    var Image = require('./models/Image')
+    var App = require('./models/App')
+    var Container = require('./models/Container')
+    var ClusterService = require('./services/Cluster')
+    var cluster = ClusterService.getCluster()
+    var config = require('./config')
+
+    var image = Image.findOne({_id: message.image})
+
+    var apps = image.then(function (image) {
+      return App.find({image: image._id}).populate('containers')
+    })
+
+    var adminToken = request({
+      method: 'POST',
+      uri: config.BACKEND_URL + '/login',
+      json: true,
+      body: {
+        email: 'admin@blackbeard.io',
+        password: 'password'
+      }
+    }).spread(function(response, body) {
+      return body.token
+    })
+
+    var containers = Promise.all([apps, adminToken]).spread(function (apps, adminToken) {
+      return Promise.map(apps, function (app) {
+        var url = config.BACKEND_URL + '/users/' + app.user + '/apps/' + app._id + '/containers'
+        console.log(url)
+        return request({
+          method: 'POST',
+          uri: url,
+          json: true,
+          headers: {
+            Authorization: adminToken
+          }
+        }).spread(function (response, body) {
+          return body
+        })
+      })
+    })
+
+    containers.then(function (containers) {
+      ack()
+    }).catch(function (err) {
+      console.log(err)
+    })
+
+  })
 })
