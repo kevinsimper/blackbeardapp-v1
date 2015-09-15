@@ -146,28 +146,60 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var ClusterService = require('./services/Cluster')
     var cluster = ClusterService.getCluster()
     var config = require('./config')
+    var _ = require('lodash')
 
     var image = Image.findOne({_id: message.image})
+
+    image.then(function (image) {
+      console.log('image', image.dockerContentDigest)
+    })
 
     var apps = image.then(function (image) {
       return App.find({image: image._id}).populate('containers')
     })
 
-    var adminToken = config.ADMIN_TOKEN()
+    var adminToken = config.ADMIN_TOKEN
 
-    var containers = Promise.all([apps, adminToken]).spread(function (apps, adminToken) {
+    var deletedAppsContainers = Promise.all([apps, adminToken]).spread(function (apps, adminToken) {
       return Promise.map(apps, function (app) {
-        var url = config.BACKEND_URL + '/users/' + app.user + '/apps/' + app._id + '/containers'
-        console.log(url)
-        return request({
-          method: 'POST',
-          uri: url,
-          json: true,
-          headers: {
-            Authorization: adminToken
-          }
-        }).spread(function (response, body) {
-          return body
+        var activeContainers = _.filter(app.containers, {deleted: false}) || []
+        return Promise.map(activeContainers, function (container) {
+          var url = config.BACKEND_URL + '/users/' + app.user + '/apps/' + app._id + '/containers/' + container._id
+          console.log(url)
+          return request({
+            method: 'DELETE',
+            uri: url,
+            json: true,
+            headers: {
+              Authorization: adminToken
+            }
+          }).spread(function (response, body) {
+            return body
+          })
+        })
+      })
+    })
+
+    var containers = Promise.all([apps, adminToken, deletedAppsContainers]).spread(function (apps, adminToken, deletedAppsContainers) {
+      console.log(deletedAppsContainers)
+      // this will loop over every app that is connected to the image
+      return Promise.map(apps, function (app, index) {
+        // will create the same amount of containers that was deleted
+        // if we deleted two containers, there should be created two containers
+        console.log(deletedAppsContainers[index])
+        Promise.map(deletedAppsContainers[index], function() {
+          var url = config.BACKEND_URL + '/users/' + app.user + '/apps/' + app._id + '/containers'
+          console.log(url)
+          return request({
+            method: 'POST',
+            uri: url,
+            json: true,
+            headers: {
+              Authorization: adminToken
+            }
+          }).spread(function (response, body) {
+            return body
+          })
         })
       })
     })
