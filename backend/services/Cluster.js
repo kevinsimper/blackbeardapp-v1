@@ -5,7 +5,7 @@ var httprequest = Promise.promisify(require('request'))
 
 exports.getCluster = function() {
   return new Promise(function (resolve, reject) {
-    Cluster.find().then(function(clusters) {
+    Cluster.find({type: {'$ne': 'test_swarm'}}).then(function(clusters) {
       resolve(clusters[0])
     })
   })
