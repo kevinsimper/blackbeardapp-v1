@@ -9,6 +9,9 @@ var Actions = Reflux.createActions({
   },
   activate: {
     asyncResult: true
+  },
+  del: {
+    asyncResult: true
   }
 })
 
