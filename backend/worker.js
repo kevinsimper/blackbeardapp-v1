@@ -75,8 +75,8 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo])
-      .spread(function (container, cluster, clusterContainerId, started, containerInfo) {
+    var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image])
+      .spread(function (container, cluster, clusterContainerId, started, containerInfo, image) {
         var ports = containerInfo.NetworkSettings.Ports
 
         if (ports === null) {
@@ -88,6 +88,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
         container.containerHash = clusterContainerId
+        container.dockerContentDigest = image.dockerContentDigest
 
         return container.save()
       })
