@@ -45,7 +45,7 @@ test:
     - ./docker-compose --verbose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose --verbose start backend
     - ./docker-compose --verbose run registryproxy /bin/bash -c "npm install && npm test"
-    - ./docker-compose --verbose run frontend /bin/bash -c "npm install && npm run build && npm test"
+    - ./docker-compose --verbose run frontend /bin/bash -c "npm install && npm rebuild && npm run build && npm test"
 deployment:
   production:
     branch: master
