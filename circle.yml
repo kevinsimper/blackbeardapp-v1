@@ -6,6 +6,10 @@ machine:
 dependencies:
   cache_directories:
     - "~/docker"
+    - "frontend/node_modules"
+    - "backend/node_modules"
+    - "registryproxy/node_modules"
+    - "router/node_modules"
   override:
     - if [[ -e ~/docker/mongo.tar ]]; then docker load -i ~/docker/mongo.tar; fi
     - if [[ -e ~/docker/node.tar ]]; then docker load -i ~/docker/node.tar; fi
@@ -14,19 +18,23 @@ dependencies:
     - chmod +x ./docker-compose
     - mv config/development.yml.sample config/development.yml
     - docker pull mongo:latest
-    - docker pull node:0.12
+    - docker pull node:4.0
     - docker pull registry:2
     - mkdir -p ~/docker; docker save mongo > ~/docker/mongo.tar
     - mkdir -p ~/docker; docker save node > ~/docker/node.tar
     - mkdir -p ~/docker; docker save registry > ~/docker/registry.tar
-test:
-  override:
-    - sudo service mongodb stop
-    - sudo service rabbitmq-server stop
     - ./docker-compose --verbose build frontend
     - ./docker-compose --verbose build backend
     - ./docker-compose --verbose build registryproxy
     - ./docker-compose --verbose build router
+    - pushd frontend/ && npm install && popd
+    - pushd backend/ && npm install && popd
+    - pushd registryproxy/ && npm install && popd
+    - pushd router/ && npm install && popd
+test:
+  override:
+    - sudo service mongodb stop
+    - sudo service rabbitmq-server stop
     - sleep 10
     - docker images
     - docker ps
@@ -37,7 +45,7 @@ test:
     - ./docker-compose --verbose run backend /bin/bash -c "npm install && npm test"
     - ./docker-compose --verbose start backend
     - ./docker-compose --verbose run registryproxy /bin/bash -c "npm install && npm test"
-    - ./docker-compose --verbose run frontend /bin/bash -c "npm install && npm run build && npm test"
+    - ./docker-compose --verbose run frontend /bin/bash -c "npm install && npm rebuild && npm run build && npm test"
 deployment:
   production:
     branch: master
