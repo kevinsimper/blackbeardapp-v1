@@ -190,8 +190,18 @@ exports.getUserBilling = function(request, reply) {
   })
 
   Promise.all([apps, billableHours]).spread(function (apps, billableHours) {
-    console.log(apps)
-    reply(billableHours)
+    if (apps.length !== billableHours.length) {
+      throw new Promise.OperationalError("An error has occurred retrieving the apps and billable hours.")
+    }
+    reply(_.map(apps, function (app, i) {
+      return {
+        app: {
+          _id: app._id,
+          name: app.name
+        },
+        hours: billableHours[i]
+      }
+    }))
   }).catch(function(e) {
     request.log(['mongo'], e)
     reply(Boom.badImplementation())
