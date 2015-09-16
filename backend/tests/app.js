@@ -224,7 +224,7 @@ lab.experiment('/users/me/apps/containers', function() {
       body: requestData
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body.status, 'to be', 'UP')
+      expect(body.status, 'to be', 'DEPLOYING')
       containerId = body._id
       done()
     })
@@ -251,7 +251,7 @@ lab.experiment('/users/me/apps/containers', function() {
       },
       json: true
     }, function(error, response, body) {
-      expect(body.status, 'to be', 'UP')
+      expect(body.status, 'to be', 'DEPLOYING')
       expect(body.deleted, 'to be', false)
       expect(body.app, 'to be', appId)
       done()
