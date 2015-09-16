@@ -5,7 +5,7 @@ var httprequest = Promise.promisify(require('request'))
 
 exports.getCluster = function() {
   return new Promise(function (resolve, reject) {
-    Cluster.find().then(function(clusters) {
+    Cluster.find({type: {'$ne': 'test_swarm'}}).then(function(clusters) {
       resolve(clusters[0])
     })
   })
@@ -28,7 +28,12 @@ exports.request = function (cluster, uri, method, json) {
   if (method) {
     options.method = method
   }
-  return httprequest(options)
+  return httprequest(options).spread(function (response, body) {
+    if(response.statusCode > 300) {
+      throw new Error(body)
+    }
+    return [response, body]
+  })
 }
 
 /**
@@ -42,7 +47,7 @@ exports.createContainer = function (cluster, image) {
     Image: image,
     HostConfig: {
       'PublishAllPorts': true,
-      'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512 
+      'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
     },
   }).spread(function (response, body) {
     return body.Id

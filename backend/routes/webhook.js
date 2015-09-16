@@ -50,6 +50,7 @@ exports.postNotifyImage = function(request, reply) {
   })
 
   var sendToWorker = Promise.all([checkImage, status]).spread(function (image, status) {
+    request.log(['info'], 'image status ' + status)
     if(status === Image.status.UPDATED) {
       return Queue.send('image-redeploy', {
         image: image._id

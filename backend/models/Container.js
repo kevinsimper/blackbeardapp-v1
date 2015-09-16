@@ -13,7 +13,8 @@ var schema = new mongoose.Schema({
   deletedAt: String,
   cluster: {type: mongoose.Schema.Types.ObjectId, ref: 'cluster'},
   containerHash: String,
-  memory: Number
+  memory: Number,
+  dockerContentDigest: String
 })
 
 schema.plugin(mongooseDelete)
