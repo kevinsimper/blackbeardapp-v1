@@ -1,3 +1,7 @@
+if(process.env.NODE_ENV == 'production') {
+  require('newrelic')
+}
+
 var debug = require('debug')('router')
 var Promise = require('bluebird')
 var request = Promise.promisify(require('request'))
