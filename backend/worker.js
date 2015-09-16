@@ -84,6 +84,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         }
         var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
+        container.status = Container.status.UP
         container.ip = ports[portKeys[0]][0].HostIp
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
