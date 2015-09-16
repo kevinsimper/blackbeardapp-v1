@@ -20,10 +20,20 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var sequest = require('sequest')
 
     var container = Container.findOne({_id: message.containerId})
+      .then(function (container) {
+        if(!container) {
+          throw new Promise.OperationalError('no-container')
+        }
+        return container
+      })
 
-    var cluster = ClusterService.getCluster()
+    var cluster = ClusterService.getCluster().then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('no-cluster')
+      }
+      return cluster
+    })
     var app = container.then(function(container) {
-
       return App.findOne({_id: container.app})
     })
     var user = app.then(function (app) {
@@ -97,14 +107,21 @@ Promise.all([mongo, rabbitmq]).then(function () {
         ack()
       })
       .error(function(err) {
-        console.warn('No cluster attached', err.stack)
+        console.warn(err.stack)
+        if(err.message === 'container-removed') {
+          ack()
+        }
+        if(err.message === 'no-cluster') {
+          container.then(function (container) {
+            container.status = Container.status.FAILED
+            return container.save()
+          }).then(function () {
+            ack()
+          })
+        }
       })
       .catch(function (err) {
-        if(process.env.NODE_ENV === 'production') {
-          throw err
-        } else {
-          console.warn('No cluster attached', err.stack)
-        }
+        console.warn(err.stack)
       })
   })
 
