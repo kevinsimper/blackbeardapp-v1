@@ -35,14 +35,29 @@ Promise.all([mongo, rabbitmq]).then(function () {
     })
     var app = container.then(function(container) {
       return App.findOne({_id: container.app})
+    }).then(function (app) {
+      if(!app) {
+        throw new Promise.OperationalError('no-app')
+      }
+      return app
     })
     var user = app.then(function (app) {
       return User.findOne({_id: app.user})
+    }).then(function (user) {
+      if(!user) {
+        throw new Promise.OperationalError('no-user')
+      }
+      return user
     })
     var image = app.then(function(app) {
       return Image.findOne({_id: app.image}).then(function(image) {
         return image
       })
+    }).then(function (image) {
+      if(!image) {
+        throw new Promise.OperationalError('no-image')
+      }
+      return image
     })
 
     var registry = config.REGISTRY_URL
@@ -108,16 +123,21 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
       .error(function(err) {
         console.warn(err.stack)
+        switch(err.message) {
+          case 'no-cluster':
+          case 'no-app':
+          case 'no-user':
+          case 'no-image':
+            container.then(function (container) {
+              container.status = Container.status.FAILED
+              return container.save()
+            }).then(function () {
+              ack()
+            })
+            break;
+        }
         if(err.message === 'container-removed') {
           ack()
-        }
-        if(err.message === 'no-cluster') {
-          container.then(function (container) {
-            container.status = Container.status.FAILED
-            return container.save()
-          }).then(function () {
-            ack()
-          })
         }
       })
       .catch(function (err) {
