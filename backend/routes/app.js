@@ -181,10 +181,17 @@ exports.getUserBilling = function(request, reply) {
   var monthM = moment(request.params.month, "YYYY-MM")
   var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
 
-  var billableHours = Billing.getUserAppsBillableHours(user, monthM, monthEndM)
+  var apps = App.find({user: user})
 
-  billableHours.then(function(billableHoursResult) {
-    reply(billableHoursResult)
+  var billableHours = apps.then(function (apps) {
+    return Promise.all(apps.map(function(app, index) {
+      return Billing.getAppBillableHours(app, monthM, monthEndM)
+    }))
+  })
+
+  Promise.all([apps, billableHours]).spread(function (apps, billableHours) {
+    console.log(apps)
+    reply(billableHours)
   }).catch(function(e) {
     request.log(['mongo'], e)
     reply(Boom.badImplementation())
