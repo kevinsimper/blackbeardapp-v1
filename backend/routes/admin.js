@@ -50,3 +50,4 @@ exports.inviteUser = function(request, reply) {
     }
   })
 }
+

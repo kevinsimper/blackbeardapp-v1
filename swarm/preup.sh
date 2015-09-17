@@ -10,3 +10,5 @@ docker-machine create \
 --swarm-discovery token://$SWARM_ID \
 --engine-insecure-registry registry.blackbeard.dev:9500 \
 swarm-master
+
+#docker-machine upgrade swarm-master

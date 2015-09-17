@@ -34,6 +34,9 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return cluster
     })
     var app = container.then(function(container) {
+      if (container === null) {
+        throw new Promise.OperationalError('Container could not be found.')
+      }
       return App.findOne({_id: container.app})
     }).then(function (app) {
       if(!app) {
