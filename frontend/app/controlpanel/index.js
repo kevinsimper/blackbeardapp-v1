@@ -24,6 +24,7 @@ var VoucherShow = require('./components/VoucherShow/')
 var VoucherCreate = require('./components/VoucherCreate/')
 var Registry = require('./components/Registry/')
 var CreditLogs = require('./components/CreditLogs/')
+var Usage = require('./components/Usage/')
 
 var routes = (
   <Route handler={ControlpanelApp}>
@@ -54,6 +55,7 @@ var routes = (
     <Route path='/vouchers/:id' handler={VoucherShow}/>
     <Route path='/registry' handler={Registry}/>
     <Route path='/creditlogs' handler={CreditLogs}/>
+    <Route path='/usage' handler={Usage}/>
   </Route>
 )
 
