@@ -5,33 +5,26 @@ var config = require('../../config')
 var findWhere = require('lodash/collection/findWhere')
 var remove = require('lodash/array/remove')
 
-var _billing = {}
+var _billing = []
 
 var store = Reflux.createStore({
   listenables: actions,
   init: function() {},
-  onLoadOne: function(month) {
-    if (month) {
-      var self = this
-      request
-        .get(config.BACKEND_HOST + '/users/me/billing/' + month)
-        .set('Authorization', localStorage.token)
-        .end(function (err, res) {
-          actions.loadOne.completed(month, res.body)
-        })
-    }
+  onLoadOne: function() {
+    var self = this
+    request
+      .get(config.BACKEND_HOST + '/users/me/billing')
+      .set('Authorization', localStorage.token)
+      .end(function (err, res) {
+        actions.loadOne.completed(month, res.body)
+      })
   },
-  onLoadOneCompleted: function(month, data) {
-    _billing[month] = data
+  onLoadOneCompleted: function(data) {
+    _billing = data
     this.trigger(data)
   },
-  getOne: function(month) {
-    console.log("MONTH", month)
-    if (!_billing[month]) {
-      return []
-    } else {
-      return _billing[month];
-    }
+  getBilling: function(month) {
+    return _billing
   }
 })
 

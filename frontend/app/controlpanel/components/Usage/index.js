@@ -11,18 +11,11 @@ var filter = require('lodash/collection/filter')
 var store = require('./store')
 var actions = require('./actions')
 
-var moment = require('moment')
-
 var Usage = React.createClass({
   mixins: [Navigation],
   getState: function() {
-    // Default month to current month
-    if (this.props.month === undefined) {
-      this.props.month = moment().format("YYYY-MM")
-    }
-
     return {
-      billing: store.getOne(this.props.month)
+      billing: store.getOne()
     }
   },
   getInitialState: function() {
@@ -32,7 +25,7 @@ var Usage = React.createClass({
   },
   componentDidMount: function() {
     var self = this
-    actions.loadOne(this.props.month)
+    actions.loadOne()
       .then(function() {
         self.setState({
           loaded: true
@@ -68,9 +61,6 @@ var Usage = React.createClass({
             })}
           </tbody>
         </Table>
-        {this.state.billing.map(function(billing) {
-         console.log(billing)
-        })}
       </div>
     );
   }

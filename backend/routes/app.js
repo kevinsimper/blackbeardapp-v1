@@ -170,24 +170,70 @@ exports.getAppLogs = function(request, reply) {
 }
 
 exports.getUserBilling = function(request, reply) {
+  var firstOfMonth = moment().set({
+    date: 1,
+    hour: 0,
+    minute: 0,
+    second: 0,
+    millisecond: 0
+  })
+
   var user = User.getUserIdFromRequest(request)
 
-  var month = request.params.month
+  var apps = App.find({user: user}).populate('containers')
 
-  if (!month.match(/\d{4}-\d{2}/g)) {
-    return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
-  }
+  var monthsToGet = apps.then(function(apps) {
+    var first = _.min(_.flatten(_.map(apps, function(app) {
+      return _.map(app.containers, function(container) {
+        return container.createdAt
+      })
+    })))
 
-  var monthM = moment(request.params.month, "YYYY-MM")
-  var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
+    var start = firstOfMonth
+    if (first) {
+      start = moment.unix(first)
+      start.set({
+        month: 7,
+        date: 1,
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0
+      })
+      console.log(start)
+    }
 
-  var apps = App.find({user: user})
+    if (start.isBefore(firstOfMonth)) {
+      // How many months ago was this started?  
+      var duration = moment.duration(firstOfMonth.diff(start));
+      //return Math.round(duration.asMonths()+1);
+      return [firstOfMonth]
+    } else {
+      return [firstOfMonth]
+    }
+  })
 
-  var billableHours = apps.then(function (apps) {
-    return Promise.all(apps.map(function(app, index) {
-      return Billing.getAppBillableHours(app, monthM, monthEndM)
+
+  // var month = request.params.month
+
+  // if (!month.match(/\d{4}-\d{2}/g)) {
+  //   return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
+  // }
+
+  // var monthM = moment(request.params.month, "YYYY-MM")
+  // var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
+
+  // var apps = App.find({user: user})
+
+  Promise.all([apps, monthsToGet]).spread(function (apps, monthsToGet) {
+    return Promise.all(monthsToGet.map(function(month) {
+      console.log(month)
+      return Promise.all(apps.map(function(app, index) {
+        return Billing.getAppBillableHours(app, monthM, monthEndM)
+      }))
     }))
   })
+    
 
   Promise.all([apps, billableHours]).spread(function (apps, billableHours) {
     if (apps.length !== billableHours.length) {

@@ -354,6 +354,20 @@ lab.experiment('/users/me/apps/containers', function() {
       })
     })
   })
+  lab.test('GET user billing', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/billing',
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function(error, response, body) {
+      console.log(body)
+
+      done()
+    })
+  })
 })
 
 lab.experiment('/apps/', function () {
