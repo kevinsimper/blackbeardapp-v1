@@ -1,3 +1,10 @@
+if(process.env.NODE_ENV == 'production') {
+  // Uses these two ENV variables
+  // NEW_RELIC_APP_NAME
+  // NEW_RELIC_LICENSE_KEY
+  require('newrelic')
+}
+
 var mongoose = require('mongoose')
 var Promise = require('bluebird')
 Promise.promisifyAll(require("mongoose"))
