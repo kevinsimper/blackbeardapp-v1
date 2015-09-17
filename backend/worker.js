@@ -14,6 +14,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
   Queue.consume('container-start', function (message, ack) {
     var ClusterService = require('./services/Cluster')
     var Container = require('./models/Container')
+    var Cluster = require('./models/Cluster')
     var App = require('./models/App')
     var Image = require('./models/Image')
     var User = require('./models/User')
@@ -103,7 +104,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var savedDetails = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image])
+    var savedContainer = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image])
       .spread(function (container, cluster, clusterContainerId, started, containerInfo, image) {
         var ports = containerInfo.NetworkSettings.Ports
 
@@ -120,32 +121,36 @@ Promise.all([mongo, rabbitmq]).then(function () {
         container.dockerContentDigest = image.dockerContentDigest
 
         return container.save()
-      })
-      .then(function (container) {
+    })
+
+    Promise.all([savedContainer, cluster]).spread(function (savedContainer, cluster) {
+      cluster.containers.push(savedContainer._id)
+      return cluster.save()
+    }).then(function(cluster) {
+      ack()
+    })
+    .error(function(err) {
+      console.warn(err.stack)
+      switch(err.message) {
+        case 'no-cluster':
+        case 'no-app':
+        case 'no-user':
+        case 'no-image':
+          container.then(function (container) {
+            container.status = Container.status.FAILED
+            return container.save()
+          }).then(function () {
+            ack()
+          })
+          break;
+      }
+      if(err.message === 'container-removed') {
         ack()
-      })
-      .error(function(err) {
-        console.warn(err.stack)
-        switch(err.message) {
-          case 'no-cluster':
-          case 'no-app':
-          case 'no-user':
-          case 'no-image':
-            container.then(function (container) {
-              container.status = Container.status.FAILED
-              return container.save()
-            }).then(function () {
-              ack()
-            })
-            break;
-        }
-        if(err.message === 'container-removed') {
-          ack()
-        }
-      })
-      .catch(function (err) {
-        console.warn(err.stack)
-      })
+      }
+    })
+    .catch(function (err) {
+      console.warn(err.stack)
+    })
   })
 
   Queue.consume('container-kill', function (message, ack) {
