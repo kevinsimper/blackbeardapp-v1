@@ -130,10 +130,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         return container.save()
     })
 
-    Promise.all([savedContainer, cluster]).spread(function (savedContainer, cluster) {
-      cluster.containers.push(savedContainer._id)
-      return cluster.save()
-    }).then(function(cluster) {
+    savedContainer.then(function() {
       ack()
     })
     .error(function(err) {

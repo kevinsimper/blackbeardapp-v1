@@ -12,9 +12,20 @@ exports.getClusters = {
     level: 'ADMIN'
   },
   handler: function (request, reply) {
-    Cluster.find({type: {'$ne': 'test_swarm'}}).populate('containers').then(function (clusters) {
-      clusters = _.map(clusters, function (cluster) {
-        var used = _.sum(_.map(cluster.containers, function(container) {
+    var clusters = Cluster.find({type: {'$ne': 'test_swarm'}})
+
+    var clusterContainers = clusters.then(function (clusters) {
+      return Promise.map(clusters, function (cluster) {
+        return Container.find({
+          cluster: cluster._id,
+          deleted: false
+        })
+      })
+    })
+
+    Promise.all([clusters, clusterContainers]).spread(function (clusters, clusterContainers) {
+      clusters = clusters.map(function (cluster, index) {
+        var used = _.sum(clusterContainers[index].map(function (container) {
           return container.memory
         }))
         cluster = cluster.toObject()
