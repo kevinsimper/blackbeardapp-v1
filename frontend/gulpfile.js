@@ -22,7 +22,7 @@ console.log(production)
 // when we switch to something else than harp for templating
 // Then we can just put in the host in the main template
 if(production) {
-  process.env.BACKEND_HOST = 'http://api.blackbeard.io'
+  process.env.BACKEND_HOST = 'https://api.blackbeard.io'
 } else {
   var doc = yaml.safeLoad(fs.readFileSync(path.join(__dirname, '../config/development.yml'), 'utf8'));
   process.env.BACKEND_HOST = doc.common.environment[0].split('=')[1]
