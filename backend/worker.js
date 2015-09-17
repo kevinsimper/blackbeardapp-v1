@@ -20,19 +20,44 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var sequest = require('sequest')
 
     var container = Container.findOne({_id: message.containerId})
+      .then(function (container) {
+        if(!container) {
+          throw new Promise.OperationalError('no-container')
+        }
+        return container
+      })
 
-    var cluster = ClusterService.getCluster()
+    var cluster = ClusterService.getCluster().then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('no-cluster')
+      }
+      return cluster
+    })
     var app = container.then(function(container) {
-
       return App.findOne({_id: container.app})
+    }).then(function (app) {
+      if(!app) {
+        throw new Promise.OperationalError('no-app')
+      }
+      return app
     })
     var user = app.then(function (app) {
       return User.findOne({_id: app.user})
+    }).then(function (user) {
+      if(!user) {
+        throw new Promise.OperationalError('no-user')
+      }
+      return user
     })
     var image = app.then(function(app) {
       return Image.findOne({_id: app.image}).then(function(image) {
         return image
       })
+    }).then(function (image) {
+      if(!image) {
+        throw new Promise.OperationalError('no-image')
+      }
+      return image
     })
 
     var registry = config.REGISTRY_URL
@@ -84,6 +109,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         }
         var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
+        container.status = Container.status.UP
         container.ip = ports[portKeys[0]][0].HostIp
         container.port = ports[portKeys[0]][0].HostPort
         container.cluster = cluster._id
@@ -96,14 +122,26 @@ Promise.all([mongo, rabbitmq]).then(function () {
         ack()
       })
       .error(function(err) {
-        console.warn('No cluster attached', err.stack)
+        console.warn(err.stack)
+        switch(err.message) {
+          case 'no-cluster':
+          case 'no-app':
+          case 'no-user':
+          case 'no-image':
+            container.then(function (container) {
+              container.status = Container.status.FAILED
+              return container.save()
+            }).then(function () {
+              ack()
+            })
+            break;
+        }
+        if(err.message === 'container-removed') {
+          ack()
+        }
       })
       .catch(function (err) {
-        if(process.env.NODE_ENV === 'production') {
-          throw err
-        } else {
-          console.warn('No cluster attached', err.stack)
-        }
+        console.warn(err.stack)
       })
   })
 

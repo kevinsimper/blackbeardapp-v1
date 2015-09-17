@@ -23,7 +23,7 @@ exports.postContainer = function(request, reply) {
     // NOTE: Memory limit here is defaulted to 512mb
     return new Container({
       region: region,
-      status: Container.status.UP,
+      status: Container.status.DEPLOYING,
       app: app,
       memory: 512,
       createdAt: Math.round(Date.now() / 1000)

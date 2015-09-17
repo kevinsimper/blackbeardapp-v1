@@ -3,8 +3,18 @@ var Promise = require('bluebird')
 var config = require('../config')
 var debug = require('debug')('queue')
 
+
+var connection = null
+
 exports.connect = function () {
-  return amqplib.connect(config.RABBITMQ_URL)
+  return new Promise(function (resolve) {
+    if(connection) {
+      resolve(connection)
+      return
+    }
+    connection = amqplib.connect(config.RABBITMQ_URL)
+    resolve(connection)
+  })
 }
 
 /**
@@ -12,11 +22,15 @@ exports.connect = function () {
 * @params {string} message
 */
 exports.send = function (queue, message) {
-  return this.connect().then(function (connection) {
-    return connection.createChannel()
-  }).then(function (channel) {
+  var connection = this.connect().then(function (connection) {
+    return connection.createConfirmChannel()
+  })
+  connection.then(function (channel) {
     channel.assertQueue(queue)
-    return channel.sendToQueue(queue, new Buffer(JSON.stringify(message)))
+    channel.sendToQueue(queue, new Buffer(JSON.stringify(message)), {}, function () {
+      channel.close()
+    })
+    return channel
   })
 }
 

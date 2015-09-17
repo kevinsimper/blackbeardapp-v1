@@ -37,5 +37,7 @@ module.exports = mongoose.model('container', schema)
 
 module.exports.status = {
   UP: 'UP',
+  DEPLOYING: 'DEPLOYING',
+  FAILED: 'FAILED',
   DOWN: 'DOWN'
 }

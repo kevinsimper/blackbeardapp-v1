@@ -69,6 +69,10 @@ app.all('/v2/*', function(req, res) {
               name: name,
               dockerContentDigest: dockerContentDigest
             }
+          }).spread(function (response, body) {
+            debug(random, 'webhook response', response.headers, body)
+          }).catch(function (err) {
+            debug(random, 'webhook error', err)
           })
           debug(random, 'webhook triggered', user, name)
         }
