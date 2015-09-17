@@ -31,11 +31,22 @@ var Containers = React.createClass({
         self.setState({
           loaded: true
         })
+        self.startAutoRefresh()
       })
     this.unsubscribe = store.listen(this.onChange)
   },
   componentWillUnmount: function() {
+    this.stopAutoRefresh()
     this.unsubscribe()
+  },
+  startAutoRefresh: function () {
+    var self = this
+    this.refresh = window.setInterval(function() {
+      actions.loadOne(self.props.app)
+    }, 3000)
+  },
+  stopAutoRefresh: function() {
+    window.clearInterval(this.refresh)
   },
   onChange: function() {
     this.setState(this.getState())

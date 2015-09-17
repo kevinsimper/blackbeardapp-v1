@@ -10,8 +10,6 @@ var ContainerItem = React.createClass({
   getContainerButton: function () {
     if (this.props.container.status === 'UP') {
       return <Button onClick={this.stopContainer}>Stop</Button>
-    } else {
-      return <Button>Start</Button>
     }
   },
   render: function() {
