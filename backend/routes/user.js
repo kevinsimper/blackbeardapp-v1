@@ -46,37 +46,36 @@ exports.postUserUsername = function(request, reply) {
 
   var existing = user.then(function(user) {
     if(user.username) {
-      reply({
-        message: 'You already have a username'
-      })
+      throw new Error('already-username')
     } else {
       return User.findOneAsync({ username: username })
     }
   })
   .then(function(existing) {
     if(existing) {
-      reply({
-        message: 'Username already taken!'
-      })
-      return true
+      throw new Error('username-taken')
     } else {
       return false
     }
   })
 
   Promise.all([user, existing]).spread(function(user, existing) {
-    if(!existing) {
-      user.username = username
-      user.save(function() {
-        reply({
-          message: 'Username saved!'
-        })
+    user.username = username
+    user.save(function() {
+      reply({
+        message: 'Username saved!'
       })
-    }
+    })
   })
   .catch(function(err) {
     request.log(['error'], err)
-    reply(Boom.badImplementation())
+    if(err.message === 'already-username') {
+      reply(Boom.badRequest('You already have a username'))
+    } else if (err.message === 'username-taken') {
+      reply(Boom.conflict('Username already taken!'))
+    } else {
+      reply(Boom.badImplementation())
+    }
   })
 
 }
@@ -297,4 +296,3 @@ exports.getUserLogs = function (request, reply) {
     return reply(Boom.badImplementation())
   })
 }
-
