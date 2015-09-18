@@ -28,10 +28,13 @@ exports.getCluster = function() {
     })
 
     Promise.all([clusters, pressures]).spread(function (clusters, pressures) {
-      clusters.map(function (cluster, index) {
-        console.log(pressures[index])
+      var orderedByPressure = _.sortBy(_.zip(clusters, pressures), function (item) {
+        return item[1]
       })
-      resolve(clusters[0])
+      var greenStatus = _.filter(orderedByPressure, function (cluster) {
+        return cluster[1] < 1.5
+      })
+      resolve(greenStatus[0][0])
     })
   })
 }
