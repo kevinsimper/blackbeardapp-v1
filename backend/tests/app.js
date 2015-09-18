@@ -363,8 +363,9 @@ lab.experiment('/users/me/apps/containers', function() {
       },
       json: true
     }, function(error, response, body) {
-      expect(body.length, 'to be greater than', 1)
-      expect(body[0].month, 'to equal', '2015-05')
+      expect(body.results.length, 'to be greater than', 1)
+      expect(body.results[0].month, 'to equal', '2015-05')
+      expect(Object.keys(body.monthTotals).length, 'to be greater than', 1)
 
       done()
     })

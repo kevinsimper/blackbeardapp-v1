@@ -144,18 +144,32 @@ module.exports = {
       })
 
       Promise.all([apps, monthsToGet, appsHours]).spread(function (apps, monthsToGet, appsHours) {
-        resolve(_.flatten(monthsToGet.map(function(month, i) {
+        var monthTotals = {}
+
+        var results = _.flatten(monthsToGet.map(function(month, i) {
           return apps.map(function (app, j) {
+            var hours = appsHours[i][j]
+            var currentMonth = month.format('YYYY-MM')
+            if (monthTotals[currentMonth] === undefined) {
+              monthTotals[currentMonth] = 0
+            }
+            monthTotals[currentMonth] += hours
+
             return {
-              month: month.format('YYYY-MM'),
+              month: currentMonth,
               app: {
                 _id: app._id,
                 name: app.name
               },
-              hours: appsHours[i][j]
+              hours: hours
             }
           })
-        })))
+        }))
+
+        resolve({
+          results: results,
+          monthTotals: monthTotals
+        })
       })
     })
   },
