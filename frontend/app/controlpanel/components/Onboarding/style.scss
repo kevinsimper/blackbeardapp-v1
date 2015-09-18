@@ -1,6 +1,19 @@
 .Onboarding {
-  background-color: #F2F2F2;
-  padding: 10px;
-  border: 1px solid #CCC;
-  margin: 10px 0;
+}
+.Onboarding__Terminal {
+  background: black;
+  color: white;
+  padding: 20px 15px;
+}
+
+.Onboarding__Username {
+  display: inline-block;
+  width: 100%;
+  max-width: 350px;
+}
+.Onboarding__Username--Valid {
+  border: 1px solid #008000;
+}
+.Onboarding__Username--Invalid {
+  border: 1px solid red;
 }

@@ -38,9 +38,11 @@ var Dashboard = React.createClass({
     if(!this.state.loaded) {
       return <div/>
     }
+    if(!this.state.profile.username) {
+      return <Onboarding/>;  
+    }
     return (
       <div>
-        {!this.state.profile.username &&  <Onboarding/>}
         <h1>Dashboard</h1>
         <div>Hi there! How are you doing?</div>
         <Apps/>
