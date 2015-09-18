@@ -11,7 +11,8 @@ var Onboarding = React.createClass({
     return {
       username: '',
       status: '',
-      error: ''
+      error: '',
+      success: false
     }
   },
   onChangeUsername: function(e) {
@@ -19,13 +20,15 @@ var Onboarding = React.createClass({
       username: e.target.value
     })
   },
-  onClickSave: function() {
+  onClickSave: function(e) {
+    e.preventDefault()
     var self = this
 
     if(this.state.username.length === 0) {
       self.setState({
         error: 'You have to fill out a username!'
       })
+      return false;
     }
     request.post(config.BACKEND_HOST + '/users/me/username')
       .set('Authorization', localStorage.token)
@@ -33,15 +36,16 @@ var Onboarding = React.createClass({
         username: this.state.username
       })
       .end(function(err, res) {
-        if(err && err.statusCode < 300) {
+        if(err && res.status > 300) {
           self.setState({
-            status: res.body.message,
-            error: ''
+            status: '',
+            error: res.body.message
           })
         } else {
           self.setState({
             error: '',
-            status: res.body.message
+            status: res.body.message,
+            success: true
           })
         }
       })
@@ -51,6 +55,9 @@ var Onboarding = React.createClass({
       'Onboarding__Username--Valid': this.state.username.length > 0,
       'Onboarding__Username--Invalid': this.state.error && this.state.username.length === 0
     })
+  },
+  goToNext: function () {
+    window.location.reload()
   },
   render: function() {
     return (
@@ -62,11 +69,21 @@ var Onboarding = React.createClass({
         <div className={this.inputClasses()}>
           <Input type='text' value={this.state.username} onChange={this.onChangeUsername}/>
         </div>
-        <div>
-          <Button onClick={this.onClickSave}>Save</Button>
-        </div>
-        <div>{this.state.status}</div>
-
+        {!this.state.success &&
+          <div>
+            <Button onClick={this.onClickSave}>Save</Button>
+          </div>
+        }
+        {this.state.status &&
+          <div className='Onboarding__Success'>
+            {this.state.status}
+          </div>
+        }
+        {this.state.error &&
+          <div className='Onboarding__Error'>
+            {this.state.error}
+          </div>
+        }
         <p>You are going to that username like this:</p>
         <div className='Onboarding__Terminal'>
           <pre>
@@ -76,6 +93,11 @@ var Onboarding = React.createClass({
             <code>$ docker push registry.blackbeard.io/{this.state.username}/container</code>
           </pre>
         </div>
+        {this.state.success &&
+          <div style={{marginTop: 40}}>
+            <Button onClick={this.goToNext}>Go to dashboard!</Button>
+          </div>
+        }
       </div>
     )
   }

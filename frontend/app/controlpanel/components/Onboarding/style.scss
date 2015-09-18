@@ -17,3 +17,15 @@
 .Onboarding__Username--Invalid {
   border: 1px solid red;
 }
+.Onboarding__Error {
+  border: 1px solid #f00;
+  background-color: lighten(#f00, 40%);
+  padding: 10px;
+  margin: 10px 0;
+}
+.Onboarding__Success {
+  border: 1px solid #008000;
+  background-color: lighten(#008000, 70%);
+  padding: 10px;
+  margin: 10px 0;
+}
