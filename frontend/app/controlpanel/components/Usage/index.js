@@ -7,6 +7,8 @@ var StatusIcon = require('../StatusIcon/')
 var Table = require('../Table/')
 var ContainerItem = require('../ContainerItem/')
 var filter = require('lodash/collection/filter')
+var Router = require('react-router')
+var Link = Router.Link
 
 var store = require('./store')
 var actions = require('./actions')
@@ -15,7 +17,7 @@ var Usage = React.createClass({
   mixins: [Navigation],
   getState: function() {
     return {
-      billing: store.getOne()
+      billing: store.getBilling()
     }
   },
   getInitialState: function() {
@@ -48,6 +50,7 @@ var Usage = React.createClass({
         <Table>
           <thead>
             <tr>
+              <th>Month</th>
               <th>Application</th>
               <th>Hours</th>
             </tr>
@@ -55,7 +58,12 @@ var Usage = React.createClass({
           <tbody>
             {this.state.billing.map(function(billing) {
               return <tr>
-                <td>{billing.name}</td>
+                <td>{billing.month}</td>
+                <td>
+                  <Link to='AppShow' params={{id: billing.app._id}}>
+                    {billing.app.name}
+                  </Link>
+                </td>
                 <td>{billing.hours}</td>
               </tr>
             })}

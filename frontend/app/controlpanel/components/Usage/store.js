@@ -16,14 +16,14 @@ var store = Reflux.createStore({
       .get(config.BACKEND_HOST + '/users/me/billing')
       .set('Authorization', localStorage.token)
       .end(function (err, res) {
-        actions.loadOne.completed(month, res.body)
+        actions.loadOne.completed(res.body)
       })
   },
   onLoadOneCompleted: function(data) {
     _billing = data
     this.trigger(data)
   },
-  getBilling: function(month) {
+  getBilling: function() {
     return _billing
   }
 })
