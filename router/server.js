@@ -46,7 +46,7 @@ var getContainers = function (appname) {
       })
     }).spread(function (resp, body) {
       debug('containers', body)
-      return body
+      return _.filter(body, {deleted: false}) || []
     })
   })
 }
@@ -65,11 +65,11 @@ var parseHost = function (host) {
   return parsed
 }
 
-http.createServer(function (req, res) {
+var app = http.createServer(function (req, res) {
   var details = parseHost(req.headers.host)
-  // there should be two subdomains
-  // the appname and apps
-  if(details.subdomains.length !== 2) {
+  // there should be onlu one subdomain,
+  // else somebody is trying to access some illegal
+  if(details.subdomains.length !== 1) {
     return res.end('Missing something!')
   }
   var appname = details.subdomains[0]
@@ -81,12 +81,19 @@ http.createServer(function (req, res) {
       target: address,
       changeOrigin: true
     })
+    proxy.on('error', function(e) {
+      console.log(e.stack)
+      res.end('Website is down!')
+    })
   }).catch(function (err) {
     debug('could not find', appname)
-    debug('error', err)
+    debug('error', err.stack)
     res.end('No app with that name!')
   })
 
-}).listen(8500, function() {
-  console.log('Router is listening!')
+})
+
+var port = 8500
+app.listen(port, function() {
+  console.log('Router is listening on', port)
 })
