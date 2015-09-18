@@ -57,7 +57,8 @@ process.stdin.on('end', function() {
     key: keyPem,
     sshPrivate: idRSA,
     sshPublic: idRSAPub,
-    sshUser: 'docker'
+    sshUser: 'docker',
+    memory: 1024
   }))
 
   req.end()
