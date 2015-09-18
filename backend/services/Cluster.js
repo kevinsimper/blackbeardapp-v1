@@ -34,7 +34,13 @@ exports.getCluster = function() {
       var greenStatus = _.filter(orderedByPressure, function (cluster) {
         return cluster[1] < 1.5
       })
-      resolve(greenStatus[0][0])
+      if(greenStatus.length > 0) {
+        resolve(greenStatus[0][0])
+      } else {
+        // THERE IS NOT GREEN CLUSTERS!!
+        console.log('THERE IS NO GREEN CLUSTERS!!')
+        resolve(orderedByPressure[0][0])
+      }
     })
   })
 }
