@@ -46,7 +46,7 @@ var getContainers = function (appname) {
       })
     }).spread(function (resp, body) {
       debug('containers', body)
-      return body
+      return _.filter(body, {deleted: false}) || []
     })
   })
 }
