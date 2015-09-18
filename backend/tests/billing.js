@@ -54,9 +54,9 @@ lab.experiment('Testing Billing service', function() {
       // Skipping old app
       expect(Math.ceil(moment('2015-09-01 00:00').diff('2015-08-06 18:31:12', 'minute')/60.0), 'to be', 606)
       total += 606
-      expect(hours, 'to be', 1921)
 
-      expect(total, 'to be', 1921)
+      expect(hours, 'to be', total)
+      expect(hours, 'to be', 1921)
 
       done()
     })
