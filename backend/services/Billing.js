@@ -74,6 +74,11 @@ module.exports = {
       resolve(hours)
     })
   },
+  /**
+  * Get list of billable months for supplied list of apps.
+  * This could be improved by not ending at the current month but by ending
+  * when the app's containers are deleted.
+  */
   getBillableMonths: function(apps) {
     var firstOfMonth = moment().set({
       date: 1,
@@ -116,6 +121,48 @@ module.exports = {
     } else {
       return [firstOfMonth]
     }
+  },
+  /**
+  * Per month get apps (id and name) and the amount of hours they were run.
+  */
+  getAppBillableHoursPerUser: function (user) {
+    var self = this
+    return new Promise(function (resolve, reject) {
+      var apps = App.find({user: user}).populate('containers')
+
+      var monthsToGet = Promise.all(apps.then(function(apps) {
+        return self.getBillableMonths(apps)
+      }))
+
+      var appsHours = Promise.all(Promise.all([apps, monthsToGet]).spread(function (apps, monthsToGet) {
+        return monthsToGet.map(function(month) {
+          var monthEnd = month.clone().add(1, 'month')
+
+          return Promise.all(apps.map(function(app, index) {
+            return self.getAppBillableHours(app, month, monthEnd)
+          }))
+        })
+      }))
+
+      Promise.all([apps, monthsToGet, appsHours]).spread(function (apps, monthsToGet, appsHours) {
+        var result = []
+
+        monthsToGet.map(function(month, i) {
+          apps.map(function (app, j) {
+            result.push({
+              month: month.format('YYYY-MM'),
+              app: {
+                _id: app._id,
+                name: app.name
+              },
+              hours: appsHours[i][j]
+            })
+          })
+        })
+
+        resolve(result)
+      })
+    })
   },
   /**
    * At this stage calculateHoursPrice is hardcoded to be 7 dollars per month divided by 30 days and 24 hours.

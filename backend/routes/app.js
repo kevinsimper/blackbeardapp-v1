@@ -170,86 +170,10 @@ exports.getAppLogs = function(request, reply) {
 }
 
 exports.getUserBilling = function(request, reply) {
-  var firstOfMonth = moment().set({
-    date: 1,
-    hour: 0,
-    minute: 0,
-    second: 0,
-    millisecond: 0
-  })
-
+  // Given current time get previous months of billablehours per app
   var user = User.getUserIdFromRequest(request)
-
-  var apps = App.find({user: user}).populate('containers')
-
-  var monthsToGet = apps.then(function(apps) {
-    var first = _.min(_.flatten(_.map(apps, function(app) {
-      return _.map(app.containers, function(container) {
-        return container.createdAt
-      })
-    })))
-
-    var start = firstOfMonth
-    if (first) {
-      start = moment.unix(first)
-      start.set({
-        month: 7,
-        date: 1,
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0
-      })
-      console.log(start)
-    }
-
-    if (start.isBefore(firstOfMonth)) {
-      // How many months ago was this started?  
-      var duration = moment.duration(firstOfMonth.diff(start));
-      //return Math.round(duration.asMonths()+1);
-      return [firstOfMonth]
-    } else {
-      return [firstOfMonth]
-    }
-  })
-
-
-  // var month = request.params.month
-
-  // if (!month.match(/\d{4}-\d{2}/g)) {
-  //   return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
-  // }
-
-  // var monthM = moment(request.params.month, "YYYY-MM")
-  // var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
-
-  // var apps = App.find({user: user})
-
-  Promise.all([apps, monthsToGet]).spread(function (apps, monthsToGet) {
-    return Promise.all(monthsToGet.map(function(month) {
-      console.log(month)
-      return Promise.all(apps.map(function(app, index) {
-        return Billing.getAppBillableHours(app, monthM, monthEndM)
-      }))
-    }))
-  })
-    
-
-  Promise.all([apps, billableHours]).spread(function (apps, billableHours) {
-    if (apps.length !== billableHours.length) {
-      throw new Promise.OperationalError("An error has occurred retrieving the apps and billable hours.")
-    }
-    reply(_.map(apps, function (app, i) {
-      return {
-        app: {
-          _id: app._id,
-          name: app.name
-        },
-        hours: billableHours[i]
-      }
-    }))
-  }).catch(function(e) {
-    request.log(['mongo'], e)
-    reply(Boom.badImplementation())
+  var userBilling = Billing.getAppBillableHoursPerUser(user)
+  userBilling.then(function(userBilling) {
+    reply(userBilling)
   })
 }
