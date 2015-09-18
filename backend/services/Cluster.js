@@ -1,11 +1,36 @@
 var request = require('request')
 var Promise = require('bluebird')
 var Cluster = require('../models/Cluster')
+var Container = require('../models/Container')
 var httprequest = Promise.promisify(require('request'))
+var _ = require('lodash')
 
 exports.getCluster = function() {
-  return new Promise(function (resolve, reject) {
-    Cluster.find({type: {'$ne': 'test_swarm'}}).then(function(clusters) {
+  return new Promise(function (resolve) {
+    var clusters = Cluster.find({type: {'$ne': 'test_swarm'}})
+
+    var clusterContainers = clusters.then(function (clusters) {
+      return Promise.map(clusters, function (cluster) {
+        return Container.find({
+          cluster: cluster._id,
+          deleted: false
+        })
+      })
+    })
+    var pressures = Promise.all([clusters, clusterContainers]).spread(function (clusters, clusterContainers) {
+      return clusters.map(function (cluster, index) {
+        var totalUsedMemory = _.sum(clusterContainers[index].map(function (container) {
+          return container.memory
+        }))
+        console.log(totalUsedMemory, cluster.memory)
+        return totalUsedMemory / cluster.memory
+      })
+    })
+
+    Promise.all([clusters, pressures]).spread(function (clusters, pressures) {
+      clusters.map(function (cluster, index) {
+        console.log(pressures[index])
+      })
       resolve(clusters[0])
     })
   })
