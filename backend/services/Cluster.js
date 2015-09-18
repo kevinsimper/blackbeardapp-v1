@@ -1,12 +1,46 @@
 var request = require('request')
 var Promise = require('bluebird')
 var Cluster = require('../models/Cluster')
+var Container = require('../models/Container')
 var httprequest = Promise.promisify(require('request'))
+var _ = require('lodash')
 
 exports.getCluster = function() {
-  return new Promise(function (resolve, reject) {
-    Cluster.find({type: {'$ne': 'test_swarm'}}).then(function(clusters) {
-      resolve(clusters[0])
+  return new Promise(function (resolve) {
+    var clusters = Cluster.find({type: {'$ne': 'test_swarm'}})
+
+    var clusterContainers = clusters.then(function (clusters) {
+      return Promise.map(clusters, function (cluster) {
+        return Container.find({
+          cluster: cluster._id,
+          deleted: false
+        })
+      })
+    })
+    var pressures = Promise.all([clusters, clusterContainers]).spread(function (clusters, clusterContainers) {
+      return clusters.map(function (cluster, index) {
+        var totalUsedMemory = _.sum(clusterContainers[index].map(function (container) {
+          return container.memory
+        }))
+        console.log(totalUsedMemory, cluster.memory)
+        return totalUsedMemory / cluster.memory
+      })
+    })
+
+    Promise.all([clusters, pressures]).spread(function (clusters, pressures) {
+      var orderedByPressure = _.sortBy(_.zip(clusters, pressures), function (item) {
+        return item[1]
+      })
+      var greenStatus = _.filter(orderedByPressure, function (cluster) {
+        return cluster[1] < 1.5
+      })
+      if(greenStatus.length > 0) {
+        resolve(greenStatus[0][0])
+      } else {
+        // THERE IS NOT GREEN CLUSTERS!!
+        console.log('THERE IS NO GREEN CLUSTERS!!')
+        resolve(orderedByPressure[0][0])
+      }
     })
   })
 }
@@ -47,7 +81,7 @@ exports.createContainer = function (cluster, image) {
     Image: image,
     HostConfig: {
       'PublishAllPorts': true,
-      'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
+      // 'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
     },
   }).spread(function (response, body) {
     return body.Id

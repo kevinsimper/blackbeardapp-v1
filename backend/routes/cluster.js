@@ -12,9 +12,20 @@ exports.getClusters = {
     level: 'ADMIN'
   },
   handler: function (request, reply) {
-    Cluster.find({type: {'$ne': 'test_swarm'}}).populate('containers').then(function (clusters) {
-      clusters = _.map(clusters, function (cluster) {
-        var used = _.sum(_.map(cluster.containers, function(container) {
+    var clusters = Cluster.find({type: {'$ne': 'test_swarm'}})
+
+    var clusterContainers = clusters.then(function (clusters) {
+      return Promise.map(clusters, function (cluster) {
+        return Container.find({
+          cluster: cluster._id,
+          deleted: false
+        })
+      })
+    })
+
+    Promise.all([clusters, clusterContainers]).spread(function (clusters, clusterContainers) {
+      clusters = clusters.map(function (cluster, index) {
+        var used = _.sum(clusterContainers[index].map(function (container) {
           return container.memory
         }))
         cluster = cluster.toObject()
@@ -176,15 +187,30 @@ exports.getClusterUsage = {
   },
   handler: function (request, reply) {
     var id = request.params.cluster
-    Cluster.findOne({_id: id}).populate('containers').then(function (cluster) {
+
+    var cluster = Cluster.findOne({_id: id}).then(function (cluster) {
       if(!cluster) {
         throw new Promise.OperationalError('does not exist!')
       }
+      return cluster
+    })
+
+    var clusterContainers = cluster.then(function (cluster) {
+      return Container.find({
+        cluster: cluster._id,
+        deleted: false
+      })
+    })
+
+    Promise.all([cluster, clusterContainers]).spread(function (cluster, clusterContainers) {
+      var used = _.sum(clusterContainers.map(function (container) {
+        return container.memory
+      }))
+      cluster = cluster.toObject()
+      cluster.pressure = used / cluster.memory
 
       reply({
-        memoryUsed: _.sum(_.map(cluster.containers, function(container) {
-          return container.memory
-        })),
+        memoryUsed: used,
         limit: cluster.memory,
         count: cluster.containers.length
       })

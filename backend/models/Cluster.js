@@ -14,7 +14,6 @@ var schema = new mongoose.Schema({
     sshPrivate: String,
     sshUser: String
   },
-  containers: [{type: mongoose.Schema.Types.ObjectId, ref: 'container'}],
   deleted: { type: Boolean, default: false },
   deletedAt: String,
   memory: { type: Number, default: 2048 },

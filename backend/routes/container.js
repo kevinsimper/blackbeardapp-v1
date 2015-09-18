@@ -103,7 +103,7 @@ exports.deleteContainer = function(request, reply) {
     })
   }).spread(function (container) {
     return Queue.send('container-kill', {
-      containerId: container.containerHash
+      containerId: container._id
     })
   }).then(function (result) {
     reply({

@@ -76,6 +76,10 @@ var ClusterShow = React.createClass({
               <td>{this.state.cluster.machines}</td>
             </tr>
             <tr>
+              <td>Machines</td>
+              <td>{this.state.cluster.memory}</td>
+            </tr>
+            <tr>
               <td>IP</td>
               <td>{this.state.cluster.ip}</td>
             </tr>
