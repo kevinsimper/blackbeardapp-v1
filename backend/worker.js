@@ -160,19 +160,19 @@ Promise.all([mongo, rabbitmq]).then(function () {
   Queue.consume('container-kill', function (message, ack) {
     var ClusterService = require('./services/Cluster')
     var Container = require('./models/Container')
+    var Cluster = require('./models/Cluster')
     var App = require('./models/App')
     var Image = require('./models/Image')
     var User = require('./models/User')
-    var sequest = require('sequest')
 
-    // TODO: Choose proper cluster here
-    var cluster = ClusterService.getCluster()
+    var container = Container.findOne({_id: message.containerId})
 
-    var clusterContainerId = message.containerId
-    var container = Container.findOne({_id: clusterContainerId})
+    var cluster = container.then(function (container) {
+      return Cluster.findOne({_id: container.cluster})
+    })
 
-    cluster.then(function(cluster) {
-      ClusterService.killContainer(cluster, clusterContainerId)
+    Promise.all([cluster, container]).spread(function(cluster, container) {
+      ClusterService.killContainer(cluster, container.containerHash)
       .then(function(result) {
         ack()
       })
