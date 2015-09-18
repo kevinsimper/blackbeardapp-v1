@@ -74,6 +74,49 @@ module.exports = {
       resolve(hours)
     })
   },
+  getBillableMonths: function(apps) {
+    var firstOfMonth = moment().set({
+      date: 1,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    })
+
+    var first = _.min(_.flatten(_.map(apps, function(app) {
+      return _.map(app.containers, function(container) {
+        return container.createdAt
+      })
+    })))
+
+    var start = firstOfMonth
+    if (first) {
+      start = moment.unix(first)
+      start.set({
+        date: 1,
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0
+      })
+    }
+
+    if (start.isBefore(firstOfMonth)) {
+      // How many months ago was this started?
+      var duration = moment.duration(firstOfMonth.diff(start));
+
+      var range = []
+      var current = start.clone()
+      for (var i=0; i<Math.round(duration.asMonths()+1); i++) {
+        range.push(current.clone())
+        current.add(1, 'month')
+      }
+
+      return range
+    } else {
+      return [firstOfMonth]
+    }
+  },
   /**
    * At this stage calculateHoursPrice is hardcoded to be 7 dollars per month divided by 30 days and 24 hours.
    */
