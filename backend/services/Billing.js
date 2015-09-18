@@ -134,33 +134,28 @@ module.exports = {
         return self.getBillableMonths(apps)
       }))
 
-      var appsHours = Promise.all(Promise.all([apps, monthsToGet]).spread(function (apps, monthsToGet) {
-        return monthsToGet.map(function(month) {
+      var appsHours = Promise.all([apps, monthsToGet]).spread(function (apps, monthsToGet) {
+        return Promise.all(monthsToGet.map(function(month) {
           var monthEnd = month.clone().add(1, 'month')
-
           return Promise.all(apps.map(function(app, index) {
             return self.getAppBillableHours(app, month, monthEnd)
           }))
-        })
-      }))
+        }))
+      })
 
       Promise.all([apps, monthsToGet, appsHours]).spread(function (apps, monthsToGet, appsHours) {
-        var result = []
-
-        monthsToGet.map(function(month, i) {
-          apps.map(function (app, j) {
-            result.push({
+        resolve(_.flatten(monthsToGet.map(function(month, i) {
+          return apps.map(function (app, j) {
+            return {
               month: month.format('YYYY-MM'),
               app: {
                 _id: app._id,
                 name: app.name
               },
               hours: appsHours[i][j]
-            })
+            }
           })
-        })
-
-        resolve(result)
+        })))
       })
     })
   },
