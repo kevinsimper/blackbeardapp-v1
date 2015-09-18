@@ -5,7 +5,7 @@ var config = require('../../config')
 var findWhere = require('lodash/collection/findWhere')
 var remove = require('lodash/array/remove')
 
-var _billing = []
+var _billing = {results: [], monthTotals: {}}
 
 var store = Reflux.createStore({
   listenables: actions,

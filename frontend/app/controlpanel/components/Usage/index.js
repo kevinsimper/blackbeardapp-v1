@@ -9,6 +9,7 @@ var ContainerItem = require('../ContainerItem/')
 var filter = require('lodash/collection/filter')
 var Router = require('react-router')
 var Link = Router.Link
+var _ = require('lodash')
 
 var store = require('./store')
 var actions = require('./actions')
@@ -56,17 +57,30 @@ var Usage = React.createClass({
             </tr>
           </thead>
           <tbody>
-            {this.state.billing.map(function(billing) {
-              return <tr>
-                <td>{billing.month}</td>
-                <td>
-                  <Link to='AppShow' params={{id: billing.app._id}}>
-                    {billing.app.name}
-                  </Link>
-                </td>
-                <td>{billing.hours}</td>
-              </tr>
-            })}
+          {Object.keys(this.state.billing.monthTotals).map(function(key) {
+            var rows = []
+            self.state.billing.results.map(function (billing) {
+              if (billing.month == key) {
+                rows.push(<tr>
+                  <td>{billing.month}</td>
+                  <td>
+                    <Link to='AppShow' params={{id: billing.app._id}}>
+                      {billing.app.name}
+                    </Link>
+                  </td>
+                  <td>{billing.hours}</td>
+                </tr>)
+              }
+            })
+
+            rows.push(<tr>
+              <td></td>
+              <td></td>
+              <td style={{fontWeight: "bold"}}>{self.state.billing.monthTotals[key]}</td>
+            </tr>)
+
+            return rows;
+          })}
           </tbody>
         </Table>
       </div>
