@@ -36,6 +36,7 @@ var Clusters = React.createClass({
             <tr>
               <th>Type</th>
               <th>Machines</th>
+              <th>Memory</th>
               <th>Container Limit %</th>
               <th>Deleted</th>
               <th>Actions</th>
@@ -48,6 +49,7 @@ var Clusters = React.createClass({
                 <tr>
                   <td>{item.type}</td>
                   <td>{item.machines}</td>
+                  <td>{item.memory}</td>
                   <td>{Math.round(item.pressure*100)}</td>
                   <td>{item.deleted && 'Yes'}</td>
                   <td>
