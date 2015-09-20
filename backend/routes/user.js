@@ -37,51 +37,57 @@ exports.getOneUser = function(request, reply) {
   })
 }
 
-exports.postUserUsername = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  var role = request.auth.credentials.role
-  var username = request.payload.username
-
-  var user = User.findOneByRoleAsync(id, role)
-
-  var existing = user.then(function(user) {
-    if(user.username) {
-      reply({
-        message: 'You already have a username'
-      })
-    } else {
-      return User.findOneAsync({ username: username })
+exports.postUserUsername = {
+  auth: 'jwt',
+  validate: {
+    payload: {
+      username: Joi.string().required().min(3)
     }
-  })
-  .then(function(existing) {
-    if(existing) {
-      reply({
-        message: 'Username already taken!'
-      })
-      return true
-    } else {
-      return false
-    }
-  })
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+    var role = request.auth.credentials.role
+    var username = request.payload.username
 
-  Promise.all([user, existing]).spread(function(user, existing) {
-    if(!existing) {
+    var user = User.findOneByRoleAsync(id, role)
+
+    var existing = user.then(function(user) {
+      if(user.username) {
+        throw new Error('already-username')
+      } else {
+        return User.findOneAsync({ username: username })
+      }
+    })
+    .then(function(existing) {
+      if(existing) {
+        throw new Error('username-taken')
+      } else {
+        return false
+      }
+    })
+
+    Promise.all([user, existing]).spread(function(user) {
       user.username = username
       user.save(function() {
         reply({
           message: 'Username saved!'
         })
       })
-    }
-  })
-  .catch(function(err) {
-    request.log(['error'], err)
-    reply(Boom.badImplementation())
-  })
+    })
+    .catch(function(err) {
+      request.log(['error'], err)
+      if(err.message === 'already-username') {
+        reply(Boom.badRequest('You already have a username'))
+      } else if (err.message === 'username-taken') {
+        reply(Boom.conflict('Username already taken!'))
+      } else {
+        reply(Boom.badImplementation())
+      }
+    })
 
+  }
 }
 
-// /user
 exports.postUser = function(request, reply) {
   var email = request.payload.email
   var password = request.payload.password
@@ -297,4 +303,3 @@ exports.getUserLogs = function (request, reply) {
     return reply(Boom.badImplementation())
   })
 }
-
