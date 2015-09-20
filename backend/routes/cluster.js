@@ -161,7 +161,7 @@ exports.getClusterContainers = {
         throw new Promise.OperationalError('does not exist!')
       }
 
-      var uri = '/containers/json'
+      var uri = '/containers/json?all=1&size=1'
       return ClusterService.request(cluster, uri)
     }).spread(function (response, body) {
       reply(body)
