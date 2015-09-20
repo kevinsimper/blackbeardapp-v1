@@ -64,7 +64,7 @@ var Onboarding = React.createClass({
       <div className="Onboarding">
         <h1>Getting started using Blackbeard</h1>
         <p>There is some things that you need to do before you can get started using Blackbeard.</p>
-        <p>You have to specify a username, that you ar going to use, when you log in to the registry.</p>
+        <p>You have to specify a username, that you are going to use when you log into the registry.</p>
         <Label>What is your registry username?</Label>
         <div className={this.inputClasses()}>
           <Input type='text' value={this.state.username} onChange={this.onChangeUsername}/>
@@ -84,7 +84,7 @@ var Onboarding = React.createClass({
             {this.state.error}
           </div>
         }
-        <p>You are going to that username like this:</p>
+        <p>You are going to use your username like this:</p>
         <div className='Onboarding__Terminal'>
           <pre>
             <code>$ docker login -u {this.state.username} registry.blackbeard.io</code>
