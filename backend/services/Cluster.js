@@ -120,3 +120,17 @@ exports.killContainer = function (cluster, containerId) {
       return 'ok'
     })
 }
+
+/**
+*
+*/
+exports.removeContainer = function (cluster, containerId) {
+  var uri = '/containers/' + containerId + '?force=1'
+  return this.request(cluster, uri, 'DELETE')
+    .spread(function (response, body) {
+      if (response.statusCode != 204) {
+        throw new Error(response.body)
+      }
+      return 'ok'
+    })
+}

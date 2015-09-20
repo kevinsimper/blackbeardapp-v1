@@ -172,7 +172,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
     })
 
     Promise.all([cluster, container]).spread(function(cluster, container) {
-      ClusterService.killContainer(cluster, container.containerHash)
+      ClusterService.removeContainer(cluster, container.containerHash)
       .then(function(result) {
         ack()
       })
