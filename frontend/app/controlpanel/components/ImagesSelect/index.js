@@ -37,7 +37,7 @@ var ImagesSelect = React.createClass({
     var self = this
     return (
       <div className='ImagesSelect'>
-        <div>
+        <div className='ImagesSelect__Search'>
           <Input type='text' placeholder='Quick Search' value={this.state.search} onChange={this.onSearchChange}/>
         </div>
         <div>

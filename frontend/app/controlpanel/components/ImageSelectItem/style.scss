@@ -1,11 +1,14 @@
 .ImageSelectItem {
   padding: 20px 10px;
   cursor: pointer;
+  &:nth-child(2n) {
+    background-color: lighten(#ECECEC, 3%);
+  }
 }
 .ImageSelectItem--unselected:hover {
-  background-color: #ECECEC;
+  background-color: lighten(#25A233, 50%);
 }
 .ImageSelectItem--selected {
-  background-color: #25A233;
+  background-color: #25A233 !important;
   color: white;
 }
