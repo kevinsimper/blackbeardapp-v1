@@ -1,4 +1,4 @@
-if(process.env.NODE_ENV == 'production') {
+if(process.env.NODE_ENV === 'production') {
   // Uses these two ENV variables
   // NEW_RELIC_APP_NAME
   // NEW_RELIC_LICENSE_KEY
@@ -42,9 +42,6 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return cluster
     })
     var app = container.then(function(container) {
-      if (container === null) {
-        throw new Promise.OperationalError('Container could not be found.')
-      }
       return App.findOne({_id: container.app})
     }).then(function (app) {
       if(!app) {
@@ -136,6 +133,9 @@ Promise.all([mongo, rabbitmq]).then(function () {
     .error(function(err) {
       console.warn(err.stack)
       switch(err.message) {
+        case 'no-container':
+          ack()
+          break;
         case 'no-cluster':
         case 'no-app':
         case 'no-user':
@@ -147,9 +147,6 @@ Promise.all([mongo, rabbitmq]).then(function () {
             ack()
           })
           break;
-      }
-      if(err.message === 'container-removed') {
-        ack()
       }
     })
     .catch(function (err) {
