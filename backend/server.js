@@ -465,6 +465,11 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
   server.route({
+    method: 'POST',
+    path: '/users/{user}/apps/{app}/billing',
+    config: appRoutes.getUserBillingPerDay
+  })
+  server.route({
     method: 'GET',
     path: '/users/{user}/billing',
     config: {

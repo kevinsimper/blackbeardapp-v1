@@ -283,6 +283,24 @@ lab.experiment('/users/me/apps/containers', function() {
       done()
     })
   })
+  lab.test('GET user billing (days)', function(done) {
+    request({
+      method: 'POST',
+      uri: appUrl + '/users/me/apps/' + appId + '/billing',
+      headers: {
+        Authorization: token
+      },
+      body: {
+        from: '2015-05-01',
+        to: '2015-05-07'
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.length, 'to equal', 7)
+
+      done()
+    })
+  })
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',

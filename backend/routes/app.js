@@ -159,3 +159,29 @@ exports.getUserBilling = function(request, reply) {
     })
   })
 }
+
+exports.getUserBillingPerDay = {
+  auth: 'jwt',
+  validate: {
+    payload: {
+      from: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required(),
+      to: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required()
+    }
+  },
+  handler: function(request, reply) {
+    // Given current time get previous months of billablehours per app
+    var user = User.getUserIdFromRequest(request)
+    var appId = request.params.app
+    var app = App.findOne({_id: appId, user: user}).populate('containers')
+
+    app.then(function(app) {
+      var from = moment(request.payload.from)
+      var to = moment(request.payload.to)
+
+      var userBilling = Billing.getBillableHoursPerAppWithDays(app, from, to)
+      userBilling.then(function(userBilling) {
+        reply(userBilling)
+      })
+    })
+  }
+}
