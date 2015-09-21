@@ -38,6 +38,7 @@ var Sidebar = React.createClass({
           </div>
           {this.state.profile.role && (this.state.profile.role === 'ADMIN') &&
             <div>
+              <h3 className='Sidebar__DividerTitel'>Admin</h3>
               <div className='Sidebar__Item'>
                 <a className='Sidebar__Link' href="#/registry">Registry</a>
               </div>
