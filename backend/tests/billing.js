@@ -38,7 +38,6 @@ lab.experiment('Testing Billing service', function() {
     var containers = [
       new Container({createdAt: moment('2015-07-24 18:31:12').unix(), deletedAt: '2015-08-24 18:01:12'}), // 571h
       new Container({createdAt: moment('2015-07-24 18:01:12').unix(), deletedAt: '2015-10-24 18:31:12'}), // 744h
-      new Container({createdAt: moment('2015-01-24 18:31:12').unix(), deletedAt: '2015-01-24 18:31:12'}), // 0h
       new Container({createdAt: moment('2015-08-06 18:31:12').unix(), deletedAt: '2015-10-24 18:31:12'}), // 606h
     ]
     var app = new App({name: "testApp"})
@@ -54,9 +53,9 @@ lab.experiment('Testing Billing service', function() {
       // Skipping old app
       expect(Math.ceil(moment('2015-09-01 00:00').diff('2015-08-06 18:31:12', 'minute')/60.0), 'to be', 606)
       total += 606
-      expect(hours, 'to be', 1921)
 
-      expect(total, 'to be', 1921)
+      expect(hours, 'to be', total)
+      expect(hours, 'to be', 1921)
 
       done()
     })
@@ -189,5 +188,58 @@ lab.experiment('Testing Billing service', function() {
 
       done()
     })
+  })
+  lab.test('Test getBillableTimeframe', function(done) {
+    // Get start of current month and go back 3 months and 10 days
+    var start = moment().set({
+      date: 1,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    }).subtract(3, 'month').subtract(10, 'day')
+
+    var containers = [
+      new Container({createdAt: start.unix()})
+    ]
+    var app = new App({name: "testApp"})
+    var testApp = app.toObject()
+    testApp.containers = containers
+
+    var dates = Billing.getBillableMonths([testApp])
+    // Will include:
+    // 1) current month
+    // 2) one month ago
+    // 3) two months ago
+    // 4) three months ago
+    // 5) four months ago (10 days of month)
+    expect(dates.length, 'to be', 5)
+
+    done()
+  })
+  lab.test('Test getBillableTimeframe 2', function(done) {
+    // Get start of current month and go back 13 days
+    var start = moment().set({
+      date: 1,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    }).subtract(13, 'day')
+
+    var containers = [
+      new Container({createdAt: start.unix()})
+    ]
+    var app = new App({name: "testApp"})
+    var testApp = app.toObject()
+    testApp.containers = containers
+
+    var dates = Billing.getBillableMonths([testApp])
+    // Will include:
+    // 1) current month
+    // 2) one month ago (13 days of month)
+    expect(dates.length, 'to be', 2)
+
+    done()
   })
 })

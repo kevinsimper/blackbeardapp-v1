@@ -74,7 +74,7 @@ exports.postApp = {
       }
 
       // Cleanse name
-      name = name.replace(/[^a-zA-Z0-9-]/g, '')
+      name = name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()
 
       var newApp = new App({
         name: name,
@@ -94,28 +94,6 @@ exports.postApp = {
       reply(Boom.badImplementation('There was a problem with the database'))
     })
   }
-}
-
-exports.putApp = function(request, reply) {
-  var id = request.params.app
-
-  var updateCallback = function(err, app) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    reply(app)
-  }
-
-  App.findById(id, function(err, app) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    app.name = request.payload.name;
-    // Explicitly leaving out image here - I'm not entirely sure if you should be able to change this once the app is made
-    app.save(updateCallback)
-  })
 }
 
 exports.deleteApp = function(request, reply) {
@@ -170,40 +148,10 @@ exports.getAppLogs = function(request, reply) {
 }
 
 exports.getUserBilling = function(request, reply) {
+  // Given current time get previous months of billablehours per app
   var user = User.getUserIdFromRequest(request)
-
-  var month = request.params.month
-
-  if (!month.match(/\d{4}-\d{2}/g)) {
-    return reply(Boom.badRequest('The month provided is not of the format YYYY-MM.'))
-  }
-
-  var monthM = moment(request.params.month, "YYYY-MM")
-  var monthEndM = moment(request.params.month, "YYYY-MM").add(1, 'month')
-
-  var apps = App.find({user: user})
-
-  var billableHours = apps.then(function (apps) {
-    return Promise.all(apps.map(function(app, index) {
-      return Billing.getAppBillableHours(app, monthM, monthEndM)
-    }))
-  })
-
-  Promise.all([apps, billableHours]).spread(function (apps, billableHours) {
-    if (apps.length !== billableHours.length) {
-      throw new Promise.OperationalError("An error has occurred retrieving the apps and billable hours.")
-    }
-    reply(_.map(apps, function (app, i) {
-      return {
-        app: {
-          _id: app._id,
-          name: app.name
-        },
-        hours: billableHours[i]
-      }
-    }))
-  }).catch(function(e) {
-    request.log(['mongo'], e)
-    reply(Boom.badImplementation())
+  var userBilling = Billing.getAppBillableHoursPerUser(user)
+  userBilling.then(function(userBilling) {
+    reply(userBilling)
   })
 }

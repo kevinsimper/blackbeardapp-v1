@@ -95,24 +95,6 @@ lab.experiment('/users/me/apps', function() {
       done()
     })
   })
-  lab.test('PUT', function(done) {
-    var requestData = {
-      name: 'testapp'
-    }
-    request({
-      method: 'PUT',
-      uri: appUrl + '/users/me/apps/' + appId,
-      headers: {
-        'Authorization': token
-      },
-      body: requestData,
-      json: true
-    }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
-      expect(body.name, 'to be', requestData.name)
-      done()
-    })
-  })
   lab.test('GET', function(done) {
     request({
       method: 'GET',
@@ -205,7 +187,7 @@ lab.experiment('/users/me/apps/containers', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
-        expect(body.name, 'to be', 'TestAppContainer')
+        expect(body.name, 'to be', 'testappcontainer')
         appId = body._id
         done()
       })
@@ -288,7 +270,7 @@ lab.experiment('/users/me/apps/containers', function() {
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',
-      uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/555cb1e2fc27fe6f5f540001',
       headers: {
         Authorization: token
       },
@@ -301,7 +283,7 @@ lab.experiment('/users/me/apps/containers', function() {
   lab.test('GET deleted container', function(done) {
     request({
       method: 'GET',
-      uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/555cb1e2fc27fe6f5f540001',
       headers: {
         Authorization: token
       },
@@ -339,7 +321,7 @@ lab.experiment('/users/me/apps/containers', function() {
         if (user.email === 'user@blackbeard.io') {
           request({
             method: 'GET',
-            uri: appUrl + '/users/' + user._id + '/apps/' + appId + '/containers',
+            uri: appUrl + '/users/' + user._id + '/apps/559396bf05974b0c00b6b284/containers',
             headers: {
               Authorization: adminToken
             },
@@ -352,6 +334,22 @@ lab.experiment('/users/me/apps/containers', function() {
           })
         }
       })
+    })
+  })
+  lab.test('GET user billing', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/billing',
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.results.length, 'to be greater than', 1)
+      expect(body.results[0].month, 'to equal', '2015-05')
+      expect(Object.keys(body.monthTotals).length, 'to be greater than', 1)
+
+      done()
     })
   })
 })

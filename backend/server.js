@@ -425,14 +425,6 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
   server.route({
-    method: 'PUT',
-    path: '/users/{user}/apps/{app}',
-    config: {
-      auth: 'jwt',
-      handler: appRoutes.putApp
-    }
-  })
-  server.route({
     method: 'POST',
     path: '/users/{user}/apps/{app}/containers',
     config: {
@@ -474,7 +466,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'GET',
-    path: '/users/{user}/billing/{month}',
+    path: '/users/{user}/billing',
     config: {
       auth: 'jwt',
       handler: appRoutes.getUserBilling
