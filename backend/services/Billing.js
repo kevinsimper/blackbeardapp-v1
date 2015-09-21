@@ -41,30 +41,30 @@ module.exports = {
         }
 
         if (deletedAt.isSame(createdDate)) {
-          current = (createdDate.isBetween(start, end)) ? 1 : 0
-        } else {
-          if (!deletedAt.isBefore(start)) {
-            if (deletedAt.isBefore(end)) {
-              // Stopped before end of month
-              // Stopped within month
-              if (createdDate.isBefore(start)) {
-                // Started before start of period
-                current = self.diffHours(deletedAt, start)
+          throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
+        }
 
-              } else {
-                // Started at start of period
-                current = self.diffHours(deletedAt, createdDate)
-              }
+        if (!deletedAt.isBefore(start)) {
+          if (deletedAt.isBefore(end)) {
+            // Stopped before end of month
+            // Stopped within month
+            if (createdDate.isBefore(start)) {
+              // Started before start of period
+              current = self.diffHours(deletedAt, start)
+
             } else {
-              // Stopped after end of month
-              if (createdDate.isBefore(start)) {
-                // Created before start so full month
-                current = self.diffHours(end, start)
+              // Started at start of period
+              current = self.diffHours(deletedAt, createdDate)
+            }
+          } else {
+            // Stopped after end of month
+            if (createdDate.isBefore(start)) {
+              // Created before start so full month
+              current = self.diffHours(end, start)
 
-              } else {
-                // from midway through to end of month
-                current = self.diffHours(end, createdDate)
-              }
+            } else {
+              // from midway through to end of month
+              current = self.diffHours(end, createdDate)
             }
           }
         }
