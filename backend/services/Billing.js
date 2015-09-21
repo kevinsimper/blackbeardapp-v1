@@ -80,19 +80,6 @@ module.exports = {
       resolve(hours)
     })
   },
-  getAppBillableHoursWithDay: function (app, start, end) {
-    var self = this
-    return new Promise(function (resolve, reject) {
-      var appBillableHours = self.getAppBillableHours(app, start, end)
-
-      appBillableHours.then(function(appBillableHours) {
-        resolve({
-          day: start,
-          hours: appBillableHours
-        })
-      })
-    })
-  },
   /**
   * Get list of billable months for supplied list of apps.
   * This could be improved by not ending at the current month but by ending
@@ -206,7 +193,16 @@ module.exports = {
       }
 
       Promise.all(days.map(function (day) {
-        return self.getAppBillableHoursWithDay(app, day, day.add(1, 'day'))
+        return new Promise(function (resolve, reject) {
+          var appBillableHours = self.getAppBillableHours(app, day, day.add(1, 'day'))
+
+          appBillableHours.then(function(appBillableHours) {
+            resolve({
+              day: day,
+              hours: appBillableHours
+            })
+          })
+        })
       })).then(function(result) {
         return _.map(result, function(entry) {
           return {
