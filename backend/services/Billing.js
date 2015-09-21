@@ -36,47 +36,47 @@ module.exports = {
 
         var deletedAt = null
 
-        if (container.deletedAt) {
-          deletedAt = moment(Date.parse(container.deletedAt))
-        } else if (createdDate.diff(moment()) < 60*1000) {
-          deletedAt = null
-        } else {
-          deletedAt = moment()
-        }
-
-        if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
-          throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
-        }
-
-        if (deletedAt.isBefore(end)) {
-          // Stopped before end of month
-          // Stopped within month
-          if (createdDate.isBefore(start)) {
-            // Started before start of period
-            current = self.diffHours(deletedAt, start)
-
+        if (!ContainerService.isCurrentlyRunning(container) || (Math.abs(createdDate.diff(moment())) >= 60*1000)) {
+          if (container.deletedAt) {
+            deletedAt = moment(Date.parse(container.deletedAt))
           } else {
-            // Started at start of period
-            current = self.diffHours(deletedAt, createdDate)
+            deletedAt = moment()
           }
-        } else {
-          // Stopped after end of month
-          if (createdDate.isBefore(start)) {
-            // Created before start so full month
-            current = self.diffHours(end, start)
 
+          if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
+            throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
           } else {
-            // from midway through to end of month
-            current = self.diffHours(end, createdDate)
+            if (deletedAt.isBefore(end)) {
+              // Stopped before end of month
+              // Stopped within month
+              if (createdDate.isBefore(start)) {
+                // Started before start of period
+                current = self.diffHours(deletedAt, start)
+
+              } else {
+                // Started at start of period
+                current = self.diffHours(deletedAt, createdDate)
+              }
+            } else {
+              // Stopped after end of month
+              if (createdDate.isBefore(start)) {
+                // Created before start so full month
+                current = self.diffHours(end, start)
+
+              } else {
+                // from midway through to end of month
+                current = self.diffHours(end, createdDate)
+              }
+            }
+
+            if (ContainerService.isCurrentlyRunning(container)) {
+              // App is currently running so we shouldn't count current hour
+              current -= 1
+            }
+
+            hours += current
           }
         }
-
-        if (ContainerService.isCurrentlyRunning(container)) {
-          // App is currently running so we shouldn't count current hour
-          current -= 1
-        }
-
-        hours += current
       })
 
       resolve(hours)

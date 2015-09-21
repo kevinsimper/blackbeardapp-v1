@@ -101,6 +101,7 @@ lab.experiment('Testing Billing service', function() {
 
     var oneAndHalfHoursAgo = moment(new Date()).subtract(1.5, 'hour')
     var tenHoursAgo = moment(new Date()).subtract(10, 'hour')
+
     var containers = [
       new Container({createdAt: oneAndHalfHoursAgo.unix()}),
       new Container({createdAt: tenHoursAgo.unix(), deletedAt: oneAndHalfHoursAgo.format("YYYY-MM-DD HH:mm:ss")})
