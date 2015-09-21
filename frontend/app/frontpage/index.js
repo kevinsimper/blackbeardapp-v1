@@ -2,23 +2,12 @@ var React = require('react');
 var Signup = require('./components/Signup/');
 var ContactForm = require('./components/ContactForm/');
 
-NodeList.prototype.forEach = Array.prototype.forEach;
-
-window.addEventListener('load', function() {
-  document.querySelectorAll('.priceitem__deploy').forEach(function(item) {
-    item.addEventListener('click', function() {
-      var event = new Event('showSignup');
-      window.dispatchEvent(event);
-      window.scrollTo(0,1)
-    }, false);
-  });
-
-  document.querySelectorAll('.members__link').forEach(function(item) {
-    item.addEventListener('click', function() {
-      var event = new Event('showSignup');
-      window.dispatchEvent(event);
-      window.scrollTo(0,1)
-    }, false);
+window.addEventListener('load', function () {
+  var priceItems = document.querySelectorAll('.priceitem__deploy')
+  Array.prototype.forEach.call(priceItems, function (element) {
+    element.addEventListener('click', function () {
+      window.location.href = '/signup'
+    })
   })
 })
 
