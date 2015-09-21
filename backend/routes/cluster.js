@@ -212,7 +212,7 @@ exports.getClusterUsage = {
       reply({
         memoryUsed: used,
         limit: cluster.memory,
-        count: cluster.containers.length
+        count: cluster.containers ? cluster.containers.length : 0
       })
     }).error(function (err) {
       request.log(['error'], err)

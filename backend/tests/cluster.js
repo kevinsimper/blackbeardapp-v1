@@ -83,7 +83,7 @@ lab.experiment('/clusters', function() {
         }
       },
       function(error, response, body) {
-        expect(body, 'to equal', { memoryUsed: 512, limit: 2048, count: 1 })
+        expect(body, 'to equal', { memoryUsed: 0, limit: 2048, count: 1 })
         done()
       })
   })

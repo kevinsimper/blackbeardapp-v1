@@ -270,7 +270,7 @@ lab.experiment('/users/me/apps/containers', function() {
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',
-      uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/555cb1e2fc27fe6f5f540001',
       headers: {
         Authorization: token
       },
@@ -283,7 +283,7 @@ lab.experiment('/users/me/apps/containers', function() {
   lab.test('GET deleted container', function(done) {
     request({
       method: 'GET',
-      uri: appUrl + '/users/me/apps/' + appId + '/containers/' + containerId,
+      uri: appUrl + '/users/me/apps/' + appId + '/containers/555cb1e2fc27fe6f5f540001',
       headers: {
         Authorization: token
       },
@@ -321,7 +321,7 @@ lab.experiment('/users/me/apps/containers', function() {
         if (user.email === 'user@blackbeard.io') {
           request({
             method: 'GET',
-            uri: appUrl + '/users/' + user._id + '/apps/' + appId + '/containers',
+            uri: appUrl + '/users/' + user._id + '/apps/559396bf05974b0c00b6b284/containers',
             headers: {
               Authorization: adminToken
             },
