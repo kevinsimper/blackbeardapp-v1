@@ -64,6 +64,7 @@ exports.postNotifyImage = function(request, reply) {
       dockerContentDigest: dockerContentDigest,
       status: status
     })
+    image.modifiedAt = timestamp
     return image.save()
   }).then(function() {
     reply("ok")
