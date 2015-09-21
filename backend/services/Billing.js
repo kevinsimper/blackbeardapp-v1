@@ -34,38 +34,40 @@ module.exports = {
         var current = 0
         var createdDate = moment.unix(container.createdAt)
 
-        var deletedAt = moment()
+        var deletedAt = null
 
         if (container.deletedAt) {
-          var deletedAt = moment(Date.parse(container.deletedAt))
+          deletedAt = moment(Date.parse(container.deletedAt))
+        } else if (createdDate.diff(moment()) < 60*1000) {
+          deletedAt = null
+        } else {
+          deletedAt = moment()
         }
 
-        if (deletedAt.isSame(createdDate)) {
+        if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
           throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
         }
 
-        if (!deletedAt.isBefore(start)) {
-          if (deletedAt.isBefore(end)) {
-            // Stopped before end of month
-            // Stopped within month
-            if (createdDate.isBefore(start)) {
-              // Started before start of period
-              current = self.diffHours(deletedAt, start)
+        if (deletedAt.isBefore(end)) {
+          // Stopped before end of month
+          // Stopped within month
+          if (createdDate.isBefore(start)) {
+            // Started before start of period
+            current = self.diffHours(deletedAt, start)
 
-            } else {
-              // Started at start of period
-              current = self.diffHours(deletedAt, createdDate)
-            }
           } else {
-            // Stopped after end of month
-            if (createdDate.isBefore(start)) {
-              // Created before start so full month
-              current = self.diffHours(end, start)
+            // Started at start of period
+            current = self.diffHours(deletedAt, createdDate)
+          }
+        } else {
+          // Stopped after end of month
+          if (createdDate.isBefore(start)) {
+            // Created before start so full month
+            current = self.diffHours(end, start)
 
-            } else {
-              // from midway through to end of month
-              current = self.diffHours(end, createdDate)
-            }
+          } else {
+            // from midway through to end of month
+            current = self.diffHours(end, createdDate)
           }
         }
 
@@ -194,7 +196,7 @@ module.exports = {
 
       Promise.all(days.map(function (day) {
         return new Promise(function (resolve, reject) {
-          var appBillableHours = self.getAppBillableHours(app, day, day.add(1, 'day'))
+          var appBillableHours = self.getAppBillableHours(app, day, day.clone().add(1, 'day'))
 
           appBillableHours.then(function(appBillableHours) {
             resolve({
