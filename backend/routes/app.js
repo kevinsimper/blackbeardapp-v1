@@ -40,9 +40,9 @@ exports.getAllApps = {
   handler: function(request, reply) {
     var query = {}
     if(request.query.name) {
-      query['name'] = new RegExp(request.query.name, 'i')
+      query.name = new RegExp(request.query.name, 'i')
     }
-    var apps = App.find(query)
+    var apps = App.find(query).sort({name: 1})
     if(request.query.limit) {
       apps.limit(request.query.limit)
     }

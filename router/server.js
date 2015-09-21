@@ -44,8 +44,8 @@ var getContainers = function (appname) {
           'Authorization': adminToken
         }
       })
-    }).spread(function (resp, body) {
-      debug('containers', body)
+    }).spread(function (response, body) {
+      debug('response', response.statusCode, body.length)
       return _.filter(body, {deleted: false}) || []
     })
   })
@@ -74,6 +74,7 @@ var app = http.createServer(function (req, res) {
   }
   var appname = details.subdomains[0]
   getContainers(appname).then(function (containers) {
+    debug('containers', containers)
     var random = _.sample(containers)
     var address = 'http://' + random.ip + ':' + random.port
     debug('proxying to ' + address)

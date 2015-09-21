@@ -54,7 +54,7 @@ app.all('/v2/*', function(req, res) {
         response.on('data', function(data) {
           debug(random, 'Answer data', data)
         })
-        if(response.statusCode === 201 && req.method === 'PUT') {
+        if(response.statusCode === 201 && req.method === 'PUT' && url.indexOf('manifests') !== -1) {
           var user = req.originalUrl.split('/')[2]
           var name = req.originalUrl.split('/')[3]
           var dockerContentDigest = response.headers['docker-content-digest']
