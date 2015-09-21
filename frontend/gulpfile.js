@@ -110,6 +110,7 @@ gulp.task('sass', function() {
 gulp.task('build', ['browserify', 'browserify-controlpanel', 'browserify-signup', 'sass']);
 gulp.task('default', ['browserify', 'browserify-controlpanel','browserify-signup', 'sass'], function() {
   gulp.watch(['./app/*.js', './app/*.jsx'], ['browserify']);
+  gulp.watch(['./app/frontpage/**/*.js'], ['browserify']);
   gulp.watch(['./app/signup/**/*.js'], ['browserify-signup']);
   gulp.watch(['./app/signup/**/*.scss'], ['sass']);
   gulp.watch(['./app/controlpanel/**/*.js', './app/controlpanel/**/*.jsx'], ['browserify-controlpanel']);

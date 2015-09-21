@@ -1,4 +1,4 @@
-if(process.env.NODE_ENV == 'production') {
+if(process.env.NODE_ENV === 'production') {
   // Uses these two ENV variables
   // NEW_RELIC_APP_NAME
   // NEW_RELIC_LICENSE_KEY
@@ -42,9 +42,6 @@ Promise.all([mongo, rabbitmq]).then(function () {
       return cluster
     })
     var app = container.then(function(container) {
-      if (container === null) {
-        throw new Promise.OperationalError('Container could not be found.')
-      }
       return App.findOne({_id: container.app})
     }).then(function (app) {
       if(!app) {
@@ -136,6 +133,9 @@ Promise.all([mongo, rabbitmq]).then(function () {
     .error(function(err) {
       console.warn(err.stack)
       switch(err.message) {
+        case 'no-container':
+          ack()
+          break;
         case 'no-cluster':
         case 'no-app':
         case 'no-user':
@@ -147,9 +147,6 @@ Promise.all([mongo, rabbitmq]).then(function () {
             ack()
           })
           break;
-      }
-      if(err.message === 'container-removed') {
-        ack()
       }
     })
     .catch(function (err) {
@@ -165,27 +162,40 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var Image = require('./models/Image')
     var User = require('./models/User')
 
-    var container = Container.findOne({_id: message.containerId})
+    var container = Container.findOne({_id: message.containerId}).then(function (container) {
+      if(!container) {
+        throw new Promise.OperationalError('no-container')
+      }
+      return container
+    })
 
     var cluster = container.then(function (container) {
       return Cluster.findOne({_id: container.cluster})
+    }).then(function (cluster) {
+      if(!cluster) {
+        throw new Promise.OperationalError('no-cluster')
+      }
+      return cluster
     })
 
     Promise.all([cluster, container]).spread(function(cluster, container) {
-      ClusterService.removeContainer(cluster, container.containerHash)
-      .then(function(result) {
-        ack()
-      })
-      .error(function(err) {
-        console.warn(err, err.stack)
-      })
-      .catch(function (err) {
-        if(process.env.NODE_ENV === 'production') {
-          throw err
-        } else {
-          console.warn('No cluster attached', err.stack)
-        }
-      })
+      return ClusterService.removeContainer(cluster, container.containerHash)
+    }).then(function(result) {
+      ack()
+    }).error(function(err) {
+      console.warn(err.stack)
+      switch(err.message) {
+        case 'no-container':
+        case 'no-cluster':
+          ack()
+          break;
+      }
+    }).catch(function (err) {
+      if(process.env.NODE_ENV === 'production') {
+        throw err
+      } else {
+        console.warn('No cluster attached', err.stack)
+      }
     })
   })
 

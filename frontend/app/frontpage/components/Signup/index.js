@@ -26,9 +26,7 @@ var Signup = React.createClass({
     window.removeEventListener('showSignup', this.onClickSignup);
   },
   onClickSignup: function() {
-    this.setState({
-      popupShow: true
-    })
+    window.location.href = '/signup'
   },
   onClickClose: function() {
     this.setState({
@@ -38,7 +36,7 @@ var Signup = React.createClass({
   render: function() {
     return (
       <div>
-        <button className="btn-signup" onClick={this.onClickSignup} >Signup now</button>
+        <button className="btn-signup" onClick={this.onClickSignup}>Signup now</button>
         <SignupPopup show={this.state.popupShow} closeHandler={this.onClickClose} />
         {this.state.queue && <h4 style={{marginBottom: 0}}>You have already signed up and are number {this.state.queue} in the queue!</h4>}
       </div>

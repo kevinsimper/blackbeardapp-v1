@@ -59,7 +59,7 @@ db.apps.insert({
 });
 db.images.insert({
   "_id": ObjectId("555cb1e2fc27fe6f5f543901"),
-  "name": "Example Image",
+  "name": "exampleimage",
   "createdAt": "1432138210",
   "modifiedAt": "1432138211",
   "user": ObjectId("559396be05974b0c00b6b282"),
@@ -68,7 +68,7 @@ db.images.insert({
 });
 db.images.insert({
   "_id": ObjectId("555cb1e2fc27fe6f5f543902"),
-  "name": "Example Image",
+  "name": "exampleimage",
   "createdAt": "1432138210",
   "modifiedAt": "1432138211",
   "user": ObjectId("559396be05974b0c00b6b281"),

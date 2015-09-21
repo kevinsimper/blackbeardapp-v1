@@ -46,6 +46,9 @@ exports.getCluster = function() {
 }
 
 exports.request = function (cluster, uri, method, json) {
+  if(!cluster) {
+    throw new Error('Cluster is not defined!')
+  }
   var _uri = 'https://' + cluster.ip + ':3376' + uri
   var options = {
     uri: _uri,

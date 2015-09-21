@@ -54,7 +54,7 @@ lab.experiment('/clusters', function() {
         'Authorization': adminToken
       },
       body: {
-        type: 'swarm',
+        type: 'test_swarm',
         machines: 2,
         ca: 'ca certificate',
         cert: 'certificate',
@@ -65,7 +65,7 @@ lab.experiment('/clusters', function() {
       cluster = body._id
       expect(response.statusCode, 'to be', 200)
       expect(body, 'to satisfy', {
-        type: 'swarm'
+        type: 'test_swarm'
       })
       done()
     }).catch(function (err) {

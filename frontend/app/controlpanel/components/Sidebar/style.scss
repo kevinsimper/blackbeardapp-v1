@@ -1,7 +1,10 @@
-.Sidebar {}
-.Sidebar__Logo {
+.Sidebar {
   color: #FFF;
   text-align: center;
+}
+.Sidebar__Logo {}
+.Sidebar__DividerTitel {
+  font-size: 1.4rem;
 }
 .Sidebar__List {
   display: flex;
@@ -22,7 +25,7 @@
   }
 }
 .Sidebar__Item:nth-child(even) .Sidebar__Link {
-  background-color: lighten(#252F3B, 6%); 
+  background-color: lighten(#252F3B, 6%);
   &:hover {
     background-color: lighten(#252F3B, 10%);
   }

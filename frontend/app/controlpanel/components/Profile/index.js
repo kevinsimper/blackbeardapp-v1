@@ -1,6 +1,7 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
 var ProfileStore = require('./store')
+var Label = require('../../components/Label/')
 var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
 var CreditcardsFormular = require('../../components/CreditcardsFormular/')
@@ -57,10 +58,12 @@ var Profile = React.createClass({
         <div className='Profile__block'>
           <form onSubmit={this.onSubmit}>
             <h1>Profile</h1>
-            <div>Name</div>
+            <Label>Name</Label>
             <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
-            <div>E-mail</div>
+            <Label>E-mail</Label>
             <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
+            <Label>Docker Registry Username</Label>
+            <Input type='text' value={this.state.username} disabled='disabled'/>
             <div>
               <Button type='submit'>Update</Button>
             </div>
