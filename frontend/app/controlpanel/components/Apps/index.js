@@ -27,20 +27,16 @@ var AppCreate = React.createClass({
   render: function() {
     return (
       <div className='Apps'>
-        <Link to='/apps/create'>Create new app</Link>
-        <h3>My Apps</h3>
-        <div>
-          {this.state.apps.map(function(item){
-            return (
-              <div className='Apps__Item'>
-                <Link className='Apps__Link' to='AppShow' params={{id: item._id}}>
-                  <StatusIcon/>
-                  {item.name}
-                </Link>
-              </div>
-            )
-          })}
-        </div>
+        {this.state.apps.map(function(item){
+          return (
+            <div className='Apps__Item'>
+              <Link className='Apps__Link' to='AppShow' params={{id: item._id}}>
+                <StatusIcon/>
+                {item.name}
+              </Link>
+            </div>
+          )
+        })}
       </div>
     );
   }
