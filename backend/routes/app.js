@@ -150,8 +150,12 @@ exports.getAppLogs = function(request, reply) {
 exports.getUserBilling = function(request, reply) {
   // Given current time get previous months of billablehours per app
   var user = User.getUserIdFromRequest(request)
-  var userBilling = Billing.getAppBillableHoursPerUser(user)
-  userBilling.then(function(userBilling) {
-    reply(userBilling)
+  var apps = App.find({user: user}).populate('containers')
+
+  apps.then(function(apps) {
+    var userBilling = Billing.getBillableHoursPerApps(apps)
+    userBilling.then(function(userBilling) {
+      reply(userBilling)
+    })
   })
 }

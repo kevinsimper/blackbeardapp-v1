@@ -189,7 +189,7 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
-  lab.test('Test getBillableTimeframe', function(done) {
+  lab.test('Test getBillableMonths', function(done) {
     // Get start of current month and go back 3 months and 10 days
     var start = moment().set({
       date: 1,
@@ -207,17 +207,19 @@ lab.experiment('Testing Billing service', function() {
     testApp.containers = containers
 
     var dates = Billing.getBillableMonths([testApp])
-    // Will include:
-    // 1) current month
-    // 2) one month ago
-    // 3) two months ago
-    // 4) three months ago
-    // 5) four months ago (10 days of month)
-    expect(dates.length, 'to be', 5)
+    dates.then(function(dates) {
+      // Will include:
+      // 1) current month
+      // 2) one month ago
+      // 3) two months ago
+      // 4) three months ago
+      // 5) four months ago (10 days of month)
+      expect(dates.length, 'to be', 5)
 
-    done()
+      done()
+    })
   })
-  lab.test('Test getBillableTimeframe 2', function(done) {
+  lab.test('Test getBillableMonths 2', function(done) {
     // Get start of current month and go back 13 days
     var start = moment().set({
       date: 1,
@@ -235,11 +237,13 @@ lab.experiment('Testing Billing service', function() {
     testApp.containers = containers
 
     var dates = Billing.getBillableMonths([testApp])
-    // Will include:
-    // 1) current month
-    // 2) one month ago (13 days of month)
-    expect(dates.length, 'to be', 2)
+    dates.then(function(dates) {
+      // Will include:
+      // 1) current month
+      // 2) one month ago (13 days of month)
+      expect(dates.length, 'to be', 2)
 
-    done()
+      done()
+    })
   })
 })

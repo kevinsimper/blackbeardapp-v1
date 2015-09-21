@@ -267,6 +267,22 @@ lab.experiment('/users/me/apps/containers', function() {
       done()
     })
   })
+  lab.test('GET user billing', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/billing',
+      headers: {
+        Authorization: token
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.results.length, 'to be greater than', 1)
+      expect(body.results[0].month, 'to equal', '2015-05')
+      expect(Object.keys(body.monthTotals).length, 'to be greater than', 1)
+
+      done()
+    })
+  })
   lab.test('DELETE', function(done) {
     request({
       method: 'DELETE',
@@ -334,22 +350,6 @@ lab.experiment('/users/me/apps/containers', function() {
           })
         }
       })
-    })
-  })
-  lab.test('GET user billing', function(done) {
-    request({
-      method: 'GET',
-      uri: appUrl + '/users/me/billing',
-      headers: {
-        Authorization: token
-      },
-      json: true
-    }, function(error, response, body) {
-      expect(body.results.length, 'to be greater than', 1)
-      expect(body.results[0].month, 'to equal', '2015-05')
-      expect(Object.keys(body.monthTotals).length, 'to be greater than', 1)
-
-      done()
     })
   })
 })
