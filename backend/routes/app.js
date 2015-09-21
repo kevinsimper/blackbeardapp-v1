@@ -74,7 +74,7 @@ exports.postApp = {
       }
 
       // Cleanse name
-      name = name.replace(/[^a-zA-Z0-9-]/g, '')
+      name = name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()
 
       var newApp = new App({
         name: name,
@@ -94,28 +94,6 @@ exports.postApp = {
       reply(Boom.badImplementation('There was a problem with the database'))
     })
   }
-}
-
-exports.putApp = function(request, reply) {
-  var id = request.params.app
-
-  var updateCallback = function(err, app) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    reply(app)
-  }
-
-  App.findById(id, function(err, app) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    app.name = request.payload.name;
-    // Explicitly leaving out image here - I'm not entirely sure if you should be able to change this once the app is made
-    app.save(updateCallback)
-  })
 }
 
 exports.deleteApp = function(request, reply) {

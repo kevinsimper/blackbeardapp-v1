@@ -95,24 +95,6 @@ lab.experiment('/users/me/apps', function() {
       done()
     })
   })
-  lab.test('PUT', function(done) {
-    var requestData = {
-      name: 'testapp'
-    }
-    request({
-      method: 'PUT',
-      uri: appUrl + '/users/me/apps/' + appId,
-      headers: {
-        'Authorization': token
-      },
-      body: requestData,
-      json: true
-    }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
-      expect(body.name, 'to be', requestData.name)
-      done()
-    })
-  })
   lab.test('GET', function(done) {
     request({
       method: 'GET',
@@ -205,7 +187,7 @@ lab.experiment('/users/me/apps/containers', function() {
       },
       function(error, response, body) {
         expect(response.statusCode, 'to be', 200)
-        expect(body.name, 'to be', 'TestAppContainer')
+        expect(body.name, 'to be', 'testappcontainer')
         appId = body._id
         done()
       })
