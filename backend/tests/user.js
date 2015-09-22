@@ -182,4 +182,17 @@ lab.experiment('/users', function() {
         done()
       })
   })
+  lab.test('Send verification email', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/verifysend',
+      json: true,
+      headers: {
+        'Authorization': token
+      }
+    }).spread(function(response, body) {
+      expect(body.message, 'to be', 'Verification email successfully sent.')
+      done()
+    })
+  })
 })
