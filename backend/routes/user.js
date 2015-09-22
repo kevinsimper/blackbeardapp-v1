@@ -379,17 +379,28 @@ exports.getUserPayments = {
   }
 }
 
-exports.getUserLogs = function (request, reply) {
-  var id = User.getUserIdFromRequest(request)
+exports.getUserLogs = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      user: Joi.string().required()
+    }
+  },
+  handler: function (request, reply) {
+    var id = User.getUserIdFromRequest(request)
 
-  var logs = Log.find({
-    user: id
-  }).then(function (logs) {
-    reply(logs)
-  }).catch(function () {
-    request.log(['mongo'], err)
-    return reply(Boom.badImplementation())
-  })
+    var logs = Log.find({
+      user: id
+    }).then(function (logs) {
+      reply(logs)
+    }).catch(function () {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
 exports.getVerifyUserEmail = {
