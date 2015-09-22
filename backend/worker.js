@@ -179,7 +179,10 @@ Promise.all([mongo, rabbitmq]).then(function () {
     })
 
     Promise.all([cluster, container]).spread(function(cluster, container) {
-      return ClusterService.removeContainer(cluster, container.containerHash)
+      return ClusterService.removeContainer(cluster, container.containerHash).catch(function (err) {
+        // It properbly did not exist anymore.
+        return 'Could not remove container'
+      })
     }).then(function(result) {
       ack()
     }).error(function(err) {
