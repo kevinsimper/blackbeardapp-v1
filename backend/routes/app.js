@@ -157,6 +157,9 @@ exports.getUserBilling = function(request, reply) {
     userBilling.then(function(userBilling) {
       reply(userBilling)
     })
+  }).catch(function(e) {
+    request.log(['mongo'], e)
+    reply(Boom.badImplementation())
   })
 }
 

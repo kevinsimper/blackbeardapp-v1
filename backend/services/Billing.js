@@ -45,37 +45,37 @@ module.exports = {
 
           if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
             throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
-          } else {
-            if (deletedAt.isBefore(end)) {
-              // Stopped before end of month
-              // Stopped within month
-              if (createdDate.isBefore(start)) {
-                // Started before start of period
-                current = self.diffHours(deletedAt, start)
-
-              } else {
-                // Started at start of period
-                current = self.diffHours(deletedAt, createdDate)
-              }
-            } else {
-              // Stopped after end of month
-              if (createdDate.isBefore(start)) {
-                // Created before start so full month
-                current = self.diffHours(end, start)
-
-              } else {
-                // from midway through to end of month
-                current = self.diffHours(end, createdDate)
-              }
-            }
-
-            if (ContainerService.isCurrentlyRunning(container)) {
-              // App is currently running so we shouldn't count current hour
-              current -= 1
-            }
-
-            hours += current
           }
+
+          if (deletedAt.isBefore(end)) {
+            // Stopped before end of month
+            // Stopped within month
+            if (createdDate.isBefore(start)) {
+              // Started before start of period
+              current = self.diffHours(deletedAt, start)
+
+            } else {
+              // Started at start of period
+              current = self.diffHours(deletedAt, createdDate)
+            }
+          } else {
+            // Stopped after end of month
+            if (createdDate.isBefore(start)) {
+              // Created before start so full month
+              current = self.diffHours(end, start)
+
+            } else {
+              // from midway through to end of month
+              current = self.diffHours(end, createdDate)
+            }
+          }
+
+          if (ContainerService.isCurrentlyRunning(container)) {
+            // App is currently running so we shouldn't count current hour
+            current -= 1
+          }
+
+          hours += current
         }
       })
 
@@ -185,36 +185,34 @@ module.exports = {
   */
   getBillableHoursPerAppWithDays: function (app, from, to) {
     var self = this
-    return new Promise(function (resolve, reject) {
-      var current = from.clone()
-      var days = []
-      while (current.isBefore(to) || current.isSame(to)) {
-        days.push(current.clone())
+    var current = from.clone()
+    var days = []
+    while (current.isBefore(to) || current.isSame(to)) {
+      days.push(current.clone())
 
-        current = current.clone().add(1, 'd')
-      }
+      current = current.clone().add(1, 'd')
+    }
 
-      Promise.all(days.map(function (day) {
-        return new Promise(function (resolve, reject) {
-          var appBillableHours = self.getAppBillableHours(app, day, day.clone().add(1, 'day'))
+    return Promise.all(days.map(function (day) {
+      return new Promise(function (resolve, reject) {
+        var appBillableHours = self.getAppBillableHours(app, day, day.clone().add(1, 'day'))
 
-          appBillableHours.then(function(appBillableHours) {
-            resolve({
-              day: day,
-              hours: appBillableHours
-            })
+        appBillableHours.then(function(appBillableHours) {
+          resolve({
+            day: day,
+            hours: appBillableHours
           })
         })
-      })).then(function(result) {
-        return _.map(result, function(entry) {
-          return {
-            day: entry.day.format('YYYY-MM-DD'),
-            hours: entry.hours
-          }
-        })
-      }).then(function (result) {
-        resolve(result)
       })
+    })).then(function(result) {
+      return _.map(result, function(entry) {
+        return {
+          day: entry.day.format('YYYY-MM-DD'),
+          hours: entry.hours
+        }
+      })
+    }).then(function (result) {
+      return result
     })
   },
   /**
