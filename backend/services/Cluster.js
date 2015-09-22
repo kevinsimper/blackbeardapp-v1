@@ -4,6 +4,7 @@ var Cluster = require('../models/Cluster')
 var Container = require('../models/Container')
 var httprequest = Promise.promisify(require('request'))
 var _ = require('lodash')
+var Notify = require('./Notify')
 
 exports.getCluster = function() {
   return new Promise(function (resolve) {
@@ -39,6 +40,7 @@ exports.getCluster = function() {
       } else {
         // THERE IS NOT GREEN CLUSTERS!!
         console.log('THERE IS NO GREEN CLUSTERS!!')
+        Notify.notifyAdmins()
         resolve(orderedByPressure[0][0])
       }
     })
