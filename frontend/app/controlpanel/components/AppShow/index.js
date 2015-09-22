@@ -10,17 +10,23 @@ var AppLogs = require('../AppLogs/')
 var Containers = require('../Containers/')
 var ContainerActions = require('../Containers/actions')
 var ContainerStore = require('../Containers/store')
+var ImagesActions = require('../Images/actions')
+var ImagesStore = require('../Images/store')
 var Button = require('../Button/')
 var StatusIcon = require('../StatusIcon/')
 var TimeSince = require('../TimeSince/')
 var filter = require('lodash/collection/filter')
+var Reflux = require('reflux')
 
 var AppShow = React.createClass({
-  mixins: [Navigation],
+  mixins: [Navigation, Reflux.ListenerMixin],
   getState: function() {
+    var imageId = this.state && this.state.app && this.state.app.image || ''
+    var image = ImagesStore.getOne(imageId)
     return {
       app: AppsStore.getOneApp(this.props.params.id),
-      containers: ContainerStore.getOne(this.props.params.id)
+      containers: ContainerStore.getOne(this.props.params.id),
+      image: image
     }
   },
   getInitialState: function() {
@@ -43,12 +49,9 @@ var AppShow = React.createClass({
         })
       })
 
-    this.unsubscribe = AppsStore.listen(this.onChange)
-    this.unsubscribeContainers = ContainerStore.listen(this.onChange)
-  },
-  componentWillUnmount: function() {
-    this.unsubscribe()
-    this.unsubscribeContainers()
+    this.listenTo(AppsStore, this.onChange)
+    this.listenTo(ContainerStore, this.onChange)
+    this.listenTo(ImagesStore, this.onChange)
   },
   onChange: function() {
     this.setState(this.getState())
@@ -78,8 +81,14 @@ var AppShow = React.createClass({
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
         <div>
-          <span>Created&nbsp;</span>
-          <TimeSince timestamp={this.state.app.timestamp}/>
+          <div>
+            <span>Image:&nbsp;</span>
+            <span> {this.state.image && this.state.image.name}</span>
+          </div>
+          <div>
+            <span>Created:&nbsp;</span>
+            <TimeSince timestamp={this.state.app.timestamp}/>
+          </div>
         </div>
         <div>
           <Button onClick={this.onClickStart}>Start Container</Button>
