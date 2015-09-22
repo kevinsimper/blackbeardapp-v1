@@ -17,6 +17,8 @@ var schema = new mongoose.Schema({
   role: String,
   ip: String,
   password: String,
+  verified: { type: Boolean, default: false },
+  verifyCode: String,
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
@@ -39,11 +41,11 @@ schema.statics.findOneByRole = function (id, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username')
+    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
-    fields.push('resetToken', 'resetExpiry', 'stripeToken', 'deleted', 'deletedAt')
+    fields.push('resetToken', 'resetExpiry', 'stripeToken', 'verifyCode', 'deleted', 'deletedAt')
     // Show deleted to admins
     conditions = {}
   }
