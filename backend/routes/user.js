@@ -89,45 +89,54 @@ exports.postUserUsername = {
   }
 }
 
-exports.postUser = function(request, reply) {
-  var email = request.payload.email
-  var password = request.payload.password
-  var hashedPassword = passwordHash.generate(password)
-
-  var insertCallback = function(err, result) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
+exports.postUser = {
+  auth: false,
+  validate: {
+    payload: {
+      email: Joi.string().required(),
+      password: Joi.string().required()
     }
-    reply({
-      message: 'User successfully added.',
-      userId: result._id
-    })
-  }
+  },
+  handler: function(request, reply) {
+    var email = request.payload.email
+    var password = request.payload.password
+    var hashedPassword = passwordHash.generate(password)
 
-  var resultCallback = function(err, user) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    if (user) {
-      reply(Boom.badRequest('A user account with this email address already exists.'))
-    } else {
-      var newUser = new User({
-        email: email,
-        password: hashedPassword,
-        credit: 0,
-        timestamp: Math.round(Date.now() / 1000),
-        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-        role: roles.USER // Regular user account
+    var insertCallback = function(err, result) {
+      if (err) {
+        request.log(['mongo'], err)
+        return reply(Boom.badImplementation('There was a problem with the database'))
+      }
+      reply({
+        message: 'User successfully added.',
+        userId: result._id
       })
-      newUser.save(insertCallback)
     }
-  }
 
-  User.findOne({
-    email: email
-  }, resultCallback)
+    var resultCallback = function(err, user) {
+      if (err) {
+        request.log(['mongo'], err)
+        return reply(Boom.badImplementation('There was a problem with the database'))
+      }
+      if (user) {
+        reply(Boom.badRequest('A user account with this email address already exists.'))
+      } else {
+        var newUser = new User({
+          email: email,
+          password: hashedPassword,
+          credit: 0,
+          timestamp: Math.round(Date.now() / 1000),
+          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+          role: roles.USER // Regular user account
+        })
+        newUser.save(insertCallback)
+      }
+    }
+
+    User.findOne({
+      email: email
+    }, resultCallback)
+  }
 }
 
 exports.putMe = {
