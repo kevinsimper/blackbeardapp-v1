@@ -266,6 +266,17 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'GET',
+    path: '/users/{user}/verifysend',
+    config: userRoutes.getVerifyUserEmail
+  })
+  server.route({
+    method: 'GET',
+    path: '/verify/{user}',
+    config: userRoutes.getVerify
+  })
+
+  server.route({
+    method: 'GET',
     path: '/users/{user}/creditlogs',
     config: billingRoutes.getCreditLogs
   })

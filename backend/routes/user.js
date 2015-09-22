@@ -10,6 +10,7 @@ var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
 var Log = require('../models/Log')
 var Joi = require('joi')
+var Hashids = require('hashids')
 
 exports.getUsers = function(request, reply) {
   User.find(function(err, users) {
@@ -302,4 +303,102 @@ exports.getUserLogs = function (request, reply) {
     request.log(['mongo'], err)
     return reply(Boom.badImplementation())
   })
+}
+
+exports.getVerifyUserEmail = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required()
+    }
+  },
+  handler: function(request, reply) {
+    var userId = User.getUserIdFromRequest(request)
+
+    User.findOne({_id: userId})
+    .then(function(user) {
+      if (user === null) {
+        throw new Promise.OperationalError('user-not-found')
+      }
+
+      if (user.verified) {
+        throw new Promise.OperationalError('alread-verified')
+      }
+
+      var token = new Hashids("saltySALT", 64, "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789")
+      user.verifyCode = token.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)])
+
+      return user.save()
+    }).then(function(user) {
+      return Mail.send({
+        from: 'Blackbeard <info@blackbeard.io>',
+        to: user.email,
+        subject: 'Blackbeard - Verify Email Account',
+        text: "Please click on the following link to verify your account. http://blackbeard.io/verify/" + user._id + "?code=" + user.verifyCode +
+          "\n\nRegards,\nThe team at Blackbeard"
+      }, function (error, body) {
+        if (error) {
+          request.log(['mail'], err)
+          return reply(Boom.badRequest('Error sending password reset email.'))
+        }
+
+        reply({
+          message: 'Verification email successfully sent.'
+        })
+      })
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      if (err.cause === 'user-not-found') {
+        return reply(Boom.notFound("User account could not be found."))
+      } else if (err.cause === 'alread-verified') {
+        return reply(Boom.badRequest("User account is already verified."))
+      }
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+  }
+}
+
+exports.getVerify = {
+  auth: false,
+  validate: {
+    params: {
+      user: Joi.string().required()
+    },
+    query: {
+      code: Joi.string().required()
+    }
+  },
+  handler: function(request, reply) {
+    var userId = request.params.user
+
+    User.findOne({_id: userId})
+    .then(function(user) {
+      if (user === null) {
+        throw new Promise.OperationalError('user-not-found')
+      }
+
+      if (user.verified) {
+        throw new Promise.OperationalError('alread-verified')
+      }
+
+      user.verified = true
+      return user.save()
+    }).then(function(user) {
+      reply({
+        message: 'Account verified.'
+      })
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      if (err.cause === 'user-not-found') {
+        return reply(Boom.notFound("User account could not be found."))
+      } else if (err.cause === 'alread-verified') {
+        return reply(Boom.badRequest("User account is already verified."))
+      }
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+  }
 }
