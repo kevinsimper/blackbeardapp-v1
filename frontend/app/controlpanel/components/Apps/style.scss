@@ -1,10 +1,10 @@
 .Apps {}
 .Apps__Item {
   line-height: 35px;
-  padding: 0 5px;
-  border-bottom: 1px solid #CCC;
+  padding: 10px 5px;
+  border-top: 1px solid #CCC;
   &:last-child {
-    border-bottom: 0px;
+    border-bottom: 1px solid #CCC;
   }
   &:hover {
     background-color: #ECECEC;
@@ -13,4 +13,12 @@
 .Apps__Link {
   display: block;
   text-decoration: none;
+}
+.Apps__Link {
+  display: flex;
+}
+.Apps__StatusIcon {
+}
+.Apps__Info {
+  flex: 1;
 }

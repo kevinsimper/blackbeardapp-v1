@@ -6,9 +6,16 @@ var findWhere = require('lodash/collection/findWhere')
 var remove = require('lodash/array/remove')
 
 var _apps = []
+var _loaded = false
 
 var store = Reflux.createStore({
   listenables: actions,
+  initialLoad: function () {
+    if(_loaded) return true
+    actions.load().then(function () {
+      _loaded = true
+    })
+  },
   onLoad: function() {
     var self = this
     request
@@ -40,6 +47,7 @@ var store = Reflux.createStore({
     this.trigger(data)
   },
   getApps: function() {
+    this.initialLoad()
     return _apps;
   },
   getOneApp: function(id) {

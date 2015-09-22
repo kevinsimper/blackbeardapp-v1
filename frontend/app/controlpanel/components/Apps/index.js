@@ -1,5 +1,4 @@
 var React = require('react')
-var Link = require('react-router').Link
 var AppStore = require('../Apps/store')
 var AppActions = require('../Apps/actions')
 var StatusIcon = require('../StatusIcon/')
@@ -27,13 +26,22 @@ var AppCreate = React.createClass({
   render: function() {
     return (
       <div className='Apps'>
-        {this.state.apps.map(function(item){
+        {this.state.apps.map(function(app){
           return (
             <div className='Apps__Item'>
-              <Link className='Apps__Link' to='AppShow' params={{id: item._id}}>
-                <StatusIcon/>
-                {item.name}
-              </Link>
+              <a href={'#/apps/' + app._id} className='Apps__Link'>
+                <div className='Apps__StatusIcon'>
+                  <StatusIcon/>
+                </div>
+                <div className='Apps__Info'>
+                  {app.name}
+                  <div className='Apps__Containers'>
+                    <small>
+                      {app.containers.length} containers running
+                    </small>
+                  </div>
+                </div>
+              </a>
             </div>
           )
         })}
