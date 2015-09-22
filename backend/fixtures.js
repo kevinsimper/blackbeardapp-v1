@@ -29,6 +29,8 @@ db.users.insert({
   "ip": "127.0.0.1",
   "role": "ADMIN",
   "creditCards": [],
+  "verified": false,
+  "verifyCode": "wq9y8XnWjnbJAGPavwmXpVNq9Y2BAwWpaytJKDB6erMdQx38y7Z5kRgKzgJRQYGV",
   "deleted": false,
   "__v": 0
 });
