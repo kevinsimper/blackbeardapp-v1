@@ -5,12 +5,19 @@ var schema = new mongoose.Schema({
   timestamp: String,
   data: [],
   ip: String,
-  type: String
+  type: String,
+  error: String
 })
 
 module.exports = mongoose.model('log', schema)
 
 module.exports.types = {
   LOGIN: 'LOGIN',
+  LOGIN_FAIL: 'LOGIN_FAIL',
   VOUCHER_CLAIM: 'VOUCHER_CLAIM'
+}
+
+module.exports.errors = {
+  NO_USER: 'NO_USER',
+  INVALID_PASS: 'INVALID_PASS'
 }

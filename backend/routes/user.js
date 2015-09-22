@@ -239,42 +239,66 @@ exports.delUser = {
   }
 }
 
-// /login
-exports.postLogin = function(request, reply) {
-  var email = request.payload.email
-  var password = request.payload.password
-
-  User.findOne({ email: email }, function(err, user) {
-    if(err) {
-      request.log(['mongo'], err)
-      reply(Boom.badImplementation())
+exports.postLogin = {
+  auth: false,
+  validate: {
+    payload: {
+      email: Joi.string().email().required(),
+      password: Joi.string().required()
     }
-    if (user) {
-      if (passwordHash.verify(password, user.password)) {
-        var token = jwt.sign(user._id, process.env.AUTH_SECRET, {
-          expiresInMinutes: 1440 // 24h
-        });
+  },
+  handler: function(request, reply) {
+    var email = request.payload.email
+    var password = request.payload.password
 
-        var log = new Log({
-          user: user,
-          timestamp: Math.round(Date.now() / 1000),
-          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-          type: Log.types.LOGIN,
-        })
-        log.saveAsync()
+    var user = User.findOne({ email: email })
 
-        reply({
-          message: 'Login successful.',
-          token: token
-        })
-
-      } else {
-        reply(Boom.unauthorized('Invalid email and password combination.'))
+    var token = user.then(function(user) {
+      if (!user) {
+        return Log.errors.NO_USER
       }
-    } else {
-      reply(Boom.unauthorized('Invalid email and password combination.'))
-    }
-  })
+
+      if (!passwordHash.verify(password, user.password)) {
+        return Log.errors.INVALID_PASS
+      }
+
+      return jwt.sign(user._id, process.env.AUTH_SECRET, {
+        expiresInMinutes: 1440 // 24h
+      })
+    })
+
+    Promise.all([user, token]).spread(function(user, token) {
+      var error = null
+      if ((token === Log.errors.NO_USER) || (token === Log.errors.INVALID_PASS)) {
+        error = token
+      }
+      var log = new Log({
+        user: user,
+        timestamp: Math.round(Date.now() / 1000),
+        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+        type: Log.types.LOGIN_FAIL,
+        error: error
+      })
+      log.save()
+    })
+
+    Promise.all([user, token]).spread(function(user, token) {
+      if ((token === Log.errors.NO_USER) || (token === Log.errors.INVALID_PASS)) {
+        throw new Promise.OperationalError(token)
+      }
+
+      reply({
+        message: 'Login successful.',
+        token: token
+      })
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.unauthorized('Invalid email and password combination.'))
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
 exports.postRegistrylogin = function(request, reply) {

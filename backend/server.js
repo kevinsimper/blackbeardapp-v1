@@ -222,10 +222,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'POST',
     path: '/login',
-    config: {
-      auth: false,
-      handler: userRoutes.postLogin
-    }
+    config: userRoutes.postLogin
   })
 
   server.route({

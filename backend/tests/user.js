@@ -62,6 +62,21 @@ lab.experiment('/users', function() {
       console.log(err)
     })
 
+    var invalidLogin = request({
+      method: 'POST',
+      uri: appUrl + '/login',
+      json: true,
+      body: {
+        email: 'nonexistant@blackbeard.io',
+        password: 'randompassword'
+      }
+    }).spread(function(response, body) {
+      expect(response.statusCode, 'to be', 401)
+    })
+    .catch(function(err) {
+      console.log(err)
+    })
+
     Promise.all([basicUser, adminUser]).then(function() {
       done()
     })
