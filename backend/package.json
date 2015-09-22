@@ -31,6 +31,7 @@
     "lab": "5.13.0",
     "lodash": "3.8.0",
     "mailgun-js": "0.6.9",
+    "mkdirp": "0.5.1",
     "moment": "2.10.3",
     "mongodb": "2.0.40",
     "mongoose": "4.0.3",
