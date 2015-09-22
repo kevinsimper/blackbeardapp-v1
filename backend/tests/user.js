@@ -135,6 +135,25 @@ lab.experiment('/users', function() {
     .spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body.email, 'to be', testUserEmail)
+
+      return request({
+        method: 'PUT',
+        uri: appUrl + '/users/559396be05974b0c00b6b282',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          name: "User One v2",
+          email: "user@blackbeard.io",
+          role: "USER"
+        }
+      })
+    })
+    .spread(function(response, body) {
+      expect(response.statusCode, 'to be', 200)
+      expect(body.name, 'to be', "User One v2")
+
       done()
     })
   })

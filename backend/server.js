@@ -211,7 +211,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'PUT',
     path: '/users/{user}',
-    config: userRoutes.putUsers
+    config: userRoutes.putUser
   })
   server.route({
     method: 'DELETE',

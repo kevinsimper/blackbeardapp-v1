@@ -178,12 +178,15 @@ exports.putMe = {
   }
 }
 
-exports.putUsers = {
+exports.putUser = {
   auth: 'jwt',
   app: {
     level: 'ADMIN'
   },
   validate: {
+    params: {
+      user: Joi.string().required()
+    },
     payload: {
       email: Joi.string().email(),
       name: Joi.string(),
@@ -193,25 +196,21 @@ exports.putUsers = {
   },
   handler: function(request, reply) {
     var id = User.getUserIdFromRequest(request)
-    User.findById(id, function(err, user) {
-      if(err) {
-        request.log(['mongo'], err)
-        reply(Boom.badImplementation())
-      }
+
+    var user = User.findById(id)
+    user.then(function(user) {
       user.email = request.payload.email
       user.name = request.payload.name
       user.role = request.payload.role
-      user.save(function(err, updated) {
-        if (err) {
-          request.log(['mongo'], err)
-          return reply(Boom.badImplementation('There was a problem with the database'))
-        }
-        reply(updated)
-      })
+      return user.save()
+    }).then(function(user) {
+      reply(user)
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
     })
   }
 }
-
 
 exports.delUsers = function(request, reply) {
   var id = User.getUserIdFromRequest(request)
