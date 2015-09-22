@@ -28,20 +28,28 @@ exports.getUsers = {
   }
 }
 
-exports.getOneUser = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  var role = request.auth.credentials.role
+exports.getOneUser = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required()
+    }
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+    var role = request.auth.credentials.role
 
-  User.findOneByRole(id, role, function(err, user) {
-    if(err) {
+    var user = User.findOneByRole(id, role)
+    user.then(function(user) {
+      if(!user) {
+        return reply(Boom.notFound('User not found!'))
+      }
+      reply(user)
+    }).catch(function(err) {
       request.log(['mongo'], err)
-      reply(Boom.badImplementation())
-    }
-    if(!user) {
-      return reply(Boom.notFound('User not found!'))
-    }
-    reply(user)
-  })
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
 exports.postUserUsername = {
