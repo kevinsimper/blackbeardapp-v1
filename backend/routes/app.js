@@ -166,7 +166,11 @@ exports.getUserBilling = function(request, reply) {
 exports.getUserBillingPerDay = {
   auth: 'jwt',
   validate: {
-    payload: {
+    params: {
+      user: Joi.string().required(),
+      app: Joi.string().required()
+    },
+    query: {
       from: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required(),
       to: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required()
     }
@@ -178,8 +182,8 @@ exports.getUserBillingPerDay = {
     var app = App.findOne({_id: appId, user: user}).populate('containers')
 
     app.then(function(app) {
-      var from = moment(request.payload.from)
-      var to = moment(request.payload.to)
+      var from = moment(request.query.from)
+      var to = moment(request.query.to)
 
       var userBilling = Billing.getBillableHoursPerAppWithDays(app, from, to)
       userBilling.then(function(userBilling) {

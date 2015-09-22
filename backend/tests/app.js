@@ -285,12 +285,12 @@ lab.experiment('/users/me/apps/containers', function() {
   })
   lab.test('GET user billing (days)', function(done) {
     request({
-      method: 'POST',
+      method: 'GET',
       uri: appUrl + '/users/me/apps/' + appId + '/billing',
       headers: {
         Authorization: token
       },
-      body: {
+      qs: {
         from: '2015-05-01',
         to: '2015-05-07'
       },
