@@ -55,6 +55,9 @@ exports.getOneUser = {
 exports.postUserUsername = {
   auth: 'jwt',
   validate: {
+    params: {
+      user: Joi.string().required()
+    },
     payload: {
       username: Joi.string().required().min(3)
     }
@@ -116,40 +119,37 @@ exports.postUser = {
     var password = request.payload.password
     var hashedPassword = passwordHash.generate(password)
 
-    var insertCallback = function(err, result) {
-      if (err) {
-        request.log(['mongo'], err)
-        return reply(Boom.badImplementation('There was a problem with the database'))
+    var user = User.findOne({
+      email: email
+    })
+    user.then(function(user) {
+      if (user) {
+        throw new Promise.OperationalError('user-already-exists')
       }
+
+      var newUser = new User({
+        email: email,
+        password: hashedPassword,
+        credit: 0,
+        timestamp: Math.round(Date.now() / 1000),
+        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+        role: roles.USER // Regular user account
+      })
+      return newUser.save()
+    }).then(function(user) {
       reply({
         message: 'User successfully added.',
-        userId: result._id
+        userId: user._id
       })
-    }
-
-    var resultCallback = function(err, user) {
-      if (err) {
-        request.log(['mongo'], err)
-        return reply(Boom.badImplementation('There was a problem with the database'))
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      if (err.cause === 'user-not-found') {
+        return reply(Boom.badRequest("User account already exists with this email."))
       }
-      if (user) {
-        reply(Boom.badRequest('A user account with this email address already exists.'))
-      } else {
-        var newUser = new User({
-          email: email,
-          password: hashedPassword,
-          credit: 0,
-          timestamp: Math.round(Date.now() / 1000),
-          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-          role: roles.USER // Regular user account
-        })
-        newUser.save(insertCallback)
-      }
-    }
-
-    User.findOne({
-      email: email
-    }, resultCallback)
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
   }
 }
 
