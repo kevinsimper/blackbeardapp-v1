@@ -228,10 +228,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'POST',
     path: '/registrylogin',
-    config: {
-      auth: false,
-      handler: userRoutes.postRegistrylogin
-    }
+    config: userRoutes.postRegistrylogin
   })
 
   server.route({

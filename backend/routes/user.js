@@ -301,33 +301,61 @@ exports.postLogin = {
   }
 }
 
-exports.postRegistrylogin = function(request, reply) {
-  var username = request.payload.username
-  var password = request.payload.password
-
-  User.findOne({ username: username }).then(function (user) {
-    if (!user) {
-      return reply(Boom.badRequest())
+exports.postRegistrylogin = {
+  auth: false,
+  validate: {
+    payload: {
+      username: Joi.string().required(),
+      password: Joi.string().required()
     }
+  },
+  handler: function(request, reply) {
+    var username = request.payload.username
+    var password = request.payload.password
 
-    if (passwordHash.verify(password, user.password)) {
-      reply('ok')
+    var user = User.findOne({ username: username })
+    var result = user.then(function (user) {
+      if (!user) {
+        return Log.errors.NO_USER
+      }
 
-      var log = new Log({
-        user: user,
-        timestamp: Math.round(Date.now() / 1000),
-        ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-        type: 'Registry Login',
+      if (passwordHash.verify(password, user.password)) {
+        return true
+      } else {
+        return Log.errors.INVALID_PASS
+      }
+    })
+
+    Promise.all([user, result]).spread(function(user, result) {
+      var error = null
+      if ((result === Log.errors.NO_USER) || (result === Log.errors.INVALID_PASS)) {
+        error = result
+      }
+
+       var log = new Log({
+         user: user,
+         timestamp: Math.round(Date.now() / 1000),
+         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+        type: Log.types.REGISTRY_LOGIN,
+        error: error
       })
-      log.saveAsync()
+      log.save()
+    })
 
-    } else {
-      reply(Boom.badRequest())
-    }
-  }).catch(function () {
-    request.log(['mongo'], err)
-    reply(Boom.badImplementation())
-  })
+    Promise.all([user, result]).spread(function(user, result) {
+      if ((result === Log.errors.NO_USER) || (result === Log.errors.INVALID_PASS)) {
+        throw new Promise.OperationalError(result)
+      }
+
+      reply('ok')
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.unauthorized('Invalid username and password combination.'))
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+   }
 }
 
 exports.getUserPayments = function(request, reply) {
