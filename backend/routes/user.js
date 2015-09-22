@@ -12,14 +12,20 @@ var Log = require('../models/Log')
 var Joi = require('joi')
 var Hashids = require('hashids')
 
-exports.getUsers = function(request, reply) {
-  User.find(function(err, users) {
-    if(err) {
+exports.getUsers = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  handler: function(request, reply) {
+    var users = User.find()
+    users.then(function(users) {
+      reply(users)
+    }).catch(function(err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
-    }
-    reply(users)
-  })
+    })
+  }
 }
 
 exports.getOneUser = function(request, reply) {

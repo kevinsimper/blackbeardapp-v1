@@ -196,13 +196,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'GET',
     path: '/users',
-    config: {
-      auth: 'jwt',
-      app: {
-        level: 'ADMIN'
-      },
-      handler: userRoutes.getUsers
-    }
+    config: userRoutes.getUsers
   })
   server.route({
     method: 'GET',
