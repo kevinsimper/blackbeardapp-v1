@@ -6,7 +6,8 @@ var once = require('lodash/function/once')
 
 var _profile = {
   name: '',
-  email: ''
+  email: '',
+  verificationSendStatus: ''
 }
 
 var startIntercom = once(function (profile) {
@@ -56,7 +57,24 @@ var store = Reflux.createStore({
   onUpdateCompleted: function(profile) {
     _profile = profile
     this.trigger(profile)
-  }
+  },
+  onVerifyUserEmail: function() {
+    request.get(config.BACKEND_HOST + '/users/me/verifysend')
+      .set('Authorization', localStorage.token)
+      .send()
+      .end(function(err, res) {
+        actions.verifyUserEmail.completed(res.body)
+      })
+  },
+  onVerifyUserEmailCompleted: function(result) {
+    if (result.status === "OK") {
+      _profile.verificationSendStatus = true
+    } else {
+      _profile.verificationSendStatus = false
+    }
+
+    this.trigger(_profile)
+  },
 })
 
 module.exports = store
