@@ -343,6 +343,7 @@ exports.getVerifyUserEmail = {
         }
 
         reply({
+          status: 'OK',
           message: 'Verification email successfully sent.'
         })
       })
@@ -387,6 +388,7 @@ exports.getVerify = {
       return user.save()
     }).then(function(user) {
       reply({
+        status: 'OK',
         message: 'Account verified.'
       })
     }).error(function (err) {
