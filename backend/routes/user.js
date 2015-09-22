@@ -164,20 +164,16 @@ exports.putMe = {
   handler: function(request, reply) {
     var id = request.auth.credentials._id
 
-    User.findById(id, function(err, user) {
-      if(err) {
-        request.log(['mongo'], err)
-        reply(Boom.badImplementation())
-      }
+    var user = User.findById(id)
+    user.then(function(user) {
       user.email = request.payload.email
       user.name = request.payload.name
-      user.save(function(err, updated) {
-        if (err) {
-          request.log(['mongo'], err)
-          return reply(Boom.badImplementation('There was a problem with the database'))
-        }
-        reply(updated)
-      })
+      return user.save()
+    }).then(function(user) {
+      reply(user)
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
     })
   }
 }
