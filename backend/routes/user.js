@@ -212,17 +212,31 @@ exports.putUser = {
   }
 }
 
-exports.delUsers = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  User.findById(id, function(err, user) {
-    if(err) {
-      request.log(['mongo'], err)
-      reply(Boom.badImplementation())
+exports.delUser = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      user: Joi.string().required()
     }
-    user.delete(function(err, savedUser) {
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+
+    var user = User.findById(id)
+    user.then(function(user) {
+      return Promise.fromNode(function (callback) {
+        user.delete(callback)
+      })
+    }).then(function(user) {
       reply()
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
     })
-  })
+  }
 }
 
 // /login
