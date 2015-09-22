@@ -277,7 +277,7 @@ exports.postLogin = {
         timestamp: Math.round(Date.now() / 1000),
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         type: Log.types.LOGIN_FAIL,
-        error: error
+        data: [error]
       })
       log.save()
     })
@@ -336,8 +336,8 @@ exports.postRegistrylogin = {
          user: user,
          timestamp: Math.round(Date.now() / 1000),
          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-        type: Log.types.REGISTRY_LOGIN,
-        error: error
+         type: Log.types.REGISTRY_LOGIN,
+         data: [error]
       })
       log.save()
     })
@@ -369,8 +369,7 @@ exports.getUserPayments = {
     var id = User.getUserIdFromRequest(request)
     var role = request.auth.credentials.role
 
-    var payments = Payment.findByUserAndRole(id, role)
-    payments.then(function(payments) {
+    Payment.findByUserAndRole(id, role).then(function(payments) {
       reply(payments)
     }).catch(function () {
       request.log(['mongo'], err)

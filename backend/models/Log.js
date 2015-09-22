@@ -5,8 +5,7 @@ var schema = new mongoose.Schema({
   timestamp: String,
   data: [],
   ip: String,
-  type: String,
-  error: String
+  type: String
 })
 
 module.exports = mongoose.model('log', schema)
