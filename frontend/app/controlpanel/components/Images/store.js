@@ -2,7 +2,10 @@ var Reflux = require('reflux')
 var request = require('superagent')
 var config = require('../../config')
 var actions = require('./actions')
+var findWhere = require('lodash/collection/findWhere')
+
 var _images = []
+var _loaded = false
 
 var store = Reflux.createStore({
   listenables: actions,
@@ -17,11 +20,23 @@ var store = Reflux.createStore({
   },
   onLoadCompleted: function(data) {
     _images = data
-
     this.trigger(data)
   },
   getImages: function() {
     return _images
+  },
+  initialLoad: function () {
+    if(_loaded) return true
+    actions.load().then(function () {
+      _loaded = true
+    })
+  },
+  getOne: function (id) {
+    this.initialLoad()
+    var image = findWhere(_images, {
+      _id: id
+    })
+    return image
   }
 })
 
