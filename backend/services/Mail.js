@@ -21,7 +21,7 @@ exports.send = function (data, callback) {
     var filename = Date.now() + data.subject + '.json'
     mkdirp('./fixtures/mails/', function () {
       fs.writeFile('./fixtures/mails/' + filename, JSON.stringify(data, null, 2), function (err) {
-        console.log(err)
+//        console.log(err)
         callback(err, {})
       })
     })
