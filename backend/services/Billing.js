@@ -34,17 +34,19 @@ module.exports = {
         var current = 0
         var createdDate = moment.unix(container.createdAt)
 
-        var deletedAt = moment()
+        var deletedAt = null
 
-        if (container.deletedAt) {
-          var deletedAt = moment(Date.parse(container.deletedAt))
-        }
+        if (!ContainerService.isCurrentlyRunning(container) || (Math.abs(createdDate.diff(moment())) >= 60*1000)) {
+          if (container.deletedAt) {
+            deletedAt = moment(Date.parse(container.deletedAt))
+          } else {
+            deletedAt = moment()
+          }
 
-        if (deletedAt.isSame(createdDate)) {
-          throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
-        }
+          if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
+            throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
+          }
 
-        if (!deletedAt.isBefore(start)) {
           if (deletedAt.isBefore(end)) {
             // Stopped before end of month
             // Stopped within month
@@ -67,14 +69,14 @@ module.exports = {
               current = self.diffHours(end, createdDate)
             }
           }
-        }
 
-        if (ContainerService.isCurrentlyRunning(container)) {
-          // App is currently running so we shouldn't count current hour
-          current -= 1
-        }
+          if (ContainerService.isCurrentlyRunning(container)) {
+            // App is currently running so we shouldn't count current hour
+            current -= 1
+          }
 
-        hours += current
+          hours += current
+        }
       })
 
       resolve(hours)
@@ -86,59 +88,58 @@ module.exports = {
   * when the app's containers are deleted.
   */
   getBillableMonths: function(apps) {
-    var firstOfMonth = moment().set({
-      date: 1,
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0
-    })
-
-    var first = _.min(_.flatten(_.map(apps, function(app) {
-      return _.map(app.containers, function(container) {
-        return container.createdAt
-      })
-    })))
-
-    var start = firstOfMonth
-    if (first) {
-      start = moment.unix(first)
-      start.set({
+    var self = this
+    return new Promise(function (resolve, reject) {
+      var firstOfMonth = moment().set({
         date: 1,
         hour: 0,
         minute: 0,
         second: 0,
         millisecond: 0
       })
-    }
 
-    if (start.isBefore(firstOfMonth)) {
-      // How many months ago was this started?
-      var duration = moment.duration(firstOfMonth.diff(start));
+      var first = _.min(_.flatten(_.map(apps, function(app) {
+        return _.map(app.containers, function(container) {
+          return container.createdAt
+        })
+      })))
 
-      var range = []
-      var current = start.clone()
-      for (var i=0; i<Math.round(duration.asMonths()+1); i++) {
-        range.push(current.clone())
-        current.add(1, 'month')
+      var start = firstOfMonth
+      if (first) {
+        start = moment.unix(first)
+        start.set({
+          date: 1,
+          hour: 0,
+          minute: 0,
+          second: 0,
+          millisecond: 0
+        })
       }
 
-      return range
-    } else {
-      return [firstOfMonth]
-    }
+      if (start.isBefore(firstOfMonth)) {
+        // How many months ago was this started?
+        var duration = moment.duration(firstOfMonth.diff(start));
+
+        var range = []
+        var current = start.clone()
+        for (var i=0; i<Math.round(duration.asMonths()+1); i++) {
+          range.push(current.clone())
+          current.add(1, 'month')
+        }
+
+        resolve(range)
+      } else {
+        resolve([firstOfMonth])
+      }
+    })
   },
   /**
   * Per month get apps (id and name) and the amount of hours they were run.
   */
-  getAppBillableHoursPerUser: function (user) {
+  getBillableHoursPerApps: function (apps) {
     var self = this
     return new Promise(function (resolve, reject) {
-      var apps = App.find({user: user}).populate('containers')
-
-      var monthsToGet = Promise.all(apps.then(function(apps) {
-        return self.getBillableMonths(apps)
-      }))
+      var monthsToGet = self.getBillableMonths(apps)
 
       var appsHours = Promise.all([apps, monthsToGet]).spread(function (apps, monthsToGet) {
         return Promise.all(monthsToGet.map(function(month) {
@@ -177,6 +178,41 @@ module.exports = {
           monthTotals: monthTotals
         })
       })
+    })
+  },
+  /**
+  * Per day get app (id and name) and the amount of hours they were run.
+  */
+  getBillableHoursPerAppWithDays: function (app, from, to) {
+    var self = this
+    var current = from.clone()
+    var days = []
+    while (current.isBefore(to) || current.isSame(to)) {
+      days.push(current.clone())
+
+      current = current.clone().add(1, 'd')
+    }
+
+    return Promise.all(days.map(function (day) {
+      return new Promise(function (resolve, reject) {
+        var appBillableHours = self.getAppBillableHours(app, day, day.clone().add(1, 'day'))
+
+        appBillableHours.then(function(appBillableHours) {
+          resolve({
+            day: day,
+            hours: appBillableHours
+          })
+        })
+      })
+    })).then(function(result) {
+      return _.map(result, function(entry) {
+        return {
+          day: entry.day.format('YYYY-MM-DD'),
+          hours: entry.hours
+        }
+      })
+    }).then(function (result) {
+      return result
     })
   },
   /**

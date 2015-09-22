@@ -150,8 +150,45 @@ exports.getAppLogs = function(request, reply) {
 exports.getUserBilling = function(request, reply) {
   // Given current time get previous months of billablehours per app
   var user = User.getUserIdFromRequest(request)
-  var userBilling = Billing.getAppBillableHoursPerUser(user)
-  userBilling.then(function(userBilling) {
-    reply(userBilling)
+  var apps = App.find({user: user}).populate('containers')
+
+  apps.then(function(apps) {
+    var userBilling = Billing.getBillableHoursPerApps(apps)
+    userBilling.then(function(userBilling) {
+      reply(userBilling)
+    })
+  }).catch(function(e) {
+    request.log(['mongo'], e)
+    reply(Boom.badImplementation())
   })
+}
+
+exports.getUserBillingPerDay = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required(),
+      app: Joi.string().required()
+    },
+    query: {
+      from: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required(),
+      to: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required()
+    }
+  },
+  handler: function(request, reply) {
+    // Given current time get previous months of billablehours per app
+    var user = User.getUserIdFromRequest(request)
+    var appId = request.params.app
+    var app = App.findOne({_id: appId, user: user}).populate('containers')
+
+    app.then(function(app) {
+      var from = moment(request.query.from)
+      var to = moment(request.query.to)
+
+      var userBilling = Billing.getBillableHoursPerAppWithDays(app, from, to)
+      userBilling.then(function(userBilling) {
+        reply(userBilling)
+      })
+    })
+  }
 }

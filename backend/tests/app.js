@@ -267,16 +267,37 @@ lab.experiment('/users/me/apps/containers', function() {
       done()
     })
   })
-  lab.test('DELETE', function(done) {
+  lab.test('GET user billing', function(done) {
     request({
-      method: 'DELETE',
-      uri: appUrl + '/users/me/apps/' + appId + '/containers/555cb1e2fc27fe6f5f540001',
+      method: 'GET',
+      uri: appUrl + '/users/me/billing',
       headers: {
         Authorization: token
       },
       json: true
     }, function(error, response, body) {
-      expect(response.statusCode, 'to be', 200)
+      expect(body.results.length, 'to be greater than', 1)
+      expect(body.results[0].month, 'to equal', '2015-05')
+      expect(Object.keys(body.monthTotals).length, 'to be greater than', 1)
+
+      done()
+    })
+  })
+  lab.test('GET user billing (days)', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/users/me/apps/' + appId + '/billing',
+      headers: {
+        Authorization: token
+      },
+      qs: {
+        from: '2015-05-01',
+        to: '2015-05-07'
+      },
+      json: true
+    }, function(error, response, body) {
+      expect(body.length, 'to equal', 7)
+
       done()
     })
   })
@@ -328,28 +349,12 @@ lab.experiment('/users/me/apps/containers', function() {
             json: true
           }, function(error, response, body) {
             expect(body.length, 'to equal', 1)
-            expect(body[0].deleted, 'to be', true)
+            expect(body[0].deleted, 'to be', false)
 
             done()
           })
         }
       })
-    })
-  })
-  lab.test('GET user billing', function(done) {
-    request({
-      method: 'GET',
-      uri: appUrl + '/users/me/billing',
-      headers: {
-        Authorization: token
-      },
-      json: true
-    }, function(error, response, body) {
-      expect(body.results.length, 'to be greater than', 1)
-      expect(body.results[0].month, 'to equal', '2015-05')
-      expect(Object.keys(body.monthTotals).length, 'to be greater than', 1)
-
-      done()
     })
   })
 })
