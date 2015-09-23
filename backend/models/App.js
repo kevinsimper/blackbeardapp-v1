@@ -9,6 +9,10 @@ var schema = new mongoose.Schema({
   timestamp: String,
   containers: [{type: mongoose.Schema.Types.ObjectId, ref: 'container'}],
   image: {type: mongoose.Schema.Types.ObjectId, ref: 'image'},
+  environment: [{
+    key: String,
+    value: String
+  }],
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })

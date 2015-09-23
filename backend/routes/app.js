@@ -192,3 +192,28 @@ exports.getUserBillingPerDay = {
     })
   }
 }
+
+exports.postEnvVar = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required(),
+      app: Joi.string().required()
+    },
+    payload: {
+      variables: Joi.array().required()
+    }
+  },
+  handler: function(request, reply) {
+    var user = User.getUserIdFromRequest(request)
+    var appId = request.params.app
+    var variables = request.payload.variables
+
+    App.findOne({_id: appId, user: user}).then(function(app) {
+      app.environment = variables
+      return app.save()
+    }).then(function(app) {
+      reply(app)
+    })
+  }
+}

@@ -410,6 +410,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'POST',
+    path: '/users/{user}/apps/{app}/env',
+    config: appRoutes.postEnvVar
+  })
+
+  server.route({
+    method: 'POST',
     path: '/users/{user}/apps/{app}/containers',
     config: {
       auth: 'jwt',
