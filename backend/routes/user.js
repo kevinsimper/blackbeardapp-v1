@@ -10,7 +10,6 @@ var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
 var Log = require('../models/Log')
 var Joi = require('joi')
-var Hashids = require('hashids')
 
 exports.getUsers = {
   auth: 'jwt',
@@ -410,47 +409,28 @@ exports.getVerifyUserEmail = {
     }
   },
   handler: function(request, reply) {
+    var self = this
     var userId = User.getUserIdFromRequest(request)
 
     User.findOne({_id: userId})
     .then(function(user) {
-      if (user === null) {
-        throw new Promise.OperationalError('user-not-found')
+      return Mail.sendVerificationEmail(user)
+    }).then(function(send) {
+      if (send !== true) {
+        throw new Promise.OperationalError(send)
       }
 
-      if (user.verified) {
-        throw new Promise.OperationalError('alread-verified')
-      }
-
-      var token = new Hashids("saltySALT", 64, "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789")
-      user.verifyCode = token.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)])
-
-      return user.save()
-    }).then(function(user) {
-      return Mail.send({
-        from: 'Blackbeard <info@blackbeard.io>',
-        to: user.email,
-        subject: 'Blackbeard - Verify Email Account',
-        text: "Please click on the following link to verify your account. http://blackbeard.io/verify/" + user._id + "?code=" + user.verifyCode +
-          "\n\nRegards,\nThe team at Blackbeard"
-      }, function (error, body) {
-        if (error) {
-          request.log(['mail'], err)
-          return reply(Boom.badRequest('Error sending password reset email.'))
-        }
-
-        reply({
-          status: 'OK',
-          message: 'Verification email successfully sent.'
-        })
+      reply({
+        message: 'Verification email successfully sent.'
       })
     }).error(function (err) {
       request.log(['mongo'], err)
       if (err.cause === 'user-not-found') {
         return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'alread-verified') {
+      } else if (err.cause === 'already-verified') {
         return reply(Boom.badRequest("User account is already verified."))
       }
+      return reply(Boom.badImplementation())
     }).catch(function (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
