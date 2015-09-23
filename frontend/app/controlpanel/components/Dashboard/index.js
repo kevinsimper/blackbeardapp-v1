@@ -54,6 +54,11 @@ var Dashboard = React.createClass({
           loadingVerify: false
         })
       })
+      .catch(function(err) {
+        self.setState({
+          loadingVerify: false
+        })
+      })
   },
   render: function() {
     if(!this.state.loaded) {

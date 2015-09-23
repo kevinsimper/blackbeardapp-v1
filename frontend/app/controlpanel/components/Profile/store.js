@@ -63,18 +63,23 @@ var store = Reflux.createStore({
       .set('Authorization', localStorage.token)
       .send()
       .end(function(err, res) {
-        actions.verifyUserEmail.completed(res.body)
+        if (res.status === 200) {
+          actions.verifyUserEmail.completed(res.body)
+        } else {
+          actions.verifyUserEmail.failed(err)
+        }
       })
   },
   onVerifyUserEmailCompleted: function(result) {
-    if (result.status === "OK") {
-      _profile.verificationSendStatus = true
-    } else {
-      _profile.verificationSendStatus = false
-    }
+    _profile.verificationSendStatus = true
 
     this.trigger(_profile)
   },
+  onVerifyUserEmailFailed: function(result) {
+    _profile.verificationSendStatus = false
+
+    this.trigger(_profile)
+  }
 })
 
 module.exports = store
