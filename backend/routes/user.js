@@ -139,11 +139,11 @@ exports.postUser = {
     var sendResult = user.then(function(user) {
       return Mail.sendVerificationEmail(user)
     }).then(function(sendResult) {
-      if (sendResult !== 'send-successful') {
+      if (sendResult !== Mail.result.SEND_SUCCESSFUL) {
         throw new Promise.OperationalError(sendResult)
       }
 
-      return 'send-successful'
+      return Mail.result.SEND_SUCCESSFUL
     }).error(function (err) {
       return err.cause
     }).catch(function (err) {
@@ -151,7 +151,7 @@ exports.postUser = {
     })
 
     Promise.all([user, sendResult]).spread(function(user, sendResult) {
-      if (sendResult !== 'send-successful') {
+      if (sendResult !== Mail.result.SEND_SUCCESSFUL) {
         throw new Promise.OperationalError(sendResult)
       }
 
@@ -438,7 +438,7 @@ exports.getVerifyUserEmail = {
     .then(function(user) {
       return Mail.sendVerificationEmail(user)
     }).then(function(send) {
-      if (send !== 'send-successful') {
+      if (send !== Mail.result.SEND_SUCCESSFUL) {
         throw new Promise.OperationalError(send)
       }
 
@@ -447,9 +447,9 @@ exports.getVerifyUserEmail = {
       })
     }).error(function (err) {
       request.log(['mongo'], err)
-      if (err.cause === 'user-not-found') {
+      if (err.cause === Mail.result.USER_NOT_FOUND) {
         return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'already-verified') {
+      } else if (err.cause === Mail.result.ALREADY_VERIFIED) {
         return reply(Boom.badRequest("User account is already verified."))
       }
       return reply(Boom.badImplementation())
@@ -476,11 +476,11 @@ exports.getVerify = {
     User.findOne({_id: userId})
     .then(function(user) {
       if (user === null) {
-        throw new Promise.OperationalError('user-not-found')
+        throw new Promise.OperationalError(Mail.result.USER_NOT_FOUND)
       }
 
       if (user.verified) {
-        throw new Promise.OperationalError('already-verified')
+        throw new Promise.OperationalError(Mail.result.ALREADY_VERIFIED)
       }
 
       user.verified = true
@@ -492,9 +492,9 @@ exports.getVerify = {
       })
     }).error(function (err) {
       request.log(['mongo'], err)
-      if (err.cause === 'user-not-found') {
+      if (err.cause === Mail.result.USER_NOT_FOUND) {
         return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'already-verified') {
+      } else if (err.cause === Mail.result.ALREADY_VERIFIED) {
         return reply(Boom.badRequest("User account is already verified."))
       }
     }).catch(function (err) {

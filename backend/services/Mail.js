@@ -33,14 +33,14 @@ exports.send = function (data, callback) {
 exports.sendVerificationEmail = function(user) {
   var self = this
   if (user === null) {
-    return 'user-not-found'
+    return self.result.USER_NOT_FOUND
   }
 
   if (user.verified) {
-    return 'already-verified'
+    return self.result.ALREADY_VERIFIED
   }
 
-  var token = new Hashids("saltySALT", 64, "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789")
+  var token = new Hashids("sweetySWEET", 64, "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789")
   user.verifyCode = token.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)])
 
   var user = user.save()
@@ -55,6 +55,12 @@ exports.sendVerificationEmail = function(user) {
       }, cb)
     })
   }).then(function (body) {
-    return 'send-successful'
+    return self.result.SEND_SUCCESSFUL
   })
+}
+
+exports.result = {
+  SEND_SUCCESSFUL: 'SEND_SUCCESSFUL',
+  ALREADY_VERIFIED: 'ALREADY_VERIFIED',
+  USER_NOT_FOUND: 'USER_NOT_FOUND'
 }
