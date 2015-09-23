@@ -114,6 +114,24 @@ lab.experiment('/users', function() {
         done()
       })
   })
+  lab.test('POST /users/me/onboarding', function(done) {
+    request({
+        method: 'POST',
+        uri: appUrl + '/users/me/onboarding',
+        json: true,
+        headers: {
+          'Authorization': token
+        },
+        body: {
+          username: 'username',
+          country: 'DK'
+        }
+      },
+      function(error, response, body) {
+        expect(response.statusCode, 'to be', 200)
+        done()
+      })
+  })
   lab.test('PUT /me', function(done) {
     var requestData = {
       email: 'updated@blackbeard.io',
