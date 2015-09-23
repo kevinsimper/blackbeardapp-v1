@@ -17,6 +17,7 @@ var StatusIcon = require('../StatusIcon/')
 var TimeSince = require('../TimeSince/')
 var filter = require('lodash/collection/filter')
 var Reflux = require('reflux')
+var ButtonGroup = require('../ButtonGroup')
 
 var AppShow = React.createClass({
   mixins: [Navigation, Reflux.ListenerMixin],
@@ -69,6 +70,9 @@ var AppShow = React.createClass({
   onClickStart: function() {
     this.transitionTo('/apps/' + this.props.params.id + '/containers')
   },
+  onClickEdit: function () {
+    this.transitionTo('/apps/' + this.props.params.id + '/edit')
+  },
   render: function() {
     var self = this
     if(!this.state.loaded) {
@@ -91,10 +95,13 @@ var AppShow = React.createClass({
           </div>
         </div>
         <div>
-          <Button onClick={this.onClickStart}>Start Container</Button>
-          {runningContainers.length === 0 &&
-            <Button variant='danger' onClick={this.onClickDelete}>Delete App</Button>
-          }
+          <ButtonGroup>
+            <Button onClick={this.onClickStart}>Start Container</Button>
+            <Button onClick={this.onClickEdit}>Edit</Button>
+            {runningContainers.length === 0 &&
+              <Button variant='danger' onClick={this.onClickDelete}>Delete App</Button>
+            }
+          </ButtonGroup>
         </div>
         <Containers app={this.state.app._id} />
         <AppLogs app={this.state.app._id} />
