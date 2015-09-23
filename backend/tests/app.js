@@ -211,6 +211,37 @@ lab.experiment('/users/me/apps/containers', function() {
       done()
     })
   })
+  lab.test('POST env', function(done) {
+    var requestData = {
+      variables: [
+        {
+          key: 'LOGGLY_HOSTNAME',
+          value: 'blackbeard.io'
+        },
+        {
+          key: 'LOGGLY_NAME',
+          value: 'blackbeard'
+        },
+        {
+          key: 'LOGGLY_SUBDOMAIN',
+          value: 'blackbeard'
+        }
+      ]
+    }
+    request({
+      method: 'POST',
+      uri: appUrl + '/users/me/apps/' + appId + '/env',
+      headers: {
+        Authorization: token
+      },
+      json: true,
+      body: requestData
+    }, function(error, response, body) {
+      console.log(body)
+      done()
+    })
+  })
+
   lab.test('GET', function(done) {
     request({
       method: 'GET',
