@@ -10,7 +10,6 @@ var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
 var Log = require('../models/Log')
 var Joi = require('joi')
-var Hashids = require('hashids')
 
 exports.getUsers = {
   auth: 'jwt',
@@ -102,7 +101,6 @@ exports.postUserUsername = {
         reply(Boom.badImplementation())
       }
     })
-
   }
 }
 
@@ -121,8 +119,7 @@ exports.postUser = {
 
     var user = User.findOne({
       email: email
-    })
-    user.then(function(user) {
+    }).then(function(user) {
       if (user) {
         throw new Promise.OperationalError('user-already-exists')
       }
@@ -135,17 +132,41 @@ exports.postUser = {
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         role: roles.USER // Regular user account
       })
-      return newUser.saveAsync()
-    }).then(function(user) {
+
+      return newUser.save()
+    })
+
+    var sendResult = user.then(function(user) {
+      return Mail.sendVerificationEmail(user)
+    }).then(function(sendResult) {
+      if (sendResult !== Mail.result.SEND_SUCCESSFUL) {
+        throw new Promise.OperationalError(sendResult)
+      }
+
+      return Mail.result.SEND_SUCCESSFUL
+    }).error(function (err) {
+      return err.cause
+    }).catch(function (err) {
+      return false
+    })
+
+    Promise.all([user, sendResult]).spread(function(user, sendResult) {
+      if (sendResult !== Mail.result.SEND_SUCCESSFUL) {
+        throw new Promise.OperationalError(sendResult)
+      }
+
       reply({
         message: 'User successfully added.',
-        userId: user._id,
+        userId: user._id
       })
     }).error(function (err) {
       request.log(['mongo'], err)
       if (err.cause === 'user-already-exists') {
         return reply(Boom.badRequest("User account already exists with this email."))
+      } else if (err.cause === 'already-verified') {
+        return reply(Boom.badRequest("User account already verified."))
       }
+      return reply(Boom.badImplementation())
     }).catch(function (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
@@ -410,47 +431,28 @@ exports.getVerifyUserEmail = {
     }
   },
   handler: function(request, reply) {
+    var self = this
     var userId = User.getUserIdFromRequest(request)
 
     User.findOne({_id: userId})
     .then(function(user) {
-      if (user === null) {
-        throw new Promise.OperationalError('user-not-found')
+      return Mail.sendVerificationEmail(user)
+    }).then(function(send) {
+      if (send !== Mail.result.SEND_SUCCESSFUL) {
+        throw new Promise.OperationalError(send)
       }
 
-      if (user.verified) {
-        throw new Promise.OperationalError('alread-verified')
-      }
-
-      var token = new Hashids("saltySALT", 64, "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789")
-      user.verifyCode = token.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)])
-
-      return user.save()
-    }).then(function(user) {
-      return Mail.send({
-        from: 'Blackbeard <info@blackbeard.io>',
-        to: user.email,
-        subject: 'Blackbeard - Verify Email Account',
-        text: "Please click on the following link to verify your account. http://blackbeard.io/verify/" + user._id + "?code=" + user.verifyCode +
-          "\n\nRegards,\nThe team at Blackbeard"
-      }, function (error, body) {
-        if (error) {
-          request.log(['mail'], err)
-          return reply(Boom.badRequest('Error sending password reset email.'))
-        }
-
-        reply({
-          status: 'OK',
-          message: 'Verification email successfully sent.'
-        })
+      reply({
+        message: 'Verification email successfully sent.'
       })
     }).error(function (err) {
       request.log(['mongo'], err)
-      if (err.cause === 'user-not-found') {
+      if (err.cause === Mail.result.USER_NOT_FOUND) {
         return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'alread-verified') {
+      } else if (err.cause === Mail.result.ALREADY_VERIFIED) {
         return reply(Boom.badRequest("User account is already verified."))
       }
+      return reply(Boom.badImplementation())
     }).catch(function (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
@@ -474,11 +476,11 @@ exports.getVerify = {
     User.findOne({_id: userId})
     .then(function(user) {
       if (user === null) {
-        throw new Promise.OperationalError('user-not-found')
+        throw new Promise.OperationalError(Mail.result.USER_NOT_FOUND)
       }
 
       if (user.verified) {
-        throw new Promise.OperationalError('alread-verified')
+        throw new Promise.OperationalError(Mail.result.ALREADY_VERIFIED)
       }
 
       user.verified = true
@@ -490,9 +492,9 @@ exports.getVerify = {
       })
     }).error(function (err) {
       request.log(['mongo'], err)
-      if (err.cause === 'user-not-found') {
+      if (err.cause === Mail.result.USER_NOT_FOUND) {
         return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'alread-verified') {
+      } else if (err.cause === Mail.result.ALREADY_VERIFIED) {
         return reply(Boom.badRequest("User account is already verified."))
       }
     }).catch(function (err) {
