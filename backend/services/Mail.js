@@ -55,6 +55,6 @@ exports.sendVerificationEmail = function(user) {
       }, cb)
     })
   }).then(function (body) {
-    return true
+    return 'send-successful'
   })
 }

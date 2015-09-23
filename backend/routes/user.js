@@ -136,23 +136,23 @@ exports.postUser = {
       return newUser.save()
     })
 
-    var send = user.then(function(user) {
+    var sendResult = user.then(function(user) {
       return Mail.sendVerificationEmail(user)
-    }).then(function(send) {
-      if (send !== true) {
-        throw new Promise.OperationalError(send)
+    }).then(function(sendResult) {
+      if (sendResult !== 'send-successful') {
+        throw new Promise.OperationalError(sendResult)
       }
 
-      return true
+      return 'send-successful'
     }).error(function (err) {
       return err.cause
     }).catch(function (err) {
       return false
     })
 
-    Promise.all([user, send]).spread(function(user, send) {
-      if (send !== true) {
-        throw new Promise.OperationalError(send)
+    Promise.all([user, sendResult]).spread(function(user, sendResult) {
+      if (sendResult !== 'send-successful') {
+        throw new Promise.OperationalError(sendResult)
       }
 
       reply({
@@ -438,7 +438,7 @@ exports.getVerifyUserEmail = {
     .then(function(user) {
       return Mail.sendVerificationEmail(user)
     }).then(function(send) {
-      if (send !== true) {
+      if (send !== 'send-successful') {
         throw new Promise.OperationalError(send)
       }
 
