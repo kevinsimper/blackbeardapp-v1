@@ -6,6 +6,9 @@ var actions = Reflux.createActions({
   },
   update: {
     asyncResult: true
+  },
+  verifyUserEmail: {
+    asyncResult: true
   }
 })
 

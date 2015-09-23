@@ -191,29 +191,17 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'POST',
     path: '/users',
-    config: {
-      auth: false,
-      handler: userRoutes.postUser
-    }
+    config: userRoutes.postUser
   })
   server.route({
     method: 'GET',
     path: '/users',
-    config: {
-      auth: 'jwt',
-      app: {
-        level: 'ADMIN'
-      },
-      handler: userRoutes.getUsers
-    }
+    config: userRoutes.getUsers
   })
   server.route({
     method: 'GET',
     path: '/users/{user}',
-    config: {
-      auth: 'jwt',
-      handler: userRoutes.getOneUser
-    }
+    config: userRoutes.getOneUser
   })
   server.route({
     method: 'PUT',
@@ -223,45 +211,30 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'PUT',
     path: '/users/{user}',
-    config: userRoutes.putUsers
+    config: userRoutes.putUser
   })
   server.route({
     method: 'DELETE',
     path: '/users/{user}',
-    config: {
-      auth: 'jwt',
-      app: {
-        level: 'ADMIN'
-      },
-      handler: userRoutes.delUsers
-    }
+    config: userRoutes.delUser
   })
 
   server.route({
     method: 'POST',
     path: '/login',
-    config: {
-      auth: false,
-      handler: userRoutes.postLogin
-    }
+    config: userRoutes.postLogin
   })
 
   server.route({
     method: 'POST',
     path: '/registrylogin',
-    config: {
-      auth: false,
-      handler: userRoutes.postRegistrylogin
-    }
+    config: userRoutes.postRegistrylogin
   })
 
   server.route({
     method: 'GET',
     path: '/users/{user}/payments',
-    config: {
-      auth: 'jwt',
-      handler: userRoutes.getUserPayments
-    }
+    config: userRoutes.getUserPayments
   })
 
   server.route({
@@ -513,13 +486,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   server.route({
     method: 'GET',
     path: '/users/{user}/logs',
-    config: {
-      auth: 'jwt',
-      app: {
-        level: 'ADMIN'
-      },
-      handler: userRoutes.getUserLogs
-    }
+    config: userRoutes.getUserLogs
   })
 
   // Webhook (associated with images)

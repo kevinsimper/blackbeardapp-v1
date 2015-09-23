@@ -5,6 +5,7 @@ var Apps = require('../Apps/')
 var Button = require('../Button/')
 var Authentication = require('../../mixins/authentication')
 var Onboarding = require('../Onboarding/')
+var ErrorMessage = require('../ErrorMessage/')
 var ProfileActions = require('../Profile/actions')
 var ProfileStore = require('../Profile/store')
 var AppsStore = require('../Apps/store')
@@ -20,7 +21,8 @@ var Dashboard = React.createClass({
   },
   getInitialState: function() {
     return extend(this.getState(), {
-      loaded: false
+      loaded: false,
+      loadingVerify: false
     })
   },
   componentDidMount: function() {
@@ -40,6 +42,19 @@ var Dashboard = React.createClass({
   onClickCreate: function () {
     this.transitionTo('/apps/create')
   },
+  onClickVerify: function () {
+    var self = this
+    this.setState({
+      loadingVerify: true
+    })
+
+    ProfileActions.verifyUserEmail()
+      .then(function(result) {
+        self.setState({
+          loadingVerify: false
+        })
+      })
+  },
   render: function() {
     if(!this.state.loaded) {
       return <div/>
@@ -50,6 +65,28 @@ var Dashboard = React.createClass({
     return (
       <div>
         <h1>Dashboard</h1>
+        {!this.state.profile.verified &&
+          (this.state.profile.verificationSendStatus === undefined ||
+          this.state.profile.verificationSendStatus === false) &&
+          <div>
+            <div>To use Blackbeard you need to verify your email address</div>
+            {this.state.loadingVerify &&
+              <span>Loading...</span>
+            }
+            {!this.state.loadingVerify &&
+              <Button onClick={this.onClickVerify}>Resend Verification Email</Button>
+            }
+            {this.state.profile.verificationSendStatus === false &&
+              <ErrorMessage>Verification email could not be sent</ErrorMessage>
+            }
+          </div>
+        }
+        {!this.state.profile.verified &&
+          this.state.profile.verificationSendStatus === true &&
+          <div style={{fontWeight: 'bold', marginBottom: '1em'}}>
+            Verification email sent.
+          </div>
+        }
         {this.state.apps.length === 0 &&
           <div>
             <div>You have not created any apps, go and create your first app! It is easier than you think!</div>

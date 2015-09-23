@@ -12,35 +12,52 @@ var Log = require('../models/Log')
 var Joi = require('joi')
 var Hashids = require('hashids')
 
-exports.getUsers = function(request, reply) {
-  User.find(function(err, users) {
-    if(err) {
+exports.getUsers = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  handler: function(request, reply) {
+    var users = User.find()
+    users.then(function(users) {
+      reply(users)
+    }).catch(function(err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
-    }
-    reply(users)
-  })
+    })
+  }
 }
 
-exports.getOneUser = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  var role = request.auth.credentials.role
+exports.getOneUser = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required()
+    }
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+    var role = request.auth.credentials.role
 
-  User.findOneByRole(id, role, function(err, user) {
-    if(err) {
+    var user = User.findOneByRole(id, role)
+    user.then(function(user) {
+      if(!user) {
+        return reply(Boom.notFound('User not found!'))
+      }
+      reply(user)
+    }).catch(function(err) {
       request.log(['mongo'], err)
-      reply(Boom.badImplementation())
-    }
-    if(!user) {
-      return reply(Boom.notFound('User not found!'))
-    }
-    reply(user)
-  })
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
 exports.postUserUsername = {
   auth: 'jwt',
   validate: {
+    params: {
+      user: Joi.string().required()
+    },
     payload: {
       username: Joi.string().required().min(3)
     }
@@ -89,30 +106,27 @@ exports.postUserUsername = {
   }
 }
 
-exports.postUser = function(request, reply) {
-  var email = request.payload.email
-  var password = request.payload.password
-  var hashedPassword = passwordHash.generate(password)
-
-  var insertCallback = function(err, result) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
+exports.postUser = {
+  auth: false,
+  validate: {
+    payload: {
+      email: Joi.string().required(),
+      password: Joi.string().required()
     }
-    reply({
-      message: 'User successfully added.',
-      userId: result._id
+  },
+  handler: function(request, reply) {
+    var email = request.payload.email
+    var password = request.payload.password
+    var hashedPassword = passwordHash.generate(password)
+
+    var user = User.findOne({
+      email: email
     })
-  }
+    user.then(function(user) {
+      if (user) {
+        throw new Promise.OperationalError('user-already-exists')
+      }
 
-  var resultCallback = function(err, user) {
-    if (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-    if (user) {
-      reply(Boom.badRequest('A user account with this email address already exists.'))
-    } else {
       var newUser = new User({
         email: email,
         password: hashedPassword,
@@ -121,13 +135,22 @@ exports.postUser = function(request, reply) {
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         role: roles.USER // Regular user account
       })
-      newUser.save(insertCallback)
-    }
+      return newUser.save()
+    }).then(function(user) {
+      reply({
+        message: 'User successfully added.',
+        userId: user._id
+      })
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      if (err.cause === 'user-not-found') {
+        return reply(Boom.badRequest("User account already exists with this email."))
+      }
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
   }
-
-  User.findOne({
-    email: email
-  }, resultCallback)
 }
 
 exports.putMe = {
@@ -141,30 +164,29 @@ exports.putMe = {
   handler: function(request, reply) {
     var id = request.auth.credentials._id
 
-    User.findById(id, function(err, user) {
-      if(err) {
-        request.log(['mongo'], err)
-        reply(Boom.badImplementation())
-      }
+    var user = User.findById(id)
+    user.then(function(user) {
       user.email = request.payload.email
       user.name = request.payload.name
-      user.save(function(err, updated) {
-        if (err) {
-          request.log(['mongo'], err)
-          return reply(Boom.badImplementation('There was a problem with the database'))
-        }
-        reply(updated)
-      })
+      return user.save()
+    }).then(function(user) {
+      reply(user)
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
     })
   }
 }
 
-exports.putUsers = {
+exports.putUser = {
   auth: 'jwt',
   app: {
     level: 'ADMIN'
   },
   validate: {
+    params: {
+      user: Joi.string().required()
+    },
     payload: {
       email: Joi.string().email(),
       name: Joi.string(),
@@ -174,135 +196,210 @@ exports.putUsers = {
   },
   handler: function(request, reply) {
     var id = User.getUserIdFromRequest(request)
-    User.findById(id, function(err, user) {
-      if(err) {
-        request.log(['mongo'], err)
-        reply(Boom.badImplementation())
-      }
+
+    var user = User.findById(id)
+    user.then(function(user) {
       user.email = request.payload.email
       user.name = request.payload.name
       user.role = request.payload.role
-      user.save(function(err, updated) {
-        if (err) {
-          request.log(['mongo'], err)
-          return reply(Boom.badImplementation('There was a problem with the database'))
-        }
-        reply(updated)
-      })
+      return user.save()
+    }).then(function(user) {
+      reply(user)
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
     })
   }
 }
 
-
-exports.delUsers = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  User.findById(id, function(err, user) {
-    if(err) {
-      request.log(['mongo'], err)
-      reply(Boom.badImplementation())
+exports.delUser = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      user: Joi.string().required()
     }
-    user.delete(function(err, savedUser) {
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+
+    var user = User.findById(id)
+    user.then(function(user) {
+      return Promise.fromNode(function (callback) {
+        user.delete(callback)
+      })
+    }).then(function(user) {
       reply()
-    })
-  })
-}
-
-// /login
-exports.postLogin = function(request, reply) {
-  var email = request.payload.email
-  var password = request.payload.password
-
-  User.findOne({ email: email }, function(err, user) {
-    if(err) {
+    }).catch(function (err) {
       request.log(['mongo'], err)
-      reply(Boom.badImplementation())
-    }
-    if (user) {
-      if (passwordHash.verify(password, user.password)) {
-        var token = jwt.sign(user._id, process.env.AUTH_SECRET, {
-          expiresInMinutes: 1440 // 24h
-        });
-
-        var log = new Log({
-          user: user,
-          timestamp: Math.round(Date.now() / 1000),
-          ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-          type: Log.types.LOGIN,
-        })
-        log.saveAsync()
-
-        reply({
-          message: 'Login successful.',
-          token: token
-        })
-
-      } else {
-        reply(Boom.unauthorized('Invalid email and password combination.'))
-      }
-    } else {
-      reply(Boom.unauthorized('Invalid email and password combination.'))
-    }
-  })
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
-exports.postRegistrylogin = function(request, reply) {
-  var username = request.payload.username
-  var password = request.payload.password
-
-  User.findOne({ username: username }).then(function (user) {
-    if (!user) {
-      return reply(Boom.badRequest())
+exports.postLogin = {
+  auth: false,
+  validate: {
+    payload: {
+      email: Joi.string().email().required(),
+      password: Joi.string().required()
     }
+  },
+  handler: function(request, reply) {
+    var email = request.payload.email
+    var password = request.payload.password
 
-    if (passwordHash.verify(password, user.password)) {
-      reply('ok')
+    var user = User.findOne({ email: email })
 
+    var token = user.then(function(user) {
+      if (!user) {
+        return Log.errors.NO_USER
+      }
+
+      if (!passwordHash.verify(password, user.password)) {
+        return Log.errors.INVALID_PASS
+      }
+
+      return jwt.sign(user._id, process.env.AUTH_SECRET, {
+        expiresInMinutes: 1440 // 24h
+      })
+    })
+
+    Promise.all([user, token]).spread(function(user, token) {
+      var error = null
+      if ((token === Log.errors.NO_USER) || (token === Log.errors.INVALID_PASS)) {
+        error = token
+      }
       var log = new Log({
         user: user,
         timestamp: Math.round(Date.now() / 1000),
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
-        type: 'Registry Login',
+        type: Log.types.LOGIN_FAIL,
+        data: [error]
       })
-      log.saveAsync()
+      log.save()
+    })
 
-    } else {
-      reply(Boom.badRequest())
-    }
-  }).catch(function () {
-    request.log(['mongo'], err)
-    reply(Boom.badImplementation())
-  })
-}
+    Promise.all([user, token]).spread(function(user, token) {
+      if ((token === Log.errors.NO_USER) || (token === Log.errors.INVALID_PASS)) {
+        throw new Promise.OperationalError(token)
+      }
 
-exports.getUserPayments = function(request, reply) {
-  var id = User.getUserIdFromRequest(request)
-  var role = request.auth.credentials.role
-
-  if ((role !== roles.ADMIN) && (id !== 'me') && (id !== request.auth.credentials._id)) {
-    return reply(Boom.unauthorized('You are not authorized to view other user\'s payments.'))
-  }
-
-  Payment.findByUserAndRole(id, role, function(err, payments) {
-    if (err) {
+      reply({
+        message: 'Login successful.',
+        token: token
+      })
+    }).error(function (err) {
       request.log(['mongo'], err)
-      return reply(Boom.badImplementation('There was a problem with the database'))
-    }
-
-    return reply(payments)
-  })
+      return reply(Boom.unauthorized('Invalid email and password combination.'))
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
-exports.getUserLogs = function (request, reply) {
-  var id = User.getUserIdFromRequest(request)
+exports.postRegistrylogin = {
+  auth: false,
+  validate: {
+    payload: {
+      username: Joi.string().required(),
+      password: Joi.string().required()
+    }
+  },
+  handler: function(request, reply) {
+    var username = request.payload.username
+    var password = request.payload.password
 
-  var logs = Log.find({
-    user: id
-  }).then(function (logs) {
-    reply(logs)
-  }).catch(function () {
-    request.log(['mongo'], err)
-    return reply(Boom.badImplementation())
-  })
+    var user = User.findOne({ username: username })
+    var result = user.then(function (user) {
+      if (!user) {
+        return Log.errors.NO_USER
+      }
+
+      if (passwordHash.verify(password, user.password)) {
+        return true
+      } else {
+        return Log.errors.INVALID_PASS
+      }
+    })
+
+    Promise.all([user, result]).spread(function(user, result) {
+      var error = null
+      if ((result === Log.errors.NO_USER) || (result === Log.errors.INVALID_PASS)) {
+        error = result
+      }
+
+       var log = new Log({
+         user: user,
+         timestamp: Math.round(Date.now() / 1000),
+         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
+         type: Log.types.REGISTRY_LOGIN,
+         data: [error]
+      })
+      log.save()
+    })
+
+    Promise.all([user, result]).spread(function(user, result) {
+      if ((result === Log.errors.NO_USER) || (result === Log.errors.INVALID_PASS)) {
+        throw new Promise.OperationalError(result)
+      }
+
+      reply('ok')
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.unauthorized('Invalid username and password combination.'))
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+   }
+}
+
+exports.getUserPayments = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required()
+     }
+  },
+  handler: function(request, reply) {
+    var id = User.getUserIdFromRequest(request)
+    var role = request.auth.credentials.role
+
+    Payment.findByUserAndRole(id, role).then(function(payments) {
+      reply(payments)
+    }).catch(function () {
+      request.log(['mongo'], err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
+exports.getUserLogs = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  validate: {
+    params: {
+      user: Joi.string().required()
+    }
+  },
+  handler: function (request, reply) {
+    var id = User.getUserIdFromRequest(request)
+
+    var logs = Log.find({
+      user: id
+    }).then(function (logs) {
+      reply(logs)
+    }).catch(function () {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+  }
 }
 
 exports.getVerifyUserEmail = {
@@ -343,6 +440,7 @@ exports.getVerifyUserEmail = {
         }
 
         reply({
+          status: 'OK',
           message: 'Verification email successfully sent.'
         })
       })
@@ -387,6 +485,7 @@ exports.getVerify = {
       return user.save()
     }).then(function(user) {
       reply({
+        status: 'OK',
         message: 'Account verified.'
       })
     }).error(function (err) {

@@ -12,5 +12,12 @@ module.exports = mongoose.model('log', schema)
 
 module.exports.types = {
   LOGIN: 'LOGIN',
-  VOUCHER_CLAIM: 'VOUCHER_CLAIM'
+  LOGIN_FAIL: 'LOGIN_FAIL',
+  VOUCHER_CLAIM: 'VOUCHER_CLAIM',
+  REGISTRY_LOGIN: 'REGISTRY_LOGIN'
+}
+
+module.exports.errors = {
+  NO_USER: 'NO_USER',
+  INVALID_PASS: 'INVALID_PASS'
 }

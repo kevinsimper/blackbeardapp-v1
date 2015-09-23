@@ -87,10 +87,10 @@ var Onboarding = React.createClass({
         <p>You are going to use your username like this:</p>
         <div className='Onboarding__Terminal'>
           <pre>
-            <code>$ docker login -u {this.state.username} registry.blackbeard.io</code>
+            <code>$ docker login -u {this.state.username || '[username]'} registry.blackbeard.io</code>
           </pre>
           <pre>
-            <code>$ docker push registry.blackbeard.io/{this.state.username}/container</code>
+            <code>$ docker push registry.blackbeard.io/{this.state.username || '[username]'}/container</code>
           </pre>
         </div>
         {this.state.success &&
