@@ -62,7 +62,7 @@ var Signup = React.createClass({
             status: res.body.message
           })
         } else {
-          self.login()
+          self.login(info)
         }
       })
   },

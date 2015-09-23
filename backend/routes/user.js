@@ -135,15 +135,15 @@ exports.postUser = {
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         role: roles.USER // Regular user account
       })
-      return newUser.save()
+      return newUser.saveAsync()
     }).then(function(user) {
       reply({
         message: 'User successfully added.',
-        userId: user._id
+        userId: user._id,
       })
     }).error(function (err) {
       request.log(['mongo'], err)
-      if (err.cause === 'user-not-found') {
+      if (err.cause === 'user-already-exists') {
         return reply(Boom.badRequest("User account already exists with this email."))
       }
     }).catch(function (err) {
