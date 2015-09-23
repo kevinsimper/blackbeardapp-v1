@@ -101,7 +101,6 @@ exports.postUserUsername = {
         reply(Boom.badImplementation())
       }
     })
-
   }
 }
 
@@ -120,8 +119,7 @@ exports.postUser = {
 
     var user = User.findOne({
       email: email
-    })
-    user.then(function(user) {
+    }).then(function(user) {
       if (user) {
         throw new Promise.OperationalError('user-already-exists')
       }
@@ -134,11 +132,36 @@ exports.postUser = {
         ip: request.headers['cf-connecting-ip'] || request.info.remoteAddress,
         role: roles.USER // Regular user account
       })
-      return newUser.saveAsync()
-    }).then(function(user) {
+
+      return newUser.save()
+    })
+
+    var send = user.then(function(user) {
+      return Mail.sendVerificationEmail(user)
+    }).then(function(send) {
+      if (send !== true) {
+        throw new Promise.OperationalError(send)
+      }
+
+      return true
+    }).error(function (err) {
+      request.log(['mongo'], err)
+      if (err.cause === 'user-not-found') {
+        return reply(Boom.notFound("User account could not be found."))
+      } else if (err.cause === 'already-verified') {
+        return reply(Boom.badRequest("User account is already verified."))
+      }
+      return reply(Boom.badImplementation())
+    }).catch(function (err) {
+      request.log(['mongo'], err)
+      return reply(Boom.badImplementation())
+    })
+
+    Promise.all([user, send]).spread(function(user, send) {
       reply({
         message: 'User successfully added.',
         userId: user._id,
+        email: send
       })
     }).error(function (err) {
       request.log(['mongo'], err)
