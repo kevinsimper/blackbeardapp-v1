@@ -77,7 +77,10 @@ Promise.all([mongo, rabbitmq]).then(function () {
           command: 'docker login -u worker -p ' + config.WORKER_PASSWORD + ' -e kevin.simper@gmail.com ' + registry + ' && docker pull ' + fullPath,
           privateKey: cluster.certificates.sshPrivate
         }, function (err, stdout) {
-          console.log(err)
+          if(err) {
+            console.log(err)
+            reject(err)
+          }
           console.log(stdout)
           resolve(stdout)
         })

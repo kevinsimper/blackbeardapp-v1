@@ -3,6 +3,8 @@ var actions = require('./actions')
 var request = require('superagent')
 var config = require('../../config')
 var findWhere = require('lodash/collection/findWhere')
+var reduce = require('lodash/collection/reduce')
+var filter = require('lodash/collection/filter')
 var remove = require('lodash/array/remove')
 
 var _containers = {}
@@ -31,6 +33,16 @@ var store = Reflux.createStore({
     } else {
       return _containers[app];
     }
+  },
+  getAll: function () {
+    return _containers
+  },
+  getAllActive: function () {
+    var activeContainers = reduce(_containers, function (result, container, app) {
+      result[app] = filter(container, {deleted: false})
+      return result
+    }, {})
+    return activeContainers
   },
   onDelOne: function(app, container) {
     remove(_containers[app], function(item) {

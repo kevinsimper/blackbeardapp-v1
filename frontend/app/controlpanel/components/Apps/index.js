@@ -1,30 +1,38 @@
 var React = require('react')
+var Reflux = require('reflux')
 var AppStore = require('../Apps/store')
 var AppActions = require('../Apps/actions')
+var ContainersStore = require('../Containers/store')
+var ContainersAction = require('../Containers/actions')
 var StatusIcon = require('../StatusIcon/')
 var filter = require('lodash/collection/filter')
 
 var getState = function() {
   return {
-    apps: AppStore.getApps()
+    apps: AppStore.getApps(),
+    containers: ContainersStore.getAllActive()
   };
 }
 
-var AppCreate = React.createClass({
+var Apps = React.createClass({
+  mixins: [Reflux.ListenerMixin],
   getInitialState: function() {
     return getState()
   },
   componentDidMount: function() {
-    AppActions.load()
-    this.unsubscribe = AppStore.listen(this.onChange)
-  },
-  componentWillUnmount: function() {
-    this.unsubscribe()
+    AppActions.load().then(function (apps) {
+      apps.forEach(function (app) {
+        ContainersAction.loadOne(app._id)
+      })
+    })
+    this.listenTo(AppStore, this.onChange)
+    this.listenTo(ContainersStore, this.onChange)
   },
   onChange: function() {
     this.setState(getState())
   },
   render: function() {
+    var self = this
     var activeApps = filter(this.state.apps, {deleted: false}) || []
     var deletedApps = filter(this.state.apps, {deleted: true}) || []
     return (
@@ -41,7 +49,7 @@ var AppCreate = React.createClass({
                     {app.name}
                     <div className='Apps__Containers'>
                       <small>
-                        {app.containers.length} containers running
+                        {self.state.containers[app._id] && self.state.containers[app._id].length} containers running
                       </small>
                     </div>
                   </div>
@@ -71,4 +79,4 @@ var AppCreate = React.createClass({
   }
 })
 
-module.exports = AppCreate
+module.exports = Apps
