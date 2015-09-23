@@ -192,8 +192,8 @@ server.register(require('hapi-auth-jwt2'), function(err) {
 
   server.route({
     method: 'POST',
-    path: '/users/{user}/username',
-    config: userRoutes.postUserUsername
+    path: '/users/{user}/onboarding',
+    config: userRoutes.postUserOnboarding
   })
   server.route({
     method: 'POST',

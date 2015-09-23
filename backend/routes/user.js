@@ -51,20 +51,22 @@ exports.getOneUser = {
   }
 }
 
-exports.postUserUsername = {
+exports.postUserOnboarding = {
   auth: 'jwt',
   validate: {
     params: {
-      user: Joi.string().required()
+      user: Joi.string().required(),
     },
     payload: {
-      username: Joi.string().required().min(3)
+      username: Joi.string().required().min(3),
+      country: Joi.string().required().length(2)
     }
   },
   handler: function(request, reply) {
     var id = User.getUserIdFromRequest(request)
     var role = request.auth.credentials.role
     var username = request.payload.username
+    var country = request.payload.country
 
     var user = User.findOneByRoleAsync(id, role)
 
@@ -85,9 +87,10 @@ exports.postUserUsername = {
 
     Promise.all([user, existing]).spread(function(user) {
       user.username = username
+      user.country = country
       user.save(function() {
         reply({
-          message: 'Username saved!'
+          message: 'Username and country saved!'
         })
       })
     })
