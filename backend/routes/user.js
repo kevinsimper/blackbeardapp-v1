@@ -145,29 +145,28 @@ exports.postUser = {
 
       return true
     }).error(function (err) {
-      request.log(['mongo'], err)
-      if (err.cause === 'user-not-found') {
-        return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'already-verified') {
-        return reply(Boom.badRequest("User account is already verified."))
-      }
-      return reply(Boom.badImplementation())
+      return err.cause
     }).catch(function (err) {
-      request.log(['mongo'], err)
-      return reply(Boom.badImplementation())
+      return false
     })
 
     Promise.all([user, send]).spread(function(user, send) {
+      if (send !== true) {
+        throw new Promise.OperationalError(send)
+      }
+
       reply({
         message: 'User successfully added.',
-        userId: user._id,
-        email: send
+        userId: user._id
       })
     }).error(function (err) {
       request.log(['mongo'], err)
       if (err.cause === 'user-already-exists') {
         return reply(Boom.badRequest("User account already exists with this email."))
+      } else if (err.cause === 'already-verified') {
+        return reply(Boom.badRequest("User account already verified."))
       }
+      return reply(Boom.badImplementation())
     }).catch(function (err) {
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
@@ -481,7 +480,7 @@ exports.getVerify = {
       }
 
       if (user.verified) {
-        throw new Promise.OperationalError('alread-verified')
+        throw new Promise.OperationalError('already-verified')
       }
 
       user.verified = true
@@ -495,7 +494,7 @@ exports.getVerify = {
       request.log(['mongo'], err)
       if (err.cause === 'user-not-found') {
         return reply(Boom.notFound("User account could not be found."))
-      } else if (err.cause === 'alread-verified') {
+      } else if (err.cause === 'already-verified') {
         return reply(Boom.badRequest("User account is already verified."))
       }
     }).catch(function (err) {

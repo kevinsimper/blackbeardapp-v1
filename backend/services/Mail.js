@@ -37,7 +37,7 @@ exports.sendVerificationEmail = function(user) {
   }
 
   if (user.verified) {
-    return 'alread-verified'
+    return 'already-verified'
   }
 
   var token = new Hashids("saltySALT", 64, "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789")
