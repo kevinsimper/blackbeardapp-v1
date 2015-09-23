@@ -7,6 +7,7 @@ var once = require('lodash/function/once')
 var _profile = {
   name: '',
   email: '',
+  country: '',
   verificationSendStatus: ''
 }
 
@@ -48,15 +49,23 @@ var store = Reflux.createStore({
       .set('Authorization', localStorage.token)
       .send({
         name: profile.name,
-        email: profile.email
+        email: profile.email,
+        country: profile.country
       })
       .end(function(err, res) {
-        actions.update.completed(res.body)
+        if (res.status === 200) {
+          actions.update.completed(res.body)
+        } else {
+          actions.update.failed(err)
+        }
       })
   },
   onUpdateCompleted: function(profile) {
     _profile = profile
     this.trigger(profile)
+  },
+  onUpdateFailed: function(error) {
+    this.trigger(_profile)
   },
   onVerifyUserEmail: function() {
     request.get(config.BACKEND_HOST + '/users/me/verifysend')
@@ -75,7 +84,7 @@ var store = Reflux.createStore({
 
     this.trigger(_profile)
   },
-  onVerifyUserEmailFailed: function(result) {
+  onVerifyUserEmailFailed: function(error) {
     _profile.verificationSendStatus = false
 
     this.trigger(_profile)

@@ -4,3 +4,29 @@
   padding-bottom: 1.5rem;
   margin-top: 1px;
 }
+
+.Profile__Email--Valid {
+  border: 1px solid green;
+}
+
+.Profile__Email--Invalid {
+  border: 1px solid red;
+}
+
+.Profile__Country--Valid {
+  border: 1px solid green;
+}
+
+.Profile__Country--Invalid {
+  border: 1px solid red;
+}
+
+.Profile__Name--Valid {
+  border: 1px solid green;
+  background-color: #FFF;
+}
+
+.Profile__Name--Invalid {
+  border: 1px solid red;
+  background-color: #FFF;
+}
