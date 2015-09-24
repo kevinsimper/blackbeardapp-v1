@@ -19,6 +19,7 @@ var schema = new mongoose.Schema({
   password: String,
   verified: { type: Boolean, default: false },
   verifyCode: String,
+  containerLimit: Number,
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
@@ -41,7 +42,7 @@ schema.statics.findOneByRole = function (id, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified')
+    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified', 'containerLimit')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
