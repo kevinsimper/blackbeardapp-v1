@@ -30,7 +30,7 @@ lab.experiment('Set system offline', function() {
     })
   })
 
-  lab.test('create user', function(done) {
+  lab.test('set to panic mode then back out of panic mode', function(done) {
     request({
       method: 'PUT',
       uri: appUrl + '/panic',
@@ -41,6 +41,20 @@ lab.experiment('Set system offline', function() {
       body: {
         state: false
       }
+    }).spread(function(response, body) {
+      expect(response.statusCode, 'to be', 200)
+
+      return request({
+        method: 'PUT',
+        uri: appUrl + '/panic',
+        json: true,
+        headers: {
+          'Authorization': adminToken
+        },
+        body: {
+          state: true
+        }
+      })
     }).spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
       done()
