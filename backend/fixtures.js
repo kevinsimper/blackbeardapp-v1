@@ -31,6 +31,7 @@ db.users.insert({
   "creditCards": [],
   "verified": false,
   "verifyCode": "wq9y8XnWjnbJAGPavwmXpVNq9Y2BAwWpaytJKDB6erMdQx38y7Z5kRgKzgJRQYGV",
+  "containerLimit": 20,
   "deleted": false,
   "__v": 0
 });
@@ -46,6 +47,7 @@ db.users.insert({
   "ip": "127.0.0.1",
   "role": "USER",
   "creditCards": [ObjectId("55b63553ec5d482b005cfbc6")],
+  "containerLimit": 20,
   "deleted": false,
   "__v": 0
 });

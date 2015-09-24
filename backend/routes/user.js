@@ -212,7 +212,8 @@ exports.putUser = {
       email: Joi.string().email(),
       name: Joi.string(),
       role: Joi.string(),
-      credit: Joi.number()
+      credit: Joi.number(),
+      containerLimit: Joi.number(),
     }
   },
   handler: function(request, reply) {
@@ -223,6 +224,7 @@ exports.putUser = {
       user.email = request.payload.email
       user.name = request.payload.name
       user.role = request.payload.role
+      user.containerLimit = request.payload.containerLimit
       return user.save()
     }).then(function(user) {
       reply(user)

@@ -63,6 +63,10 @@ var UserShow = React.createClass({
               <td><Input valueLink={this.linkState('credit')}/></td>
             </tr>
             <tr>
+              <td>Container Limit</td>
+              <td><Input valueLink={this.linkState('containerLimit')}/></td>
+            </tr>
+            <tr>
               <td>Role</td>
               <td>
                 <select valueLink={this.linkState('role')}>
