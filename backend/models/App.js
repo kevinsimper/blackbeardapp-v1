@@ -28,7 +28,7 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'timestamp', 'containers', 'image')
+    fields.push('name', 'timestamp', 'containers', 'image', 'environments')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
