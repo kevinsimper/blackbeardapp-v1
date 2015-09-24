@@ -13,7 +13,14 @@ var CreditcardsFormular = React.createClass({
   getInitialState: function() {
     return {
       loading: false,
-      error: false
+      error: false,
+      name: '',
+      country: '',
+      creditcard: '',
+      cvv: '',
+      expiryMonth: '',
+      expiryYear: '',
+      expires: ''
     }
   },
   onSubmit: function(e) {
@@ -36,7 +43,14 @@ var CreditcardsFormular = React.createClass({
     .then(function() {
       self.setState({
         loading: false,
-        error: false
+        error: false,
+        name: '',
+        country: '',
+        creditcard: '',
+        cvv: '',
+        expiryMonth: '',
+        expiryYear: '',
+        expires: ''
       })
     }).catch(function(err) {
       self.setState({
@@ -60,6 +74,9 @@ var CreditcardsFormular = React.createClass({
     })
   },
   render: function() {
+    var self = this
+
+
     var error = {
       border: "1px solid #f00",
       backgroundColor: "lighten(#f00, 40%)",
@@ -73,12 +90,17 @@ var CreditcardsFormular = React.createClass({
         <Input placeholder='Master Department Mastercard' valueLink={this.linkState('name')}/>
         <Label>Country</Label>
         <div>
-          <Input  valueLink={this.linkState('country')}/>
+          <Select valueLink={this.linkState('country')}>
+            <option value="">-</option>
+            {countries.all.map(function(country) {
+              return <option value={country.alpha2}>{country.name}</option>
+            })}
+          </Select>
         </div>
         <Label>Card Number</Label>
         <Input placeholder='1234-5678-9012-3456' valueLink={this.linkState('creditcard')}/>
         <Label>CCV</Label>
-        <Input  valueLink={this.linkState('cvv')}/>
+        <Input valueLink={this.linkState('cvv')}/>
         <Label>Expires</Label>
         <Input placeholder='MM/YY' value={this.state.expires} onChange={this.handleExpiryChange}/>
         <div>
