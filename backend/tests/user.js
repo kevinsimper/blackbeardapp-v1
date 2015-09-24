@@ -161,13 +161,16 @@ lab.experiment('/users', function() {
         body: {
           name: "User One v2",
           email: "user@blackbeard.io",
-          role: "USER"
+          role: "USER",
+          containerLimit: 100
         }
       })
     })
     .spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body.name, 'to be', "User One v2")
+      expect(body.email, 'to be', "user@blackbeard.io")
+      expect(body.containerLimit, 'to be', 100)
 
       done()
     })

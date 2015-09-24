@@ -19,7 +19,7 @@ var schema = new mongoose.Schema({
   password: String,
   verified: { type: Boolean, default: false },
   verifyCode: String,
-  containerLimit: Number,
+  containerLimit: {type: Number, default: 20},
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
