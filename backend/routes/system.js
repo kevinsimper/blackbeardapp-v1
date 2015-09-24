@@ -34,7 +34,6 @@ exports.panic = {
       request.log(['mongo'], err)
       return reply(Boom.badRequest('No Change'))
     }).catch(function (err) {
-      console.log(err)
       request.log(['mongo'], err)
       return reply(Boom.badImplementation())
     })

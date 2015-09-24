@@ -25,6 +25,9 @@ var ContainerFormular = React.createClass({
       .then(function() {
         self.transitionTo('/apps/' + self.props.params.id)
       })
+      .catch(function(err) {
+        alert("Blackbeard is temporarily unavailable. Please try again later.")
+      })
   },
   render: function() {
     return (
