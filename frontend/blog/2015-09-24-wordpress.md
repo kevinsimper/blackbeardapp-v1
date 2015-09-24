@@ -17,16 +17,17 @@ Once you have the image you can tag it with the blackbeard registry:
 And push it up to us:
 `docker push registry.blackbeard.io/jambroo/wordpress`
 
-If you don't have Google Cloud account you can sign up for one here: https://cloud.google.com/. They offer a free trial on their Cloud platform if you haven't previously signed up. There is extensive documentation on setting up and using this service: https://cloud.google.com/sql/docs/introduction
-
-Screenshot-5.png
-
-By clicking on Create Instance you will be presented with a form to set the region and tier. Once this is made you can set up the Instance ID, ........
+If you don't have Google Cloud account you can sign up for one here: https://cloud.google.com/. The following video by Google is really helpful in setting up a MySQL instance: https://www.youtube.com/watch?v=_kQXgjIfLgo
 
 Interface stuff to set env variables
+* WORDPRESS_DB_HOST
+* WORDPRESS_DB_USER
+* WORDPRESS_DB_PASSWORD
 
 Interface stuff to deploy
 
 Sources:
 https://hub.docker.com/_/wordpress/
+https://www.youtube.com/watch?v=_kQXgjIfLgo
+https://codex.wordpress.org/Editing_wp-config.php#Set_Database_Host
 http://www.sitepoint.com/database-as-a-service-mysql-in-the-cloud/
