@@ -3,18 +3,44 @@ var extend = require('lodash/object/extend')
 var Input = require('../Input')
 var Table = require('../Table')
 var Button = require('../Button')
+var request = require('superagent')
+var config = require('../../config')
 
 var AppEdit = React.createClass({
   getInitialState: function () {
     return {
       app: {},
-      variables: [{
-        key: 'NODE_ENV',
-        value: 'production'
-      }],
+      environments: [],
       key: '',
-      value: ''
+      value: '',
+      status: ''
     }
+  },
+  componentDidMount: function () {
+    var self = this
+    request
+      .get(config.BACKEND_HOST + '/users/me/apps/' + this.props.params.id)
+      .set('Authorization', localStorage.token)
+      .end(function(err, res) {
+        self.setState({
+          app: res.body,
+          environments: res.body.environments
+        })
+      })
+  },
+  saveEnvironments: function () {
+    var self = this
+    request
+      .patch(config.BACKEND_HOST + '/users/me/apps/' + this.props.params.id)
+      .set('Authorization', localStorage.token)
+      .send({
+        environments: this.state.environments
+      })
+      .end(function(err, res) {
+        self.setState({
+          status: 'OK'
+        })
+      })
   },
   onKeyChange: function (e) {
     this.setState({
@@ -28,16 +54,30 @@ var AppEdit = React.createClass({
   },
   onClickAdd: function () {
     this.setState({
-      variables: this.state.variables.concat([{key: this.state.key, value: this.state.value}]),
+      environments: this.state.environments.concat([{key: this.state.key, value: this.state.value}]),
       key: '',
       value: ''
     })
   },
   onClickDelete: function (variable) {
     this.setState({
-      variables: this.state.variables.filter(function (item) {
+      environments: this.state.environments.filter(function (item) {
         return item.key !== variable.key
       })
+    })
+  },
+  onClickSave: function () {
+    this.saveEnvironments()
+  },
+  onExistingValueChange: function (variable, e) {
+    var copy = this.state.environments.slice()
+    copy.forEach(function (item) {
+      if(item.key === variable.key) {
+        item.value = e.target.value
+      }
+    })
+    this.setState({
+      variables: copy
     })
   },
   render: function () {
@@ -54,14 +94,14 @@ var AppEdit = React.createClass({
             </tr>
           </thead>
           <tbody>
-            {this.state.variables.map(function (variable) {
+            {this.state.environments.map(function (variable) {
               return (
                 <tr className='AppEdit__Variable' key={variable.key}>
                   <td className='AppEdit__Variable__Key'>
                     {variable.key}
                   </td>
                   <td className='AppEdit__Variable__Value'>
-                    <Input type='text' value={variable.value} />
+                    <Input type='text' value={variable.value} onChange={self.onExistingValueChange.bind(null, variable)} />
                   </td>
                   <td>
                     <Button variant='danger' size='small' onClick={self.onClickDelete.bind(null, variable)}>Delete</Button>
@@ -82,7 +122,10 @@ var AppEdit = React.createClass({
             </tr>
           </tbody>
         </Table>
-
+        <Button onClick={this.onClickSave}>Save</Button>
+        <div>
+          {this.state.status}
+        </div>
       </div>
     )
   }
