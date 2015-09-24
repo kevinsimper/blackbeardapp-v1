@@ -30,7 +30,8 @@ var Store = Reflux.createStore({
         creditcard: item.creditcard,
         expiryMonth: item.expiryMonth,
         expiryYear: item.expiryYear,
-        cvv: item.cvv
+        cvv: item.cvv,
+        country: item.country
       })
       .end(function (err, res) {
         if (err) {

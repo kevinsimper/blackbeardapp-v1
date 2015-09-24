@@ -3,13 +3,17 @@ var extend = require('lodash/object/extend')
 var Input = require('../Input')
 var Button = require('../Button')
 var Label = require('../Label')
+var Select = require('../Select')
 var CreditcardsActions = require('../Creditcards/actions')
+var classNames = require('classnames')
+var countries = require('country-data').countries
 
 var CreditcardsFormular = React.createClass({
   mixins: [React.addons.LinkedStateMixin],
   getInitialState: function() {
     return {
-      loading: false
+      loading: false,
+      error: false
     }
   },
   onSubmit: function(e) {
@@ -19,13 +23,25 @@ var CreditcardsFormular = React.createClass({
       loading: true
     })
     var data = extend(this.state, {
-      expiryMonth: this.state.expires.split('/')[0],
-      expiryYear: this.state.expires.split('/')[1]
+      expiryMonth: '',
+      expiryYear: ''
     })
+    if (this.state.expires) {
+      data = extend(this.state, {
+        expiryMonth: this.state.expires.split('/')[0],
+        expiryYear: this.state.expires.split('/')[1]
+      })
+    }
     CreditcardsActions.new(data)
     .then(function() {
       self.setState({
-        loading: false
+        loading: false,
+        error: false
+      })
+    }).catch(function(err) {
+      self.setState({
+        loading: false,
+        error: true
       })
     })
   },
@@ -44,11 +60,21 @@ var CreditcardsFormular = React.createClass({
     })
   },
   render: function() {
+    var error = {
+      border: "1px solid #f00",
+      backgroundColor: "lighten(#f00, 40%)",
+      padding: "10px",
+      margin: "10px 0"
+    }
     return (
       <form className='Payment' onSubmit={this.onSubmit}>
         <h2>New Credit Card</h2>
         <Label>Name</Label>
         <Input placeholder='Master Department Mastercard' valueLink={this.linkState('name')}/>
+        <Label>Country</Label>
+        <div>
+          <Input  valueLink={this.linkState('country')}/>
+        </div>
         <Label>Card Number</Label>
         <Input placeholder='1234-5678-9012-3456' valueLink={this.linkState('creditcard')}/>
         <Label>CCV</Label>
@@ -59,6 +85,7 @@ var CreditcardsFormular = React.createClass({
           <Button>Create creditcard</Button>
         </div>
         {this.state.loading && <div>Loading ...</div>}
+        {this.state.error && <div style={error}>Invalid Credit Card details.</div>}
       </form>
     )
   }
