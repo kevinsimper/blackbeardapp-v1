@@ -55,6 +55,21 @@ exports.getAllApps = {
   }
 }
 
+exports.getOneApp = {
+  auth: 'jwt',
+  handler: function (request, reply) {
+    var user = User.getUserIdFromRequest(request)
+    var appId = request.params.app
+
+    App.findOne({_id: appId, user: user}).then(function (app) {
+      reply(app)
+    }).catch(function(e) {
+      request.log(['error'], e)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
 exports.postApp = {
   auth: 'jwt',
   validate: {
