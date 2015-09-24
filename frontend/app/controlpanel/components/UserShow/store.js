@@ -34,7 +34,8 @@ var store = Reflux.createStore({
       .send({
         role: user.role,
         email: user.email,
-        credit: user.credit
+        credit: user.credit,
+        containerLimit: user.containerLimit,
       })
       .end(function(err, res) {
         actions.save.completed(res.body)
