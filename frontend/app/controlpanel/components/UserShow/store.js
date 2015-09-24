@@ -29,7 +29,7 @@ var store = Reflux.createStore({
       })
   },
   onSave: function(user) {
-    request.put(config.BACKEND_HOST + '/users/' + user._id)
+    request.patch(config.BACKEND_HOST + '/users/' + user._id)
       .set('Authorization', localStorage.token)
       .send({
         role: user.role,
