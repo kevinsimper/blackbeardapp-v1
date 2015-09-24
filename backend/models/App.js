@@ -9,7 +9,7 @@ var schema = new mongoose.Schema({
   timestamp: String,
   containers: [{type: mongoose.Schema.Types.ObjectId, ref: 'container'}],
   image: {type: mongoose.Schema.Types.ObjectId, ref: 'image'},
-  environment: [{
+  environments: [{
     key: String,
     value: String
   }],
@@ -28,7 +28,7 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'timestamp', 'containers', 'image')
+    fields.push('name', 'timestamp', 'containers', 'image', 'environments')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {

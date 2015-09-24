@@ -55,6 +55,21 @@ exports.getAllApps = {
   }
 }
 
+exports.getOneApp = {
+  auth: 'jwt',
+  handler: function (request, reply) {
+    var user = User.getUserIdFromRequest(request)
+    var appId = request.params.app
+
+    App.findOne({_id: appId, user: user}).then(function (app) {
+      reply(app)
+    }).catch(function(e) {
+      request.log(['error'], e)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
 exports.postApp = {
   auth: 'jwt',
   validate: {
@@ -95,6 +110,37 @@ exports.postApp = {
     })
   }
 }
+
+exports.patchApp = {
+  auth: 'jwt',
+  validate: {
+    params: {
+      user: Joi.string().required(),
+      app: Joi.string().required()
+    },
+    payload: {
+      environments: Joi.array()
+    }
+  },
+  handler: function(request, reply) {
+    var user = User.getUserIdFromRequest(request)
+    var appId = request.params.app
+    var environments = request.payload.environments
+
+    App.findOne({_id: appId, user: user}).then(function (app) {
+      if(environments) {
+        app.environments = environments
+      }
+      return app.save()
+    }).then(function(app) {
+      reply(app)
+    }).catch(function(e) {
+      request.log(['error'], e)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
 
 exports.deleteApp = function(request, reply) {
   var id = request.params.app
@@ -186,34 +232,12 @@ exports.getUserBillingPerDay = {
       var to = moment(request.query.to)
 
       var userBilling = Billing.getBillableHoursPerAppWithDays(app, from, to)
-      userBilling.then(function(userBilling) {
+      return userBilling.then(function(userBilling) {
         reply(userBilling)
       })
-    })
-  }
-}
-
-exports.postEnvVar = {
-  auth: 'jwt',
-  validate: {
-    params: {
-      user: Joi.string().required(),
-      app: Joi.string().required()
-    },
-    payload: {
-      variables: Joi.array().required()
-    }
-  },
-  handler: function(request, reply) {
-    var user = User.getUserIdFromRequest(request)
-    var appId = request.params.app
-    var variables = request.payload.variables
-
-    App.findOne({_id: appId, user: user}).then(function(app) {
-      app.environment = variables
-      return app.save()
-    }).then(function(app) {
-      reply(app)
+    }).catch(function(e) {
+      request.log(['error'], e)
+      reply(Boom.badImplementation())
     })
   }
 }

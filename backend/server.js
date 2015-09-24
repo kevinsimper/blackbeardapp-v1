@@ -409,9 +409,14 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     }
   })
   server.route({
-    method: 'POST',
-    path: '/users/{user}/apps/{app}/env',
-    config: appRoutes.postEnvVar
+    method: 'PATCH',
+    path: '/users/{user}/apps/{app}',
+    config: appRoutes.patchApp
+  })
+  server.route({
+    method: 'GET',
+    path: '/users/{user}/apps/{app}',
+    config: appRoutes.getOneApp
   })
 
   server.route({

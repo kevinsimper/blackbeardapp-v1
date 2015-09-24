@@ -211,9 +211,9 @@ lab.experiment('/users/me/apps/containers', function() {
       done()
     })
   })
-  lab.test('POST env', function(done) {
+  lab.test('PATCH environments', function(done) {
     var requestData = {
-      variables: [
+      environments: [
         {
           key: 'LOGGLY_HOSTNAME',
           value: 'blackbeard.io'
@@ -229,15 +229,15 @@ lab.experiment('/users/me/apps/containers', function() {
       ]
     }
     request({
-      method: 'POST',
-      uri: appUrl + '/users/me/apps/' + appId + '/env',
+      method: 'PATCH',
+      uri: appUrl + '/users/me/apps/' + appId,
       headers: {
         Authorization: token
       },
       json: true,
       body: requestData
     }, function(error, response, body) {
-      console.log(body)
+      expect(body.environments, 'to satisfy', requestData.environments)
       done()
     })
   })
