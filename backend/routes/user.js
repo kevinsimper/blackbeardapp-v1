@@ -272,7 +272,7 @@ exports.postLogin = {
     var email = request.payload.email
     var password = request.payload.password
 
-    var user = User.findOne({ email: email })
+    var user = User.findOne({ email: email, deleted: false })
 
     var token = user.then(function(user) {
       if (!user) {
@@ -334,7 +334,7 @@ exports.postRegistrylogin = {
     var username = request.payload.username
     var password = request.payload.password
 
-    var user = User.findOne({ username: username })
+    var user = User.findOne({ username: username, deleted: false })
     var result = user.then(function (user) {
       if (!user) {
         return Log.errors.NO_USER
