@@ -42,6 +42,9 @@ var Dashboard = React.createClass({
   onClickCreate: function () {
     this.transitionTo('/apps/create')
   },
+  onClickCreditCard: function () {
+    this.transitionTo('/profile')
+  },
   onClickVerify: function () {
     var self = this
     this.setState({
@@ -61,6 +64,11 @@ var Dashboard = React.createClass({
       })
   },
   render: function() {
+    var creditCardCount = 0
+    if (this.state.profile.creditCards) {
+      creditCardCount = this.state.profile.creditCards.length
+    }
+
     if(!this.state.loaded) {
       return <div/>
     }
@@ -90,6 +98,12 @@ var Dashboard = React.createClass({
           this.state.profile.verificationSendStatus === true &&
           <div style={{fontWeight: 'bold', marginBottom: '1em'}}>
             Verification email sent.
+          </div>
+        }
+        {!creditCardCount &&
+          <div style={{marginBottom: '1em'}}>
+            <div>To deploy containers on Blackbeard you need to supply a credit card!</div>
+            <Button onClick={this.onClickCreditCard}>Enter Card Details</Button>
           </div>
         }
         {this.state.apps.length === 0 &&
