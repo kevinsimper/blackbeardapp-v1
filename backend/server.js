@@ -216,9 +216,9 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     config: userRoutes.putMe
   })
   server.route({
-    method: 'PUT',
+    method: 'PATCH',
     path: '/users/{user}',
-    config: userRoutes.putUser
+    config: userRoutes.patchUser
   })
   server.route({
     method: 'DELETE',

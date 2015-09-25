@@ -42,7 +42,7 @@ schema.statics.findOneByRole = function (id, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified', 'containerLimit', 'country')
+    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified', 'containerLimit')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {

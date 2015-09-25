@@ -169,7 +169,7 @@ lab.experiment('/users', function() {
       expect(body.email, 'to be', testUserEmail)
 
       return request({
-        method: 'PUT',
+        method: 'PATCH',
         uri: appUrl + '/users/559396be05974b0c00b6b282',
         json: true,
         headers: {
@@ -179,7 +179,6 @@ lab.experiment('/users', function() {
           name: "User One v2",
           email: "user@blackbeard.io",
           containerLimit: 100,
-          country: "AU",
           role: "USER"
         }
       })
