@@ -209,9 +209,9 @@ exports.patchUser = {
       user: Joi.string().required()
     },
     payload: {
-      email: Joi.string().email().required(),
-      name: Joi.string().min(3).required(),
-      role: Joi.string().required(),
+      email: Joi.string().email(),
+      name: Joi.string().min(3),
+      role: Joi.string(),
       containerLimit: Joi.number()
     }
   },

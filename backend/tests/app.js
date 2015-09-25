@@ -193,9 +193,6 @@ lab.experiment('/users/me/apps/containers', function() {
       })
   })
   lab.test('POST', function(done) {
-    var requestData = {
-      region: 'eu'
-    }
     request({
       method: 'POST',
       uri: appUrl + '/users/me/apps/' + appId + '/containers',
@@ -203,12 +200,45 @@ lab.experiment('/users/me/apps/containers', function() {
         Authorization: token
       },
       json: true,
-      body: requestData
+      body: {
+        region: 'eu'
+      }
     }, function(error, response, body) {
       expect(response.statusCode, 'to be', 200)
       expect(body.status, 'to be', 'DEPLOYING')
       containerId = body._id
       done()
+    })
+  })
+  lab.test('Reject if too many containers', function(done) {
+    var TEST_USER_ID = '559396be05974b0c00b6b282'
+    request({
+      method: 'PATCH',
+      uri: appUrl + '/users/' + TEST_USER_ID,
+      json: true,
+      headers: {
+        'Authorization': adminToken
+      },
+      body: {
+        containerLimit: 1
+      }
+    }).spread(function (response, body) {
+      expect(body.containerLimit, 'to be', 1)
+
+      return request({
+        method: 'POST',
+        uri: appUrl + '/users/me/apps/' + appId + '/containers',
+        headers: {
+          Authorization: token
+        },
+        json: true,
+        body: {
+          region: 'eu'
+        }
+      })
+    }).spread(function (response, body) {
+      expect(response.statusCode, 'to be', 400)
+     done()
     })
   })
   lab.test('PATCH environments', function(done) {
