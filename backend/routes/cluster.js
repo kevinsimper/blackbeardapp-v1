@@ -144,6 +144,38 @@ exports.getClusterStatus = {
   }
 }
 
+exports.getAllClusterStatus = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  handler: function (request, reply) {
+    var id = request.params.cluster
+
+    var statuses = Cluster.find().then(function (clusters) {
+      if(!clusters || (clusters.length === 0)) {
+        throw new Promise.OperationalError('no-clusters')
+      }
+
+      return _.map(clusters, function(cluster) {
+        return ClusterService.request(cluster, '/info')
+      })
+    })
+
+    Promise.all(statuses).then(function(results) {
+      reply(_.map(results, function (result) {
+        return result[1]
+      }))
+    }).error(function (err) {
+      request.log(['error'], err)
+      reply(Boom.notFound())
+    }).catch(function (err) {
+      request.log(['error'], err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
 exports.getClusterContainers = {
   auth: 'jwt',
   app: {
