@@ -61,7 +61,7 @@ var Onboarding = React.createClass({
   },
   inputClassesUsername: function () {
     return classNames('Onboarding__Username', {
-      'Onboarding__Username--Valid': this.state.username.length > 0 && this.state.username.length > 3,
+      'Onboarding__Username--Valid': this.state.username.length > 3,
       'Onboarding__Username--Invalid': this.state.error && this.state.username.length < 3
     })
   },

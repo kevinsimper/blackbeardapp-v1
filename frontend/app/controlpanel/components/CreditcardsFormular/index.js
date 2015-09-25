@@ -79,7 +79,6 @@ var CreditcardsFormular = React.createClass({
 
     var error = {
       border: "1px solid #f00",
-      backgroundColor: "lighten(#f00, 40%)",
       padding: "10px",
       margin: "10px 0"
     }

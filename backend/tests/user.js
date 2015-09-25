@@ -178,7 +178,7 @@ lab.experiment('/users', function() {
         body: {
           name: "User One v2",
           email: "user@blackbeard.io",
-          containerLimit: 100
+          containerLimit: 100,
           country: "AU",
           role: "USER"
         }

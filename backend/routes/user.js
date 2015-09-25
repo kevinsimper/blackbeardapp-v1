@@ -212,7 +212,7 @@ exports.putUser = {
       email: Joi.string().email().required(),
       name: Joi.string().min(3).required(),
       role: Joi.string().required(),
-      country: Joi.string().required()
+      country: Joi.string().required(),
       containerLimit: Joi.number()
     }
   },
