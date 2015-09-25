@@ -16,14 +16,14 @@ exports.postContainer = function(request, reply) {
   var region = request.payload.region
 
   var systemState = System.findOne().then(function(system) {
-    return system.state
-  })
-
-  var app = systemState.then(function(systemState) {
     if (!systemState) {
       throw new Promise.OperationalError('panic')
     }
 
+    return system.state
+  })
+
+  var app = systemState.then(function(systemState) {
     return App.findById(appId)
   })
 
