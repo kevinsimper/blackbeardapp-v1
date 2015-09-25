@@ -60,7 +60,7 @@ var UserShow = React.createClass({
             </tr>
             <tr>
               <td>Credit</td>
-              <td><Input valueLink={this.linkState('credit')}/></td>
+              <td>{this.state.credit}</td>
             </tr>
             <tr>
               <td>Container Limit</td>
