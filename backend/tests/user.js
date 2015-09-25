@@ -117,7 +117,8 @@ lab.experiment('/users', function() {
   lab.test('PUT /me', function(done) {
     var requestData = {
       email: 'updated@blackbeard.io',
-      name: 'Mary Ormond'
+      name: 'Mary Ormond',
+      country: 'US'
     }
 
     request({
@@ -143,7 +144,8 @@ lab.experiment('/users', function() {
         },
         body: {
           name: 'Blackbeard',
-          email: testUserEmail
+          email: testUserEmail,
+          country: 'DK'
         }
       })
     })
@@ -161,8 +163,9 @@ lab.experiment('/users', function() {
         body: {
           name: "User One v2",
           email: "user@blackbeard.io",
-          role: "USER",
           containerLimit: 100
+          country: "AU",
+          role: "USER"
         }
       })
     })
