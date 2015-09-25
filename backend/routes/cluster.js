@@ -150,7 +150,7 @@ exports.getAllClusterUsage = {
     level: 'ADMIN'
   },
   handler: function (request, reply) {
-    var clusters = Cluster.find()
+    var clusters = Cluster.find({type: {'$ne': 'test_swarm'}})
 
     var clusterContainers = clusters.then(function(clusters) {
       if(!clusters || (clusters.length === 0)) {

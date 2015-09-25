@@ -43,7 +43,6 @@ lab.before(function(done) {
 })
 
 lab.test('GET cluster/status', function (done) {
-  console.log(appUrl + '/clusters/' + clusterId + '/status')
   request({
     method: 'GET',
     uri: appUrl + '/clusters/' + clusterId + '/status',
@@ -66,9 +65,9 @@ lab.test('GET all clusters usage', function(done) {
       'Authorization': adminToken
     }
   }).spread(function(response, body) {
-    expect(body.results.length, 'to be', 2)
-    expect(body.memoryUsed, 'to be', 512)
-    expect(body.count, 'to be', 1)
+    expect(body.results.length, 'to be', 1)
+    expect(body.memoryUsed, 'to be', 0)
+    expect(body.count, 'to be', 0)
     done()
   })
 })
