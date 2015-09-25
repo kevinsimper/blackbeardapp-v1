@@ -144,28 +144,63 @@ exports.getClusterStatus = {
   }
 }
 
-exports.getAllClusterStatus = {
+exports.getAllClusterUsage = {
   auth: 'jwt',
   app: {
     level: 'ADMIN'
   },
   handler: function (request, reply) {
-    var id = request.params.cluster
+    var clusters = Cluster.find()
 
-    var statuses = Cluster.find().then(function (clusters) {
+    var clusterContainers = clusters.then(function(clusters) {
       if(!clusters || (clusters.length === 0)) {
         throw new Promise.OperationalError('no-clusters')
       }
 
       return _.map(clusters, function(cluster) {
-        return ClusterService.request(cluster, '/info')
+        return Container.find({
+          cluster: cluster._id,
+          deleted: false
+        })
       })
     })
 
-    Promise.all(statuses).then(function(results) {
-      reply(_.map(results, function (result) {
-        return result[1]
+    var usages = Promise.all(clusterContainers).then(function(clusterContainers) {
+      return _.map(clusterContainers, function (containers) {
+        var used = _.sum(containers.map(function (container) {
+          return container.memory
+        }))
+
+        return {
+          memoryUsed: used,
+          count: containers ? containers.length : 0
+        }
+      })
+    })
+
+    clusters.then(function(clusters) {
+      return Promise.all(usages).then(function(usages) {
+        return _.map(clusters, function(cluster, i) {
+          var usage = usages[i]
+          return {
+            cluster: cluster._id,
+            memoryUsed: usage.memoryUsed,
+            count: usage.count
+          }
+        })
+      })
+    }).then(function(result) {
+      var memoryTotal = _.sum(_.map(result, function(cluster) {
+        return cluster.memoryUsed
       }))
+      var countTotal = _.sum(_.map(result, function(cluster) {
+        return cluster.count
+      }))
+      reply({
+        results: result,
+        memoryUsed: memoryTotal,
+        count: countTotal
+      })
     }).error(function (err) {
       request.log(['error'], err)
       reply(Boom.notFound())

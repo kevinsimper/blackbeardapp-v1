@@ -57,6 +57,22 @@ lab.test('GET cluster/status', function (done) {
   })
 })
 
+lab.test('GET all clusters usage', function(done) {
+  request({
+    method: 'GET',
+    uri: appUrl + '/clusters/usage',
+    json: true,
+    headers: {
+      'Authorization': adminToken
+    }
+  }).spread(function(response, body) {
+    expect(body.results.length, 'to be', 2)
+    expect(body.memoryUsed, 'to be', 512)
+    expect(body.count, 'to be', 1)
+    done()
+  })
+})
+
 lab.test('GET cluster/containers', function (done) {
   request({
     method: 'GET',
