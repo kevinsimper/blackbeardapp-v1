@@ -213,7 +213,7 @@ exports.putUser = {
       name: Joi.string(),
       role: Joi.string(),
       credit: Joi.number(),
-      containerLimit: Joi.number(),
+      containerLimit: Joi.number()
     }
   },
   handler: function(request, reply) {
