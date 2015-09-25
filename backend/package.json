@@ -17,6 +17,7 @@
     "bluebird": "2.9.34",
     "boom": "2.7.1",
     "code": "1.4.0",
+    "country-data": "0.0.23",
     "crypto": "0.0.3",
     "debug": "2.2.0",
     "good": "6.3.0",

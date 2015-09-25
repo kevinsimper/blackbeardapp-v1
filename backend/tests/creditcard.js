@@ -32,26 +32,25 @@ lab.experiment('/users/{id}/creditcards', function () {
   })
 
   lab.test('POST', function (done) {
-    var requestData = {
-      name: 'New Card',
-      creditcard: '4111111111111111',
-      expiryMonth: '06',
-      expiryYear: '2018',
-      cvv: '123'
-    }
     request({
-        method: 'POST',
-        uri: appUrl + '/users/me/creditcards',
-        headers: {
-          'Authorization': adminToken
-        },
-        json: true,
-        body: requestData
+      method: 'POST',
+      uri: appUrl + '/users/me/creditcards',
+      headers: {
+        'Authorization': adminToken
       },
-      function (error, response, body) {
-        expect(response.statusCode, 'to be', 200)
-        done()
-      })
+      json: true,
+      body: {
+        name: 'New Card',
+        creditcard: '4111111111111111',
+        expiryMonth: '06',
+        expiryYear: '2018',
+        cvv: '123',
+        country: 'DK'
+      }
+    }).spread(function(response, body) {
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
   })
 
   // TODO
@@ -85,7 +84,8 @@ lab.experiment('/users/{id}/creditcards', function () {
       creditcard: '4000000000000002',
       expiryMonth: '01',
       expiryYear: '2019',
-      cvv: '456'
+      cvv: '456',
+      country: 'AU'
     }
     request({
         method: 'POST',

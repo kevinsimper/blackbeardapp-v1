@@ -4,12 +4,14 @@ var ProfileStore = require('./store')
 var Label = require('../../components/Label/')
 var Input = require('../../components/Input/')
 var Button = require('../../components/Button/')
+var Select = require('../Select')
 var CreditcardsFormular = require('../../components/CreditcardsFormular/')
 var Creditcards = require('../../components/Creditcards/')
 var PreviousPayments = require('../PreviousPayments/')
 var VoucherClaim = require('../VoucherClaim/')
 var ProfileActions = require('./actions')
 var moment = require('moment')
+var classes = require('classnames')
 
 var Profile = React.createClass({
   getState: function() {
@@ -51,17 +53,32 @@ var Profile = React.createClass({
           message: 'Updated'
         })
       })
+      .catch(function(err) {
+        self.setState({
+          loading: false,
+          message: 'Failed'
+        })
+      })
   },
   render: function() {
+    var self = this
+    var nameClasses = classes('Input', {
+      'Profile__Name--Valid': this.state.name,
+      'Profile__Name--Invalid': !this.state.name
+    })
+    var emailClasses = classes('Input', {
+      'Profile__Email--Valid': this.state.email,
+      'Profile__Email--Invalid': !this.state.email
+    })
     return (
       <div>
         <div className='Profile__block'>
           <form onSubmit={this.onSubmit}>
             <h1>Profile</h1>
             <Label>Name</Label>
-            <Input type='text' value={this.state.name} onChange={this.handleNameChange}/>
+            <Input type='text' value={this.state.name} className={nameClasses} onChange={this.handleNameChange}/>
             <Label>E-mail</Label>
-            <Input type='text' value={this.state.email} onChange={this.handleEmailChange}/>
+            <Input type='text' value={this.state.email} className={emailClasses} onChange={this.handleEmailChange}/>
             <Label>Docker Registry Username</Label>
             <Input type='text' value={this.state.username} disabled='disabled'/>
             <div>

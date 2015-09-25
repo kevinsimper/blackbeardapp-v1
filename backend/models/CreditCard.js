@@ -8,6 +8,7 @@ var schema = new mongoose.Schema({
   brand: String,
   expiryYear: String,
   token: String,
+  country: String,
   active:  { type: Boolean, default: false },
   deleted: { type: Boolean, default: false },
   deletedAt: String
@@ -23,7 +24,7 @@ var getFieldsAndConditions = function (role) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'number', 'brand', 'active')
+    fields.push('name', 'number', 'brand', 'active', 'country')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {

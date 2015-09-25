@@ -51,12 +51,19 @@ var store = Reflux.createStore({
         email: profile.email
       })
       .end(function(err, res) {
-        actions.update.completed(res.body)
+        if (res.status === 200) {
+          actions.update.completed(res.body)
+        } else {
+          actions.update.failed(err)
+        }
       })
   },
   onUpdateCompleted: function(profile) {
     _profile = profile
     this.trigger(profile)
+  },
+  onUpdateFailed: function(error) {
+    this.trigger(_profile)
   },
   onVerifyUserEmail: function() {
     request.get(config.BACKEND_HOST + '/users/me/verifysend')
@@ -75,7 +82,7 @@ var store = Reflux.createStore({
 
     this.trigger(_profile)
   },
-  onVerifyUserEmailFailed: function(result) {
+  onVerifyUserEmailFailed: function(error) {
     _profile.verificationSendStatus = false
 
     this.trigger(_profile)
