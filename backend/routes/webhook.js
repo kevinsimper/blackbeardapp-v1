@@ -1,6 +1,7 @@
 var Promise = require('bluebird')
-var Image = Promise.promisifyAll(require('../models/Image'))
-var User = Promise.promisifyAll(require('../models/User'))
+var Image = require('../models/Image')
+var User = require('../models/User')
+var System = require('../models/System')
 var Boom = require('boom')
 var Queue = require('../services/Queue')
 
@@ -9,14 +10,24 @@ exports.postNotifyImage = function(request, reply) {
   var name = request.payload.name
   var dockerContentDigest = request.payload.dockerContentDigest
 
-  var user = User.findOneAsync({username: username}).then(function(user) {
-    if (!user) {
-      throw new Promise.OperationalError("User not found")
+  var timestamp = Math.round(Date.now() / 1000)
+
+  var system = System.findOne().then(function(system) {
+    if (!system.state) {
+      throw new Promise.OperationalError('panic')
     }
-    return user
+
+    return system
   })
 
-  var timestamp = Math.round(Date.now() / 1000)
+  var user = system.then(function(systemState) {
+    return User.findOne({username: username}).then(function(user) {
+      if (!user) {
+        throw new Promise.OperationalError("User not found")
+      }
+      return user
+    })
+  })
 
   var image = user.then(function() {
     return Image.findOne({ name: name })
