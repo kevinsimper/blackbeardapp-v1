@@ -2,6 +2,7 @@ var Promise = require('bluebird')
 var User = require('../models/User')
 var App = Promise.promisifyAll(require('../models/App'))
 var Container = require('../models/Container')
+var System = require('../models/System')
 var Boom = require('boom')
 var _ = require('lodash')
 var moment = require('moment')
@@ -14,11 +15,21 @@ exports.postContainer = function(request, reply) {
   var user = User.getUserIdFromRequest(request)
   var region = request.payload.region
 
-  var app = App.findById(appId)
+  var systemState = System.findOne().then(function(system) {
+    if (!systemState) {
+      throw new Promise.OperationalError('panic')
+    }
+
+    return system.state
+  })
+
+  var app = systemState.then(function(systemState) {
+    return App.findById(appId)
+  })
 
   var container = app.then(function(app) {
     if(!app) {
-      throw new Promise.OperationalError('could not find app')
+      throw new Promise.OperationalError('not-found')
     }
     // NOTE: Memory limit here is defaulted to 512mb
     return new Container({
@@ -47,6 +58,9 @@ exports.postContainer = function(request, reply) {
     reply(container)
   }).error(function (err) {
     request.log(['mongo'], err)
+    if (err.message === 'panic') {
+      return reply(Boom.forbidden())
+    }
     return reply(Boom.notFound())
   }).catch( function (err) {
     request.log(['mongo'], err)

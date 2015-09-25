@@ -112,3 +112,9 @@ db.containers.insert({
   "cluster": ObjectId("555cb1e2fc27fe6f5f540002"),
   "__v": 0
 });
+db.systems.insert({
+  "_id" : ObjectId("5603f7d2fafe52010047d03f"),
+  "state" : true,
+  "logs" : [],
+  "__v" : 1
+})

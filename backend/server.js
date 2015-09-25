@@ -29,6 +29,7 @@ var voucherRoutes = require('./routes/voucher')
 var billingRoutes = require('./routes/billing')
 var containerRoutes = require('./routes/container')
 var registryRoutes = require('./routes/registry')
+var systemRoutes = require('./routes/system')
 
 console.log('NODE_ENV', process.env.NODE_ENV)
 
@@ -105,6 +106,12 @@ server.register(require('hapi-auth-jwt2'), function(err) {
         });
       }
     }
+  })
+
+  server.route({
+    method: 'PUT',
+    path: '/panic',
+    config: systemRoutes.panic
   })
 
   server.route({
