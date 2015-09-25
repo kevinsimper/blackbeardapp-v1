@@ -7,7 +7,6 @@ var schema = new mongoose.Schema({
   email: String,
   name: String,
   username: String,
-  country: String,
   credit: Number,
   virtualCredit: Number,
   timestamp: String,

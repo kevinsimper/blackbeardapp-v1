@@ -58,15 +58,13 @@ exports.postUserOnboarding = {
       user: Joi.string().required(),
     },
     payload: {
-      username: Joi.string().required().min(3),
-      country: Joi.string().required().length(2)
+      username: Joi.string().required().min(3)
     }
   },
   handler: function(request, reply) {
     var id = User.getUserIdFromRequest(request)
     var role = request.auth.credentials.role
     var username = request.payload.username
-    var country = request.payload.country
 
     var user = User.findOneByRoleAsync(id, role)
 
@@ -87,10 +85,9 @@ exports.postUserOnboarding = {
 
     Promise.all([user, existing]).spread(function(user) {
       user.username = username
-      user.country = country
       user.save(function() {
         reply({
-          message: 'Username and country saved!'
+          message: 'Username saved!'
         })
       })
     })
@@ -182,8 +179,7 @@ exports.putMe = {
   validate: {
     payload: {
       email: Joi.string().email().required(),
-      name: Joi.string().min(3).required(),
-      country: Joi.string().length(2).required()
+      name: Joi.string().min(3).required()
     }
   },
   handler: function(request, reply) {
@@ -193,7 +189,6 @@ exports.putMe = {
     user.then(function(user) {
       user.email = request.payload.email
       user.name = request.payload.name
-      user.country = request.payload.country
       return user.save()
     }).then(function(user) {
       reply(user)
@@ -218,7 +213,7 @@ exports.putUser = {
       name: Joi.string().min(3).required(),
       role: Joi.string().required(),
       country: Joi.string().required()
-      containerLimit: Joi.number(),
+      containerLimit: Joi.number()
     }
   },
   handler: function(request, reply) {

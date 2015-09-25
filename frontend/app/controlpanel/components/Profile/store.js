@@ -7,7 +7,6 @@ var once = require('lodash/function/once')
 var _profile = {
   name: '',
   email: '',
-  country: '',
   verificationSendStatus: ''
 }
 
@@ -49,8 +48,7 @@ var store = Reflux.createStore({
       .set('Authorization', localStorage.token)
       .send({
         name: profile.name,
-        email: profile.email,
-        country: profile.country
+        email: profile.email
       })
       .end(function(err, res) {
         if (res.status === 200) {

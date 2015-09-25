@@ -12,7 +12,6 @@ var VoucherClaim = require('../VoucherClaim/')
 var ProfileActions = require('./actions')
 var moment = require('moment')
 var classes = require('classnames')
-var countries = require('country-data').countries
 
 var Profile = React.createClass({
   getState: function() {
@@ -39,11 +38,6 @@ var Profile = React.createClass({
   handleEmailChange: function(e) {
     this.setState({
       email: e.target.value
-    })
-  },
-  handleCountryChange: function(e) {
-    this.setState({
-      country: e.target.value
     })
   },
   onSubmit: function(e) {
@@ -76,10 +70,6 @@ var Profile = React.createClass({
       'Profile__Email--Valid': this.state.email,
       'Profile__Email--Invalid': !this.state.email
     })
-    var countryClasses = classes('Input', {
-      'Profile__Country--Valid': this.state.country,
-      'Profile__Country--Invalid': !this.state.country
-    })
     return (
       <div>
         <div className='Profile__block'>
@@ -89,13 +79,6 @@ var Profile = React.createClass({
             <Input type='text' value={this.state.name} className={nameClasses} onChange={this.handleNameChange}/>
             <Label>E-mail</Label>
             <Input type='text' value={this.state.email} className={emailClasses} onChange={this.handleEmailChange}/>
-            <Label>Country</Label>
-            <Select className={countryClasses} onChange={this.handleCountryChange}>
-              <option value="">-</option>
-              {countries.all.map(function(country) {
-                return <option selected={country.alpha2 == self.state.country} value={country.alpha2}>{country.name}</option>
-              })}
-            </Select>
             <Label>Docker Registry Username</Label>
             <Input type='text' value={this.state.username} disabled='disabled'/>
             <div>

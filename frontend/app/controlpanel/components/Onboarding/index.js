@@ -6,13 +6,11 @@ var Select = require('../Select')
 var request = require('superagent')
 var config = require('../../config')
 var classNames = require('classnames')
-var countries = require('country-data').countries
 
 var Onboarding = React.createClass({
   getInitialState: function() {
     return {
       username: '',
-      country: false,
       status: '',
       error: '',
       success: false
@@ -23,28 +21,13 @@ var Onboarding = React.createClass({
       username: e.target.value
     })
   },
-  onChangeCountry: function(e) {
-    this.setState({
-      country: e.target.value
-    })
-  },
   onClickSave: function(e) {
     e.preventDefault()
     var self = this
 
-    if (this.state.country === false) {
-      this.state.country = ''
-    }
-
-    if ((this.state.username.length === 0) || (this.state.country === '')) {
-      var field = 'username'
-      if ((this.state.username.length === 0) && (this.state.country === '')) {
-        field = 'username and country'
-      } else if (this.state.country === '') {
-        field = 'country'
-      }
+    if (this.state.username.length === 0) {
       self.setState({
-        error: 'You have to fill out a ' + field + '!'
+        error: 'You have to fill out a username!'
       })
       return
     }
@@ -59,8 +42,7 @@ var Onboarding = React.createClass({
     request.post(config.BACKEND_HOST + '/users/me/onboarding')
       .set('Authorization', localStorage.token)
       .send({
-        username: this.state.username,
-        country: this.state.country
+        username: this.state.username
       })
       .end(function(err, res) {
         if(err && res.status > 300) {
@@ -83,13 +65,6 @@ var Onboarding = React.createClass({
       'Onboarding__Username--Invalid': this.state.error && this.state.username.length < 3
     })
   },
-  inputClassesCountry: function () {
-    return classNames('Select', {
-      'Onboarding__Country--Valid': this.state.country,
-      'Onboarding__Country--Invalid': this.state.country === '',
-
-    })
-  },
   goToNext: function () {
     window.location.reload()
   },
@@ -103,15 +78,6 @@ var Onboarding = React.createClass({
         <Label>What is your registry username?</Label>
         <div className={this.inputClassesUsername()}>
           <Input type='text' value={this.state.username} onChange={this.onChangeUsername}/>
-        </div>
-        <Label>What country are you in?</Label>
-        <div>
-          <Select className={this.inputClassesCountry()} onChange={this.onChangeCountry}>
-            <option value="">-</option>
-            {countries.all.map(function(country) {
-              return <option selected={country.alpha2 == self.state.country} value={country.alpha2}>{country.name}</option>
-            })}
-          </Select>
         </div>
         {!this.state.success &&
           <div>

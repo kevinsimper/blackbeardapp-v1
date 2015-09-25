@@ -123,8 +123,7 @@ lab.experiment('/users', function() {
           'Authorization': token
         },
         body: {
-          username: 'username',
-          country: 'DK'
+          username: 'username'
         }
       },
       function(error, response, body) {
@@ -135,8 +134,7 @@ lab.experiment('/users', function() {
   lab.test('PUT /me', function(done) {
     var requestData = {
       email: 'updated@blackbeard.io',
-      name: 'Mary Ormond',
-      country: 'US'
+      name: 'Mary Ormond'
     }
 
     request({
@@ -162,8 +160,7 @@ lab.experiment('/users', function() {
         },
         body: {
           name: 'Blackbeard',
-          email: testUserEmail,
-          country: 'DK'
+          email: testUserEmail
         }
       })
     })
