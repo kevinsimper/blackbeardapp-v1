@@ -37,3 +37,17 @@ exports.getOneTagImageManifest = function (registryUrl, image, tag) {
     return body
   })
 }
+
+exports.deleteOneTagImageManifest = function (registryUrl, image, tag) {
+  var url = registryUrl + '/v2/' + image + '/manifests/' + tag
+  console.log(url)
+
+  return request({
+    method: 'DELETE',
+    uri: url,
+    json: true
+  }).spread(function (response, body) {
+    console.log(body)
+    return body
+  })
+}

@@ -568,6 +568,11 @@ server.register(require('hapi-auth-jwt2'), function(err) {
     path: '/registry/images',
     config: registryRoutes.getRegistryAllImages
   })
+  server.route({
+    method: 'GET',
+    path: '/registry/synchronise',
+    config: registryRoutes.getSynchronise
+  })
 })
 
 module.exports = server
