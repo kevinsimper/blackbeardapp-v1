@@ -157,7 +157,7 @@ exports.getAllClusterUsage = {
         throw new Promise.OperationalError('no-clusters')
       }
 
-      return _.map(clusters, function(cluster) {
+      return Promise.map(clusters, function(cluster) {
         return Container.find({
           cluster: cluster._id,
           deleted: false
@@ -165,12 +165,11 @@ exports.getAllClusterUsage = {
       })
     })
 
-    var usages = Promise.all(clusterContainers).then(function(clusterContainers) {
-      return _.map(clusterContainers, function (containers) {
+    var usages = clusterContainers.then(function(clusterContainers) {
+      return _.map(clusterContainers, function(containers) {
         var used = _.sum(containers.map(function (container) {
           return container.memory
         }))
-
         return {
           memoryUsed: used,
           count: containers ? containers.length : 0
