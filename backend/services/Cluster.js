@@ -51,7 +51,7 @@ exports.request = function (cluster, uri, method, json) {
   if(!cluster) {
     throw new Error('Cluster is not defined!')
   }
-  var _uri = 'https://' + cluster.ip + ':3376' + uri
+  var _uri = 'https://' + cluster.ip + ':2376' + uri
   var options = {
     uri: _uri,
     agentOptions: {
@@ -86,7 +86,7 @@ exports.createContainer = function (cluster, image) {
     Image: image,
     HostConfig: {
       'PublishAllPorts': true,
-      // 'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
+      'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
     },
   }).spread(function (response, body) {
     return body.Id
