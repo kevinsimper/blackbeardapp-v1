@@ -15,15 +15,15 @@ exports.postContainer = function(request, reply) {
   var user = User.getUserIdFromRequest(request)
   var region = request.payload.region
 
-  var systemState = System.findOne().then(function(system) {
-    if (!systemState) {
+  var system = System.findOne().then(function(system) {
+    if (!system.state) {
       throw new Promise.OperationalError('panic')
     }
 
-    return system.state
+    return system 
   })
 
-  var app = systemState.then(function(systemState) {
+  var app = system.then(function(system) {
     return App.findById(appId)
   })
 
