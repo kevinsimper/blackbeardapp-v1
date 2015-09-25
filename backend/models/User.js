@@ -7,6 +7,7 @@ var schema = new mongoose.Schema({
   email: String,
   name: String,
   username: String,
+  country: String,
   credit: Number,
   virtualCredit: Number,
   timestamp: String,
@@ -42,7 +43,7 @@ schema.statics.findOneByRole = function (id, role, cb) {
   }
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified', 'containerLimit')
+    fields.push('email', 'name', 'credit', 'timestamp', 'creditCards', 'role', 'username', 'verified', 'containerLimit', 'country')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {
