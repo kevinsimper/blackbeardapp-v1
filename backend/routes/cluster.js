@@ -144,6 +144,72 @@ exports.getClusterStatus = {
   }
 }
 
+exports.getAllClusterUsage = {
+  auth: 'jwt',
+  app: {
+    level: 'ADMIN'
+  },
+  handler: function (request, reply) {
+    var clusters = Cluster.find({type: {'$ne': 'test_swarm'}})
+
+    var clusterContainers = clusters.then(function(clusters) {
+      if(!clusters || (clusters.length === 0)) {
+        throw new Promise.OperationalError('no-clusters')
+      }
+
+      return Promise.map(clusters, function(cluster) {
+        return Container.find({
+          cluster: cluster._id,
+          deleted: false
+        })
+      })
+    })
+
+    var usages = clusterContainers.then(function(clusterContainers) {
+      return _.map(clusterContainers, function(containers) {
+        var used = _.sum(containers.map(function (container) {
+          return container.memory
+        }))
+        return {
+          memoryUsed: used,
+          count: containers ? containers.length : 0
+        }
+      })
+    })
+
+    clusters.then(function(clusters) {
+      return Promise.all(usages).then(function(usages) {
+        return _.map(clusters, function(cluster, i) {
+          var usage = usages[i]
+          return {
+            cluster: cluster._id,
+            memoryUsed: usage.memoryUsed,
+            count: usage.count
+          }
+        })
+      })
+    }).then(function(result) {
+      var memoryTotal = _.sum(_.map(result, function(cluster) {
+        return cluster.memoryUsed
+      }))
+      var countTotal = _.sum(_.map(result, function(cluster) {
+        return cluster.count
+      }))
+      reply({
+        results: result,
+        memoryUsed: memoryTotal,
+        count: countTotal
+      })
+    }).error(function (err) {
+      request.log(['error'], err)
+      reply(Boom.notFound())
+    }).catch(function (err) {
+      request.log(['error'], err)
+      reply(Boom.badImplementation())
+    })
+  }
+}
+
 exports.getClusterContainers = {
   auth: 'jwt',
   app: {
