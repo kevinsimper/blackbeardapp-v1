@@ -8,6 +8,7 @@ var AppsStore = require('../Apps/store')
 var AppsActions = require('../Apps/actions')
 var AppLogs = require('../AppLogs/')
 var Containers = require('../Containers/')
+var Ports = require('../Ports/')
 var ContainerActions = require('../Containers/actions')
 var ContainerStore = require('../Containers/store')
 var ImagesActions = require('../Images/actions')
@@ -115,6 +116,7 @@ var AppShow = React.createClass({
             }
           </ButtonGroup>
         </div>
+        <Ports availablePorts={this.state.app.availablePorts} port={this.state.app.port}  />
         <Containers app={this.state.app._id} />
         <AppLogs app={this.state.app._id} />
       </div>
