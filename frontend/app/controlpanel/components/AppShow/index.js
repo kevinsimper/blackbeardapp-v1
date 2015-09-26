@@ -80,6 +80,7 @@ var AppShow = React.createClass({
     }
 
     var runningContainers = filter(this.state.containers, {deleted: false}) || []
+    var upContainers = filter(this.state.containers, {deleted: false, status: 'UP'}) || []
 
     return (
       <div className='AppShow'>
@@ -92,6 +93,17 @@ var AppShow = React.createClass({
           <div>
             <span>Created:&nbsp;</span>
             <TimeSince timestamp={this.state.app.timestamp}/>
+          </div>
+          <div>
+            <span>URL:&nbsp;</span>
+            {upContainers.length !== 0 &&
+            <a target='_BLANK' href={'http://' + this.state.app.name + '.blackbeardapps.com'}>
+              http://{this.state.app.name}.blackbeardapps.com
+            </a>
+            }
+            {upContainers.length === 0 &&
+            <span>-</span>
+            }
           </div>
         </div>
         <div>
