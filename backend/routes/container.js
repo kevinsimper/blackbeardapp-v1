@@ -12,7 +12,7 @@ var Queue = require('../services/Queue')
 
 exports.postContainer = function(request, reply) {
   var appId = request.params.app
-  var user = User.getUserIdFromRequest(request)
+  var userId = User.getUserIdFromRequest(request)
   var region = request.payload.region
 
   var system = System.findOne().then(function(system) {
@@ -23,7 +23,26 @@ exports.postContainer = function(request, reply) {
     return system 
   })
 
-  var app = system.then(function(system) {
+  var user = system.then(function(system) {
+    return User.findOne(userId)
+  })
+
+  // Get complete count of running containers for this user
+  var containerCount = user.then(function(user) {
+    return App.find({user: userId}).populate('containers')
+  }).then(function(userApps) {
+    return _.sum(_.flatten(_.map(userApps, function(userApp) {
+      return _.map(userApp.containers, function(container) {
+        return (container.status === Container.status.UP)
+      })
+    })))
+  })
+
+  var app = Promise.all([user, containerCount]).spread(function(user, containerCount) {
+    if (containerCount >= user.containerLimit) {
+      throw new Promise.OperationalError('limit')
+    }
+
     return App.findById(appId)
   })
 
@@ -60,6 +79,8 @@ exports.postContainer = function(request, reply) {
     request.log(['mongo'], err)
     if (err.message === 'panic') {
       return reply(Boom.forbidden())
+    } else if (err.message === 'limit') {
+      return reply(Boom.badRequest('Container limit reached for this user account.'))
     }
     return reply(Boom.notFound())
   }).catch( function (err) {

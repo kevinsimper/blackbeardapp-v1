@@ -199,7 +199,7 @@ exports.putMe = {
   }
 }
 
-exports.putUser = {
+exports.patchUser = {
   auth: 'jwt',
   app: {
     level: 'ADMIN'
@@ -209,10 +209,9 @@ exports.putUser = {
       user: Joi.string().required()
     },
     payload: {
-      email: Joi.string().email().required(),
-      name: Joi.string().min(3).required(),
-      role: Joi.string().required(),
-      country: Joi.string().required(),
+      email: Joi.string().email(),
+      name: Joi.string().min(3),
+      role: Joi.string(),
       containerLimit: Joi.number()
     }
   },
@@ -221,11 +220,19 @@ exports.putUser = {
 
     var user = User.findById(id)
     user.then(function(user) {
-      user.email = request.payload.email
-      user.name = request.payload.name
-      user.role = request.payload.role
-      user.containerLimit = request.payload.containerLimit
-      user.country = request.payload.country
+      if (request.payload.email) {
+        user.email = request.payload.email
+      }
+      if (request.payload.name) {
+        user.name = request.payload.name
+      }
+      if (request.payload.role) {
+        user.role = request.payload.role
+      }
+      if (request.payload.containerLimit) {
+        user.containerLimit = request.payload.containerLimit
+      }
+
       return user.save()
     }).then(function(user) {
       reply(user)

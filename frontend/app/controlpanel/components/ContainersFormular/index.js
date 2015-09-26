@@ -26,7 +26,13 @@ var ContainerFormular = React.createClass({
         self.transitionTo('/apps/' + self.props.params.id)
       })
       .catch(function(err) {
-        alert("Blackbeard is temporarily unavailable. Please try again later.")
+        if (err.status == 400) {
+          alert("You have reached your limit of containers.")
+        } else if (err.status == 403) {
+          alert("Blackbeard is temporarily unavailable. Please try again later.")
+        } else {
+          alert("An unknown error has ocurred.")
+        }
       })
   },
   render: function() {
