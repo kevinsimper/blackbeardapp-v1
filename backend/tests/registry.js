@@ -42,4 +42,19 @@ lab.experiment('/registry/images', function () {
       done()
     })
   })
+
+  lab.test('/registry/synchronise', function(done) {
+    request({
+      method: 'GET',
+      uri: appUrl + '/registry/synchronise',
+      headers: {
+        'Authorization': adminToken
+      },
+      json: true,
+    }).spread(function(response, body) {
+      console.log(body)
+      expect(response.statusCode, 'to be', 200)
+      done()
+    })
+  })
 })
