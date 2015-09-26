@@ -58,6 +58,8 @@ db.apps.insert({
   "timestamp": "1435735744",
   "containers": [ObjectId("555cb1e2fc27fe6f5f540001")],
   "image": ObjectId("555cb1e2fc27fe6f5f543901"),
+  "availablePorts": ["80", "443"],
+  "port": "80",
   "deleted": false,
   "__v": 0
 });
