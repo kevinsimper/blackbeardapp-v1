@@ -15,8 +15,8 @@ var appUrl = helpers.appUrl()
 
 var server = require('../startdev')()
 
+var adminToken = ''
 lab.experiment('Testing Billing service', function() {
-  var adminToken = ''
   lab.before(function (done) {
     request({
       method: 'POST',
@@ -31,41 +31,137 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
-  lab.test('Verify date ranges', function(done) {
-    var start = moment('2015-08', "YYYY-MM")
-    var end = moment('2015-09', "YYYY-MM")
 
+  lab.test('Less than 1 hour within range', function(done) {
     var containers = [
-      new Container({createdAt: moment('2015-07-24 18:31:12').unix(), deletedAt: '2015-08-24 18:01:12'}), // 571h
-      new Container({createdAt: moment('2015-07-24 18:01:12').unix(), deletedAt: '2015-10-24 18:31:12'}), // 744h
-      new Container({createdAt: moment('2015-08-06 18:31:12').unix(), deletedAt: '2015-10-24 18:31:12'}), // 606h
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 18:40:00',
+        deleted: true
+      })
     ]
     var app = new App({name: "testApp"})
     var test = app.toObject()
     test.containers = containers
 
+    var start = moment('2015-08', "YYYY-MM")
+    var end = moment('2015-09', "YYYY-MM")
     Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      var total = 0
-      expect(Math.ceil(moment('2015-08-24 18:01:12').diff('2015-08-01 00:00', 'minute')/60.0), 'to be', 571)
-      total += 571
-      expect(Math.ceil(moment('2015-09-01 00:00:00').diff('2015-08-01 00:00', 'minute')/60.0), 'to be', 744)
-      total += 744
-      // Skipping old app
-      expect(Math.ceil(moment('2015-09-01 00:00').diff('2015-08-06 18:31:12', 'minute')/60.0), 'to be', 606)
-      total += 606
-
-      expect(hours, 'to be', total)
-      expect(hours, 'to be', 1921)
-
+      expect(hours, 'to be', 1)
       done()
     })
   })
-  lab.test('Verify single day', function(done) {
+  lab.test('More than 2 hours within range', function(done) {
+    var containers = [
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 20:40:00',
+        deleted: true
+      })
+    ]
+    var app = new App({name: "testApp"}).toObject()
+    app.containers = containers
+
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
-
+    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+      expect(hours, 'to be', 3)
+      done()
+    })
+  })
+  lab.test('Single day multiple containers within range', function(done) {
     var containers = [
-      new Container({createdAt: moment('2015-08-06 18:00:00').unix(), deletedAt: '2015-08-06 18:40:00'})
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 20:40:00',
+        deleted: true
+      }),
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 20:40:00',
+        deleted: true
+      })
+    ]
+    var app = new App({name: "testApp"}).toObject()
+    app.containers = containers
+
+    var start = moment('2015-08', "YYYY-MM")
+    var end = moment('2015-09', "YYYY-MM")
+    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+      expect(hours, 'to be', 6)
+      done()
+    })
+  })
+  lab.test('Multiple days multiple containers within range', function(done) {
+    var containers = [
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 20:40:00',
+        deleted: true
+      }),
+      new Container({
+        createdAt: moment('2015-08-05 18:00:00').unix(),
+        deletedAt: '2015-08-06 20:40:00',
+        deleted: true
+      })
+    ]
+    var app = new App({name: "testApp"}).toObject()
+    app.containers = containers
+
+    var start = moment('2015-08-01')
+    var end = moment('2015-09-01')
+    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+      expect(hours, 'to be', 3 + 24 + 3)
+      done()
+    })
+  })
+
+  lab.test('1 month 1 container within range', function(done) {
+    var app = new App({name: "testApp"}).toObject()
+    app.containers = [
+      new Container({
+        createdAt: moment('2015-07-24 18:00:00').unix(),
+        deletedAt: '2015-08-24 18:00:00',
+        deleted: true
+      }), // 571h
+    ]
+
+    var start = moment('2015-07-01')
+    var end = moment('2015-09-01')
+    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+      var total = Math.ceil(moment('2015-08-24 18:00:00').diff('2015-07-24 18:00:00', 'hours', true))
+      expect(total, 'to be', 744)
+      expect(hours, 'to be', total)
+      done()
+    })
+  })
+
+  lab.test('1 month 1 container out of range', function(done) {
+    var app = new App({name: "testApp"}).toObject()
+    app.containers = [
+      new Container({
+        createdAt: moment('2015-07-24 18:00:00').unix(),
+        deletedAt: '2015-08-24 18:00:00',
+        deleted: true
+      }), // 571h
+    ]
+
+    var start = moment('2015-08-01')
+    var end = moment('2015-08-02')
+    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+      expect(hours, 'to be', 24)
+      done()
+    })
+  })
+  lab.test('Verify container that just started', function(done) {
+    var start = moment().subtract(1, 'day')
+    var end = moment().add(1, 'month')
+
+    var fiveMinAgo = moment().subtract(5, 'minute').unix()
+    var containers = [
+      new Container({
+        createdAt: fiveMinAgo
+      })
     ]
     var app = new App({name: "testApp"})
     var test = app.toObject()
@@ -73,50 +169,39 @@ lab.experiment('Testing Billing service', function() {
 
     Billing.getAppBillableHours(test, start, end).then(function(hours) {
       expect(hours, 'to be', 1)
-
-      done()
-    })
-  })
-  lab.test('Verify container that just started ignored', function(done) {
-    var start = moment(new Date()).subtract(1, 'day')
-    var end = moment(new Date()).add(1, 'month')
-
-    var fiveMinAgo = moment(new Date()).subtract(5, 'minute').unix()
-    var containers = [
-      new Container({createdAt: fiveMinAgo})
-    ]
-    var app = new App({name: "testApp"})
-    var test = app.toObject()
-    test.containers = containers
-
-    Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      expect(hours, 'to be', 0)
-
       done()
     })
   })
   lab.test('Verify multiple containers', function(done) {
-    var start = moment(new Date()).subtract(1, 'day')
-    var end = moment(new Date()).add(1, 'month')
+    var start = moment().subtract(1, 'day')
+    var end = moment().add(1, 'month')
 
-    var oneAndHalfHoursAgo = moment(new Date()).subtract(1.5, 'hour')
-    var tenHoursAgo = moment(new Date()).subtract(10, 'hour')
+    var oneAndHalfHoursAgo = moment().subtract(1.5, 'hour')
+    var tenHoursAgo = moment().subtract(10, 'hour')
 
     var containers = [
-      new Container({createdAt: oneAndHalfHoursAgo.unix()}),
-      new Container({createdAt: tenHoursAgo.unix(), deletedAt: oneAndHalfHoursAgo.format("YYYY-MM-DD HH:mm:ss")})
+      new Container({
+        createdAt: oneAndHalfHoursAgo.unix()
+      }),
+      new Container({
+        createdAt: tenHoursAgo.unix(),
+        deletedAt: oneAndHalfHoursAgo.format("YYYY-MM-DD HH:mm:ss"),
+        deleted: true
+      })
     ]
     var app = new App({name: "testApp"})
     var test = app.toObject()
     test.containers = containers
 
     Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      expect(hours, 'to be', 1+9)
-
+      expect(hours, 'to be', 2+9)
       done()
     })
   })
-  lab.test('Test billing', function(done) {
+})
+
+lab.experiment('Testing Billing API', function() {
+  lab.test('/billing', function(done) {
     var users = []
     users[0] = request({
       method: 'GET',
@@ -190,6 +275,9 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
+})
+
+lab.experiment('Test getBillableMonths', function() {
   lab.test('Test getBillableMonths', function(done) {
     // Get start of current month and go back 3 months and 10 days
     var start = moment().set({

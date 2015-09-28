@@ -1,22 +1,15 @@
 var _ = require('lodash')
 var moment = require('moment')
 var Promise = require('bluebird')
-var App = Promise.promisifyAll(require('../models/App'))
-var User = Promise.promisifyAll(require('../models/User'))
-var UserRoles = require('../models/roles/')
-var Container = require('../models/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
-var stripe = require('stripe')(process.env.STRIPE_SECRET)
-var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
-var ContainerService = require('../services/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
-var Boom = require('boom')
+var debug = require('debug')('billing')
 
 module.exports = {
   topUpInterval: 1000,
-  diffHours: function (a, b) {
-    return Math.ceil(a.diff(b)/1000/60/60)
+  diffHours: function (start, stop) {
+    return Math.ceil(Math.abs(start.diff(stop, 'hours', true)))
   },
   /**
   * Takes app and date range. From this all containers are retrieved and the
@@ -27,59 +20,65 @@ module.exports = {
   */
   getAppBillableHours: function (app, start, end) {
     var self = this
-    return new Promise(function (resolve, reject) {
-      var hours = 0
-
-      app.containers.forEach(function (container, i) {
-        var current = 0
+    var now = moment()
+    return new Promise(function (resolve) {
+      var hours = app.containers.map(function (container) {
         var createdDate = moment.unix(container.createdAt)
+        var deletedDate = moment(Date.parse(container.deletedAt))
 
-        var deletedAt = null
-
-        if (!ContainerService.isCurrentlyRunning(container) || (Math.abs(createdDate.diff(moment())) >= 60*1000)) {
-          if (container.deletedAt) {
-            deletedAt = moment(Date.parse(container.deletedAt))
-          } else {
-            deletedAt = moment()
-          }
-
-          if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
-            throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
-          }
-
-          if (deletedAt.isBefore(end)) {
-            // Stopped before end of month
-            // Stopped within month
-            if (createdDate.isBefore(start)) {
-              // Started before start of period
-              current = self.diffHours(deletedAt, start)
-
-            } else {
-              // Started at start of period
-              current = self.diffHours(deletedAt, createdDate)
-            }
-          } else {
-            // Stopped after end of month
-            if (createdDate.isBefore(start)) {
-              // Created before start so full month
-              current = self.diffHours(end, start)
-
-            } else {
-              // from midway through to end of month
-              current = self.diffHours(end, createdDate)
-            }
-          }
-
-          if (ContainerService.isCurrentlyRunning(container)) {
-            // App is currently running so we shouldn't count current hour
-            current -= 1
-          }
-
-          hours += current
+        if(start.isAfter(now)) {
+          debug('start.isAfter(now)')
+          return 0
         }
-      })
+        if(createdDate.isAfter(start) && createdDate.isAfter(end)) {
+          debug('createdDate.isAfter(start)')
+          return 0
+        }
+        if(deletedDate.isBefore(start) && deletedDate.isBefore(end)) {
+          debug('deletedDate.isBefore(start) ')
+          return 0
+        }
 
-      resolve(hours)
+        debug('deleted', container.deleted)
+        if(container.deleted) {
+          debug('createdDate.isAfter(start)', createdDate.isAfter(start))
+          if(createdDate.isAfter(start)) {
+            if(deletedDate.isBefore(end)) {
+              return self.diffHours(createdDate, deletedDate)
+            } else {
+              return self.diffHours(createdDate, end)
+            }
+          }
+          if(createdDate.isBefore(start)) {
+            if(deletedDate.isBefore(end)) {
+              return self.diffHours(start, deletedDate)
+            } else {
+              return self.diffHours(start, end)
+            }
+          }
+        }
+
+        debug('createdDate.isBefore(start)', createdDate.isBefore(start))
+        // if created before start and not deleted
+        if(createdDate.isBefore(start)) {
+          if(now.isBefore(end)) {
+            return self.diffHours(start, now)
+          } else {
+            return self.diffHours(start, end)
+          }
+        }
+        debug('isBetween', createdDate.isBetween(start, end))
+        if(createdDate.isBetween(start, end)) {
+          if(now.isBetween(start, end)) {
+            return self.diffHours(createdDate, now)
+          } else {
+            return self.diffHours(createdDate, end)
+          }
+        }
+        throw new Error('Billing has an error!')
+      })
+      debug('hours', hours)
+      resolve(_.sum(hours))
     })
   },
   /**
