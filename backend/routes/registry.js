@@ -86,17 +86,44 @@ exports.getSynchronise = {
       })
     }))
 
-    Promise.all([registryImages, comparedUsers]).spread(function(registryImages, comparedUsers) {
+    Promise.all(Promise.all([registryImages, comparedUsers]).spread(function(registryImages, comparedUsers) {
       return _.map(registryImages, function (registryImage, i) {
         var user = comparedUsers[i]
         if (user !== 'matched') {
+          var dockerContentDigest = registryImage[0].dockerContentDigest
           var registryImageName = registryImage[0].name.split('/')
           var name = registryImageName[1]
 
           var timestamp = Math.round(Date.now() / 1000)
 
-          // Here we want to synchronise it with what is currently running
+          // Create image
+          var image = new Image({
+            user: user._id,
+            name: name,
+            createdAt: timestamp,
+            dockerContentDigest: dockerContentDigest,
+            logs: [
+              {
+                timestamp: timestamp,
+                dockerContentDigest: dockerContentDigest,
+                status: Image.status.EXISTS,
+              }
+            ]
+          })
+
+          return image.save()
+        } else {
+          return 'okay'
         }
+      })
+    })).then(function(result) {
+      var added = _.filter(result, function(entry) {
+        return entry !== 'okay'
+      })
+      reply({
+        count: result.length,
+        addedCount: added.length,
+        added: added
       })
     })
   }

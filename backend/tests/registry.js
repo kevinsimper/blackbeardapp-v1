@@ -52,7 +52,6 @@ lab.experiment('/registry/images', function () {
       },
       json: true,
     }).spread(function(response, body) {
-      console.log(body)
       expect(response.statusCode, 'to be', 200)
       done()
     })
