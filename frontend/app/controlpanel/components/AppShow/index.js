@@ -83,6 +83,16 @@ var AppShow = React.createClass({
     var runningContainers = filter(this.state.containers, {deleted: false}) || []
     var upContainers = filter(this.state.containers, {deleted: false, status: 'UP'}) || []
 
+    var ports = []
+    if (runningContainers.length) {
+      ports = runningContainers.forEach(function (container) {
+        return container.availablePorts
+      })
+    }
+    console.log(runningContainers)
+    console.log(ports)
+    //        <Ports availablePorts={this.state.app.availablePorts} port={this.state.app.port}  />
+
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
@@ -116,7 +126,6 @@ var AppShow = React.createClass({
             }
           </ButtonGroup>
         </div>
-        <Ports availablePorts={this.state.app.availablePorts} port={this.state.app.port}  />
         <Containers app={this.state.app._id} />
         <AppLogs app={this.state.app._id} />
       </div>
