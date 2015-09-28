@@ -87,10 +87,10 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var clusterContainerId = Promise.all([cluster, user, image, pullImage]).spread(function (cluster, user, image, pullImage) {
-      var image = registry + '/' + user.username + '/' + image.name + ':latest'
+    var clusterContainerId = Promise.all([cluster, user, image, pullImage, app]).spread(function (cluster, user, image, pullImage, app) {
+      var imagePath = registry + '/' + user.username + '/' + image.name + ':latest'
       console.log('image to start', image)
-      return ClusterService.createContainer(cluster, image).then(function(clusterContainerId) {
+      return ClusterService.createContainer(cluster, imagePath, app).then(function(clusterContainerId) {
         console.log('clusterContainerId', clusterContainerId)
         return clusterContainerId
       })
