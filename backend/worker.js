@@ -112,37 +112,25 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var appPorts = Promise.all([containerInfo, app]).spread(function (containerInfo, app) {
-      var ports = containerInfo.NetworkSettings.Ports
-
-      if (ports === null) {
-        throw new Promise.OperationalError('No container connection details found.')
+    var savedContainer = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image, app])
+    .spread(function (container, cluster, clusterContainerId, started, containerInfo, image, app) {
+      if (containerInfo.NetworkSettings.Ports === null) {
+        throw new Promise.OperationalError('no-connection-details')
       }
-      var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
-      app.availablePorts = _.map(portKeys, function (port) {
-        return port.split("/")[0]
-      })
+      var appPorts = _.flatten(_.filter(containerInfo.NetworkSettings.Ports, function (details, port) {
+        var port = port.split("/")[0]
 
-      return app.save()
-    })
+        return port == app.port
+      }), true)
 
-    var savedContainer = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image, appPorts])
-    .spread(function (container, cluster, clusterContainerId, started, containerInfo, image, appPorts) {
-      var ports = containerInfo.NetworkSettings.Ports
-
-      if (ports === null) {
-        throw new Promise.OperationalError('No container connection details found.')
+      if (!appPorts.length) {
+        throw new Promise.OperationalError('no-port')
       }
-      var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
-
-      var availablePorts = _.map(portKeys, function (port) {
-        return port.split("/")[0]
-      })
 
       container.status = Container.status.UP
       container.ip = cluster.ip
-      container.port = ports[portKeys[0]][0].HostPort
+      container.port = appPorts[0].HostPort
       container.cluster = cluster._id
       container.containerHash = clusterContainerId
       container.dockerContentDigest = image.dockerContentDigest
@@ -162,6 +150,8 @@ Promise.all([mongo, rabbitmq]).then(function () {
         case 'no-cluster':
         case 'no-app':
         case 'no-user':
+        case 'no-port':
+        case 'no-connection-details':
         case 'no-image':
           container.then(function (container) {
             container.status = Container.status.FAILED
