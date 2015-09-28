@@ -79,18 +79,24 @@ exports.request = function (cluster, uri, method, json) {
 * @params {Object} cluster
 * @returns {String} container id
 */
-exports.createContainer = function (cluster, image) {
+exports.createContainer = function (cluster, image, app) {
   var self = this
   var uri = '/containers/create'
-  return self.request(cluster, uri, 'POST', {
+  var envs = app.environments.map(function (env) {
+    return env.key + '=' + env.value
+  })
+  var options = {
     Image: image,
     HostConfig: {
       'PublishAllPorts': true,
       'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
     },
-  }).spread(function (response, body) {
-    return body.Id
-  })
+    'Env': envs
+  }
+  return self.request(cluster, uri, 'POST', options)
+    .spread(function (response, body) {
+      return body.Id
+    })
 }
 
 /**
