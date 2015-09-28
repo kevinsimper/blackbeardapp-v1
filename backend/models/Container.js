@@ -14,6 +14,7 @@ var schema = new mongoose.Schema({
   cluster: {type: mongoose.Schema.Types.ObjectId, ref: 'cluster'},
   containerHash: String,
   memory: Number,
+  availablePorts: [String],
   dockerContentDigest: String
 })
 
