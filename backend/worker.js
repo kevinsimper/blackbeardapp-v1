@@ -6,6 +6,7 @@ if(process.env.NODE_ENV === 'production') {
 }
 
 var mongoose = require('mongoose')
+var _ = require('lodash')
 var Promise = require('bluebird')
 Promise.promisifyAll(require("mongoose"))
 var config = require('./config')
@@ -123,6 +124,9 @@ Promise.all([mongo, rabbitmq]).then(function () {
         container.status = Container.status.UP
         container.ip = cluster.ip
         container.port = ports[portKeys[0]][0].HostPort
+        container.availablePorts = _.map(portKeys, function(port) {
+          return port.split("/")[0]
+        })
         container.cluster = cluster._id
         container.containerHash = clusterContainerId
         container.dockerContentDigest = image.dockerContentDigest
