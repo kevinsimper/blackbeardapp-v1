@@ -78,6 +78,7 @@ var Usage = React.createClass({
           })}
           </tbody>
         </Table>
+        <UsageDaily/>
       </div>
     );
   }
