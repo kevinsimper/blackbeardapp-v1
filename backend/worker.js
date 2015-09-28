@@ -30,22 +30,22 @@ Promise.all([mongo, rabbitmq]).then(function () {
 
     var container = Container.findOne({_id: message.containerId})
       .then(function (container) {
-        if(!container) {
+        if (!container) {
           throw new Promise.OperationalError('no-container')
         }
         return container
       })
 
     var cluster = ClusterService.getCluster().then(function (cluster) {
-      if(!cluster) {
+      if (!cluster) {
         throw new Promise.OperationalError('no-cluster')
       }
       return cluster
     })
-    var app = container.then(function(container) {
+    var app = container.then(function (container) {
       return App.findOne({_id: container.app})
     }).then(function (app) {
-      if(!app) {
+      if (!app) {
         throw new Promise.OperationalError('no-app')
       }
       return app
@@ -53,17 +53,17 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var user = app.then(function (app) {
       return User.findOne({_id: app.user})
     }).then(function (user) {
-      if(!user) {
+      if (!user) {
         throw new Promise.OperationalError('no-user')
       }
       return user
     })
-    var image = app.then(function(app) {
-      return Image.findOne({_id: app.image}).then(function(image) {
+    var image = app.then(function (app) {
+      return Image.findOne({_id: app.image}).then(function (image) {
         return image
       })
     }).then(function (image) {
-      if(!image) {
+      if (!image) {
         throw new Promise.OperationalError('no-image')
       }
       return image
@@ -78,7 +78,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
           command: 'docker login -u worker -p ' + config.WORKER_PASSWORD + ' -e kevin.simper@gmail.com ' + registry + ' && docker pull ' + fullPath,
           privateKey: cluster.certificates.sshPrivate
         }, function (err, stdout) {
-          if(err) {
+          if (err) {
             console.log(err)
             reject(err)
           }
@@ -91,7 +91,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
     var clusterContainerId = Promise.all([cluster, user, image, pullImage, app]).spread(function (cluster, user, image, pullImage, app) {
       var imagePath = registry + '/' + user.username + '/' + image.name + ':latest'
       console.log('image to start', image)
-      return ClusterService.createContainer(cluster, imagePath, app).then(function(clusterContainerId) {
+      return ClusterService.createContainer(cluster, imagePath, app).then(function (clusterContainerId) {
         console.log('clusterContainerId', clusterContainerId)
         return clusterContainerId
       })
@@ -99,7 +99,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
 
     var started = Promise.all([cluster, clusterContainerId])
       .spread(function (cluster, clusterContainerId) {
-        return ClusterService.startContainer(cluster, clusterContainerId).then(function(started) {
+        return ClusterService.startContainer(cluster, clusterContainerId).then(function (started) {
           console.log('started', started)
           return started
         })
@@ -112,26 +112,42 @@ Promise.all([mongo, rabbitmq]).then(function () {
       })
     })
 
-    var savedContainer = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image])
-      .spread(function (container, cluster, clusterContainerId, started, containerInfo, image) {
-        var ports = containerInfo.NetworkSettings.Ports
+    var appPorts = Promise.all([containerInfo, app]).spread(function (containerInfo, app) {
+      var ports = containerInfo.NetworkSettings.Ports
 
-        if (ports === null) {
-          throw new Promise.OperationalError('No container connection details found.')
-        }
-        var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
+      if (ports === null) {
+        throw new Promise.OperationalError('No container connection details found.')
+      }
+      var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
 
-        container.status = Container.status.UP
-        container.ip = cluster.ip
-        container.port = ports[portKeys[0]][0].HostPort
-        container.availablePorts = _.map(portKeys, function(port) {
-          return port.split("/")[0]
-        })
-        container.cluster = cluster._id
-        container.containerHash = clusterContainerId
-        container.dockerContentDigest = image.dockerContentDigest
+      app.availablePorts = _.map(portKeys, function (port) {
+        return port.split("/")[0]
+      })
 
-        return container.save()
+      return app.save()
+    })
+
+    var savedContainer = Promise.all([container, cluster, clusterContainerId, started, containerInfo, image, appPorts])
+    .spread(function (container, cluster, clusterContainerId, started, containerInfo, image, appPorts) {
+      var ports = containerInfo.NetworkSettings.Ports
+
+      if (ports === null) {
+        throw new Promise.OperationalError('No container connection details found.')
+      }
+      var portKeys = Object.keys(containerInfo.NetworkSettings.Ports).reverse()
+
+      var availablePorts = _.map(portKeys, function (port) {
+        return port.split("/")[0]
+      })
+
+      container.status = Container.status.UP
+      container.ip = cluster.ip
+      container.port = ports[portKeys[0]][0].HostPort
+      container.cluster = cluster._id
+      container.containerHash = clusterContainerId
+      container.dockerContentDigest = image.dockerContentDigest
+
+      return container.save()
     })
 
     savedContainer.then(function() {
