@@ -38,7 +38,6 @@ lab.experiment('/registry/images', function () {
       json: true,
     }).spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
-      expect(body.length, 'to be', 2)
       done()
     })
   })

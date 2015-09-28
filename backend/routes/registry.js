@@ -13,7 +13,7 @@ exports.getRegistryAllImages = {
   handler: function(response, reply) {
     var allImages = RegistryService.getAllImages(config.REGISTRY_FULLURL)
 
-    var imageTags = allImages.then(function (allImages) {
+    var images = allImages.then(function (allImages) {
       return Promise.map(allImages, function (image) {
         return RegistryService.getOneImage(config.REGISTRY_FULLURL, image)
       })
@@ -21,16 +21,16 @@ exports.getRegistryAllImages = {
       // Flatten because it should be a collection of objects and not arrays
       return _.flatten(data)
     })
-    var imageDetails = imageTags.then(function (imageTags) {
-      return Promise.map(imageTags, function (imageTag) {
-        return Promise.map(imageTag.tags, function (tag) {
-          return RegistryService.getOneTagImageManifest(config.REGISTRY_FULLURL, imageTag.name, tag)
+    var imageDetails = images.then(function (images) {
+      return Promise.map(images, function (image) {
+        return Promise.map(image.tags, function (tag) {
+          return RegistryService.getOneTagImageManifest(config.REGISTRY_FULLURL, image.name, tag)
         })
       })
     })
 
-    Promise.all([allImages, imageTags, imageDetails]).spread(function (allImages, imageTags, imageDetails) {
-      var combined = imageTags.map(function(image, index) {
+    Promise.all([allImages, images, imageDetails]).spread(function (allImages, images, imageDetails) {
+      var combined = images.map(function(image, index) {
         image.tags = imageDetails[index]
         return image
       })
@@ -47,7 +47,7 @@ exports.getSynchronise = {
   handler: function(response, reply) {
     var allImages = RegistryService.getAllImages(config.REGISTRY_FULLURL)
 
-    var imageTags = allImages.then(function (allImages) {
+    var images = allImages.then(function (allImages) {
       return Promise.map(allImages, function (image) {
         return RegistryService.getOneImage(config.REGISTRY_FULLURL, image)
       })
@@ -55,10 +55,10 @@ exports.getSynchronise = {
       // Flatten because it should be a collection of objects and not arrays
       return _.flatten(data)
     })
-    var registryImages = imageTags.then(function (imageTags) {
-      return Promise.map(imageTags, function (imageTag) {
-        return Promise.map(imageTag.tags, function (tag) {
-          return RegistryService.getOneTagImageManifest(config.REGISTRY_FULLURL, imageTag.name, tag)
+    var registryImages = images.then(function (images) {
+      return Promise.map(images, function (image) {
+        return Promise.map(image.tags, function (tag) {
+          return RegistryService.getOneTagImageManifest(config.REGISTRY_FULLURL, image.name, tag)
         })
       })
     })
@@ -66,15 +66,15 @@ exports.getSynchronise = {
     var savedImages = Image.find({}).populate('user')
 
     // Need to update mongo to reflect what is present in registry
-    var comparedUsers = Promise.all(Promise.all([registryImages, savedImages]).spread(function(registryImages, savedImages) {
-      return _.map(registryImages, function (registryImage) {
+    var comparedUsers = savedImages.then(function (savedImages) {
+      return Promise.map(registryImages, function (registryImage) {
         var registryImageName = registryImage[0].name.split('/')
         var username = registryImageName[0]
         var image = registryImageName[1]
         var tag = registryImage[0].tag
 
         var matchCount = _.size(_.filter(savedImages, function (savedImage) {
-          return (savedImage.user.username === username) && (savedImage.name === image)
+          return (savedImage && savedImage.user && savedImage.user.username && savedImage.user.username === username) && (savedImage.name === image)
         }))
 
         if (matchCount === 0) {
@@ -84,10 +84,10 @@ exports.getSynchronise = {
 
         return 'matched'
       })
-    }))
+    })
 
-    Promise.all(Promise.all([registryImages, comparedUsers]).spread(function(registryImages, comparedUsers) {
-      return _.map(registryImages, function (registryImage, i) {
+    comparedUsers.then(function(comparedUsers) {
+      return Promise.map(registryImages, function (registryImage, i) {
         var user = comparedUsers[i]
         if (user !== 'matched') {
           var dockerContentDigest = registryImage[0].dockerContentDigest
@@ -116,7 +116,7 @@ exports.getSynchronise = {
           return 'okay'
         }
       })
-    })).then(function(result) {
+    }).then(function(result) {
       var added = _.filter(result, function(entry) {
         return entry !== 'okay'
       })
