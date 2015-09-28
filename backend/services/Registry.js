@@ -30,6 +30,7 @@ exports.getOneTagImageManifest = function (registryUrl, image, tag) {
     uri: url,
     json: true
   }).spread(function (response, body) {
+    body.dockerContentDigest = response.headers['docker-content-digest']
     body.history = body.history.map(function (history) {
       history.v1Compatibility = JSON.parse(history.v1Compatibility)
       return history
