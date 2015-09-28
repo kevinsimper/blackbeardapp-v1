@@ -1,15 +1,10 @@
 var React = require('react')
 var extend = require('lodash/object/extend')
-var moment = require('moment')
-var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
-var StatusIcon = require('../StatusIcon/')
 var Table = require('../Table/')
-var ContainerItem = require('../ContainerItem/')
-var filter = require('lodash/collection/filter')
+var UsageDaily = require('../UsageDaily/')
 var Router = require('react-router')
 var Link = Router.Link
-var _ = require('lodash')
 
 var store = require('./store')
 var actions = require('./actions')
