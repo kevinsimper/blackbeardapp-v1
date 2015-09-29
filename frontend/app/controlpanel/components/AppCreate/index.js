@@ -22,7 +22,8 @@ var AppCreate = React.createClass({
     return extend(this.getState(), {
       loaded: false,
       name: '',
-      image: ''
+      image: '',
+      status: ''
     })
   },
   onChange: function() {
@@ -70,6 +71,11 @@ var AppCreate = React.createClass({
       .then(function(newApp) {
         self.replaceWith('/apps/' + newApp._id)
       })
+      .catch(function(error) {
+        self.setState({
+          status: error.message
+        })
+      })
   },
   render: function() {
     return (
@@ -79,10 +85,10 @@ var AppCreate = React.createClass({
         <Input type="text" value={this.state.name} onChange={this.onChangeName} />
         <Label>Image</Label>
         <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
+        <ErrorMessage>{this.state.status}</ErrorMessage>
         <div>
           <Button>Create app</Button>
         </div>
-        <ErrorMessage>{this.state.status}</ErrorMessage>
       </form>
     );
   }

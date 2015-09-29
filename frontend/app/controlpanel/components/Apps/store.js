@@ -39,12 +39,19 @@ var store = Reflux.createStore({
         image: app.image
       })
       .end(function(err, res) {
-        actions.new.completed(res.body)
+        if (err) {
+          actions.new.failed(res.body)
+        } else {
+          actions.new.completed(res.body)
+        }
       })
   },
   onNewCompleted: function(data) {
     _apps.push(data)
     this.trigger(data)
+  },
+  onNewFailed: function(data) {
+    this.trigger(_apps)
   },
   getApps: function() {
     this.initialLoad()
