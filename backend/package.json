@@ -8,7 +8,8 @@
     "test": "npm run load-fixtures && npm run lab",
     "lab": "lab -m 20000 tests/*.js",
     "load-fixtures": "./loadfixtures.sh",
-    "test-cluster": "./fixtures/load.sh && ./node_modules/lab/bin/lab tests/cluster/status.js"
+    "test-cluster": "./fixtures/load.sh && ./node_modules/lab/bin/lab tests/cluster/status.js",
+    "migrate": "node ./migrate.js"
   },
   "author": "",
   "license": "ISC",
@@ -42,9 +43,7 @@
     "request": "2.55.0",
     "sequest": "0.8.0",
     "stripe": "3.6.0",
-    "unexpected": "9.2.1"
-  },
-  "devDependencies": {
+    "unexpected": "9.2.1",
     "migrate": "0.2.2"
   }
 }
