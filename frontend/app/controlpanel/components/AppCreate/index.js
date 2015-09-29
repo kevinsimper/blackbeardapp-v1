@@ -23,7 +23,8 @@ var AppCreate = React.createClass({
       loaded: false,
       name: '',
       image: '',
-      status: ''
+      status: '',
+      port: ''
     })
   },
   onChange: function() {
@@ -49,6 +50,11 @@ var AppCreate = React.createClass({
       image: image
     })
   },
+  onChangePort: function(e) {
+    this.setState({
+      port: e.target.value
+    })
+  },
   onSubmit: function(e) {
     e.preventDefault()
     var self = this
@@ -61,6 +67,12 @@ var AppCreate = React.createClass({
     if(!this.state.image) {
       this.setState({
         status: 'You have to choose a image'
+      })
+      return false
+    }
+    if(!this.state.port || !this.state.port.match(/\d/)) {
+      this.setState({
+        status: 'You have to choose a port to expose'
       })
       return false
     }
@@ -83,6 +95,8 @@ var AppCreate = React.createClass({
         <h1>Create app</h1>
         <Label>Name</Label>
         <Input type="text" value={this.state.name} onChange={this.onChangeName} />
+        <Label>Port</Label>
+        <Input style={{width: "5em"}} type="text" value={this.state.port} onChange={this.onChangePort} />
         <Label>Image</Label>
         <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
         <ErrorMessage>{this.state.status}</ErrorMessage>
