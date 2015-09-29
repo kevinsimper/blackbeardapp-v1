@@ -82,15 +82,7 @@ var AppShow = React.createClass({
     var runningContainers = filter(this.state.containers, {deleted: false}) || []
     var upContainers = filter(this.state.containers, {deleted: false, status: 'UP'}) || []
 
-    var ports = []
-    if (runningContainers.length) {
-      ports = runningContainers.forEach(function (container) {
-        return container.availablePorts
-      })
-    }
-    console.log(runningContainers)
-    console.log(ports)
-    //        <Ports availablePorts={this.state.app.availablePorts} port={this.state.app.port}  />
+    console.log(this.state.app)
 
     return (
       <div className='AppShow'>
@@ -99,6 +91,10 @@ var AppShow = React.createClass({
           <div>
             <span>Image:&nbsp;</span>
             <span> {this.state.image && this.state.image.name}</span>
+          </div>
+          <div>
+            <span>Port:&nbsp;</span>
+            <span> {this.state.app.port}</span>
           </div>
           <div>
             <span>Created:&nbsp;</span>
