@@ -53,8 +53,9 @@ var AppCreate = React.createClass({
     var imageObject = ImageStore.getOne(image)
     var ports = []
     var exposedPorts = []
-    if (imageObject.exposedPorts && (imageObject.exposedPorts instanceof Array)) {
-      exposedPorts =imageObject.exposedPorts.sort(function(a, b){
+    if (imageObject.exposedPorts && (imageObject.exposedPorts instanceof Array) &&
+      (imageObject.exposedPorts.length > 0)) {
+      exposedPorts = imageObject.exposedPorts.sort(function(a, b){
         return parseInt(a) > parseInt(b)
       })
       ports = [exposedPorts[0].toString()]
