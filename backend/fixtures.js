@@ -120,3 +120,14 @@ db.systems.insert({
   "logs" : [],
   "__v" : 1
 })
+db.vouchers.insert({
+  "deleted" : false,
+  "email" : null,
+  "amount" : 300,
+  "note" : "Welcome to Blackbeard :)",
+  "createdAt" : "1443628956",
+  "claimants" : [],
+  "used" : 0,
+  "limit" : null,
+  "code" : "WELCOMETOBLACKBEARD"
+})
