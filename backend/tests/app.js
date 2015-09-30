@@ -67,7 +67,7 @@ lab.experiment('/users/me/apps', function() {
         body: {
           name: 'testa!!!@#!@#pp-new',
           image: image._id,
-          port: 80
+          ports: [80]
         },
         json: true
       })
@@ -87,7 +87,7 @@ lab.experiment('/users/me/apps', function() {
         body: {
           name: 'testapp-new',
           image: image._id,
-          port: 443
+          ports: [443]
         },
         json: true
       })
@@ -177,7 +177,7 @@ lab.experiment('/users/me/apps/containers', function() {
     var requestData = {
       name: 'Test App Container',
       image: imageId,
-      port: 80
+      ports: [80]
     }
     request({
         method: 'POST',
