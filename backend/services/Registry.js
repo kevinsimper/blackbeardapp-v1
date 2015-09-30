@@ -2,12 +2,19 @@ var Promise = require('bluebird')
 var request = Promise.promisify(require('request'))
 var _ = require('lodash')
 
+var config = require('../config')
+
+var auth = "Basic " + new Buffer("worker:"+config.WORKER_PASSWORD).toString("base64");
+
 exports.getAllImages = function (registryUrl) {
   var url = registryUrl + '/v2/_catalog'
   return request({
     method: 'GET',
     uri: url,
-    json: true
+    json: true,
+    headers: {
+      Authorization: auth
+    }
   }).spread(function(response, body) {
     return body.repositories
   })
@@ -18,7 +25,10 @@ exports.getOneImage = function (registryUrl, image) {
   return request({
     method: 'GET',
     uri: url,
-    json: true
+    json: true,
+    headers: {
+      Authorization: auth
+    }
   }).spread(function (response, body) {
     return body
   })
@@ -29,7 +39,10 @@ exports.getOneTagImageManifest = function (registryUrl, image, tag) {
   return request({
     method: 'GET',
     uri: url,
-    json: true
+    json: true,
+    headers: {
+      Authorization: auth
+    }
   }).spread(function (response, body) {
     body.dockerContentDigest = response.headers['docker-content-digest']
     body.history = body.history.map(function (history) {
