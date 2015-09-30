@@ -32,6 +32,20 @@ exports.getRegistryAllImages = {
     Promise.all([allImages, images, imageDetails]).spread(function (allImages, images, imageDetails) {
       var combined = images.map(function(image, index) {
         image.tags = imageDetails[index]
+
+        // Overcomplicated code here but it has to extract a very nested value with the key 'ExposedPorts'
+        var exposedPorts = _.uniq(_.flattenDeep(_.map(image.tags, function(tag) {
+          return _.without(_.map(tag.history, function(history) {
+            if (history.v1Compatibility.config.ExposedPorts) {
+              return _.map(Object.keys(history.v1Compatibility.config.ExposedPorts), function (port) {
+                return port.split("/")[0]
+              })
+            }
+          }), undefined)
+        })))
+
+        image.exposedPorts = exposedPorts
+
         return image
       })
       reply(combined)
