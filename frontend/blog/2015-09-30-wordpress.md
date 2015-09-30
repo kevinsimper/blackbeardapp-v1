@@ -21,10 +21,9 @@ If you don't have Google Cloud account you can sign up for one here: https://clo
 
 Because the actual IP of our container will not be known we can set the allowed networks of our MySql server to "0.0.0.0/0". This can be found under the "Access Control" tab in the "Authorization" sub-tab of the Cloud SQL instance page. You will need to create a user for WordPress to log into the database as too, which is done from the "Users" sub-tab.
 
+Create a new App on Blackbeard.
+
 Interface stuff to set env variables. In my case because I am hugely security-conscious I set them to:
-* WORDPRESS_DB_HOST="173.194.81.17"
-* WORDPRESS_DB_USER="wordpress"
-* WORDPRESS_DB_PASSWORD="wordpress"
 
 Interface stuff to deploy
 
