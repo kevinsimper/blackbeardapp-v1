@@ -82,8 +82,6 @@ var AppShow = React.createClass({
     var runningContainers = filter(this.state.containers, {deleted: false}) || []
     var upContainers = filter(this.state.containers, {deleted: false, status: 'UP'}) || []
 
-    console.log(this.state.app)
-
     return (
       <div className='AppShow'>
         <h1><StatusIcon/>{this.state.app.name}</h1>
