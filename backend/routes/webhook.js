@@ -56,11 +56,9 @@ exports.postNotifyImage = function(request, reply) {
       return RegistryService.getOneTagImageManifest(config.REGISTRY_FULLURL, registryImage.name, tag)
     })
   }).then(function(imageManifests) {
-    if (imageManifests.length === 0) {
-      return []
-    }
-
     return RegistryService.extractPortsFromTagImageManifest(imageManifests)
+  }).catch(function(err) {
+    return []
   })
 
   var status = checkImage.then(function (image) {
@@ -95,6 +93,7 @@ exports.postNotifyImage = function(request, reply) {
     })
     image.modifiedAt = timestamp
     image.exposedPorts = exposedPorts
+
     return image.save()
   }).then(function() {
     reply("ok")

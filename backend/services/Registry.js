@@ -41,6 +41,9 @@ exports.getOneTagImageManifest = function (registryUrl, image, tag) {
 }
 
 exports.extractPortsFromTagImageManifest = function(manifest) {
+  if (!manifest.length) {
+    return []
+  }
   // Overcomplicated code here but it has to extract a very nested value with the key 'ExposedPorts'
   var imageManifest = manifest[0]
   return _.uniq(_.flatten(_.without(_.map(imageManifest.history, function(history) {
