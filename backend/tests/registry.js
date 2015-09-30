@@ -42,17 +42,17 @@ lab.experiment('/registry/images', function () {
     })
   })
 
-  lab.test('/registry/synchronise', function(done) {
-    request({
-      method: 'GET',
-      uri: appUrl + '/registry/synchronise',
-      headers: {
-        'Authorization': adminToken
-      },
-      json: true,
-    }).spread(function(response, body) {
-      expect(response.statusCode, 'to be', 200)
-      done()
-    })
-  })
+  //lab.test('/registry/synchronise', function(done) {
+  //  request({
+  //    method: 'GET',
+  //    uri: appUrl + '/registry/synchronise',
+  //    headers: {
+  //      'Authorization': adminToken
+  //    },
+  //    json: true,
+  //  }).spread(function(response, body) {
+  //    expect(response.statusCode, 'to be', 200)
+  //    done()
+  //  })
+  //})
 })
