@@ -19,10 +19,12 @@ And push it up to us:
 
 If you don't have Google Cloud account you can sign up for one here: https://cloud.google.com/. They offer a free trial on their Cloud platform if you haven't previously signed up. There is extensive documentation on setting up and using this service at https://cloud.google.com/sql/docs/getting-started, which features a [youtube video](https://youtu.be/_kQXgjIfLgo) on creating an instance.
 
-Interface stuff to set env variables
-* WORDPRESS_DB_HOST
-* WORDPRESS_DB_USER
-* WORDPRESS_DB_PASSWORD
+Because the actual IP of our container will not be known we can set the allowed networks of our MySql server to "0.0.0.0/0". This can be found under the "Access Control" tab in the "Authorization" sub-tab of the Cloud SQL instance page. You will need to create a user for WordPress to log into the database as too, which is done from the "Users" sub-tab.
+
+Interface stuff to set env variables. In my case because I am hugely security-conscious I set them to:
+* WORDPRESS_DB_HOST="173.194.81.17"
+* WORDPRESS_DB_USER="wordpress"
+* WORDPRESS_DB_PASSWORD="wordpress"
 
 Interface stuff to deploy
 
