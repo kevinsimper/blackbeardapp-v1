@@ -91,6 +91,10 @@ var AppShow = React.createClass({
             <span> {this.state.image && this.state.image.name}</span>
           </div>
           <div>
+            <span>Port:&nbsp;</span>
+            <span> {this.state.app.port}</span>
+          </div>
+          <div>
             <span>Created:&nbsp;</span>
             <TimeSince timestamp={this.state.app.timestamp}/>
           </div>

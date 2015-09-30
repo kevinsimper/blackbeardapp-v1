@@ -58,6 +58,7 @@ db.apps.insert({
   "timestamp": "1435735744",
   "containers": [ObjectId("555cb1e2fc27fe6f5f540001")],
   "image": ObjectId("555cb1e2fc27fe6f5f543901"),
+  "port": 80,
   "deleted": false,
   "__v": 0
 });
@@ -107,6 +108,7 @@ db.containers.insert({
   "status": "UP",
   "createdAt": "1432138210",
   "deleted": false,
+  "port": 3751,
   "memory": 512,
   "app": ObjectId("559396bf05974b0c00b6b284"),
   "cluster": ObjectId("555cb1e2fc27fe6f5f540002"),

@@ -75,12 +75,14 @@ exports.postApp = {
   validate: {
     payload: {
       name: Joi.string().required(),
-      image: Joi.string().required()
+      image: Joi.string().required(),
+      port: Joi.number().required()
     }
   },
   handler: function(request, reply) {
     var name = request.payload.name
     var image = request.payload.image
+    var port = request.payload.port
     var user = User.getUserIdFromRequest(request)
 
     App.findAsync({name: name}).then(function(app) {
@@ -95,6 +97,7 @@ exports.postApp = {
         name: name,
         image: image,
         user: user,
+        port: port,
         timestamp: Math.round(Date.now() / 1000)
       })
 

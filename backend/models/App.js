@@ -13,6 +13,7 @@ var schema = new mongoose.Schema({
     key: String,
     value: String
   }],
+  port: String,
   deleted: { type: Boolean, default: false },
   deletedAt: String
 })
@@ -26,7 +27,7 @@ schema.statics.findByUserAndRole = function (user, role, cb) {
   var conditions = {}
 
   if(roles.isAllowed(roles.USER, role)) {
-    fields.push('name', 'timestamp', 'containers', 'image', 'environments', 'deleted', 'deletedAt', 'user')
+    fields.push('name', 'timestamp', 'containers', 'image', 'environments', 'deleted', 'deletedAt', 'user', 'port')
   }
 
   if(roles.isAllowed(roles.ADMIN, role)) {}

@@ -36,7 +36,8 @@ var store = Reflux.createStore({
       .set('Authorization', localStorage.token)
       .send({
         name: app.name,
-        image: app.image
+        image: app.image,
+        port: app.port
       })
       .end(function(err, res) {
         if (err) {
