@@ -26,7 +26,7 @@ var AppCreate = React.createClass({
       image: '',
       exposedPorts: [],
       status: '',
-      port: ''
+      ports: []
     })
   },
   onChange: function() {
@@ -51,24 +51,32 @@ var AppCreate = React.createClass({
     // Get ports from image.
     // Sort them and set the default selected port to the first one.
     var imageObject = ImageStore.getOne(image)
-    var port = null
+    var ports = []
     var exposedPorts = []
     if (imageObject.exposedPorts && (imageObject.exposedPorts instanceof Array)) {
       exposedPorts =imageObject.exposedPorts.sort(function(a, b){
         return parseInt(a) > parseInt(b)
       })
-      port = exposedPorts[0].toString()
+      ports = [exposedPorts[0].toString()]
     }
 
     this.setState({
       image: image,
       exposedPorts: exposedPorts,
-      port: port
+      ports: ports
     })
   },
   onChangePort: function(e) {
+    var options = e.target.options;
+    var value = [];
+    for (var i = 0, l = options.length; i < l; i++) {
+      if (options[i].selected) {
+        value.push(options[i].value);
+      }
+    }
+
     this.setState({
-      port: e.target.value
+      ports: value
     })
   },
   onSubmit: function(e) {
@@ -92,7 +100,7 @@ var AppCreate = React.createClass({
       })
       return false
     }
-    if(!this.state.port || !this.state.port.match(/\d/)) {
+    if(!this.state.ports || (this.state.ports.length === 0)) {
       this.setState({
         status: 'You have to choose a port to expose'
       })
@@ -122,9 +130,9 @@ var AppCreate = React.createClass({
         <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
         <Label>Port</Label>
         {(this.state.exposedPorts.length > 0) &&
-        <Select value={this.state.port} onChange={this.onChangePort}>
+        <Select multiple={true} value={this.state.ports} onChange={this.onChangePort}>
           {this.state.exposedPorts.map(function(port) {
-            return <option value={port} selected={self.state.port == port}>{port}</option>
+            return <option value={port} selected={self.state.ports == port}>{port}</option>
           })}
         </Select>}
         {!this.state.image && <span>Please select an image</span>}
