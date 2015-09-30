@@ -88,7 +88,12 @@ exports.createContainer = function (cluster, image, app) {
   var options = {
     Image: image,
     HostConfig: {
-      'PublishAllPorts': true,
+      'ExposedPorts': {
+        "80/tcp": {}
+      },
+      "HostConfig": {
+        "PortBindings": {"80/tcp": [{"HostPort": "32231"}]},
+      },
       'Memory': 1024 * 1024 * 512 // 1024 bytes * 1024 bytes = 1 megabyte * 512
     },
     'Env': envs
