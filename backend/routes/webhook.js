@@ -33,8 +33,11 @@ exports.postNotifyImage = function(request, reply) {
     })
   })
 
-  var image = user.then(function() {
-    return Image.findOne({ name: name })
+  var image = user.then(function(user) {
+    return Image.findOne({
+      name: name,
+      user: user._id
+    })
   })
   var checkImage = Promise.all([user, image]).spread(function (user, image) {
     if(!image) {
