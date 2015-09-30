@@ -30,6 +30,8 @@ var ContainerFormular = React.createClass({
           alert("You have reached your limit of containers.")
         } else if (err.status == 403) {
           alert("Blackbeard is temporarily unavailable. Please try again later.")
+        } else if (err.status == 429) {
+          alert('User account has insufficient credit to start a new container.')
         } else {
           alert("An unknown error has ocurred.")
         }

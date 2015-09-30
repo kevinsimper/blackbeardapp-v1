@@ -29,6 +29,10 @@ exports.postContainer = function(request, reply) {
 
   // Get complete count of running containers for this user
   var containerCount = user.then(function(user) {
+    if (user.credit <= 0) {
+      throw new Promise.OperationalError('no-credit')
+    }
+
     return App.find({user: userId}).populate('containers')
   }).then(function(userApps) {
     return _.sum(_.flatten(_.map(userApps, function(userApp) {
@@ -81,6 +85,10 @@ exports.postContainer = function(request, reply) {
       return reply(Boom.forbidden())
     } else if (err.message === 'limit') {
       return reply(Boom.badRequest('Container limit reached for this user account.'))
+    } else if (err.message === 'no-credit') {
+      // This is incorrect use here of tooManyRequests, however it badRequest is used by container limit above
+      // and the message doesn't seem to be sent with the error.
+      return reply(Boom.tooManyRequests('User account has insufficient credit to start a new container.'))
     }
     return reply(Boom.notFound())
   }).catch( function (err) {
