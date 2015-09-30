@@ -1,9 +1,13 @@
 var Promise = require('bluebird')
 var Image = require('../models/Image')
 var User = require('../models/User')
+var RegistryService = require('../services/Registry')
 var System = require('../models/System')
 var Boom = require('boom')
 var Queue = require('../services/Queue')
+var _ = require('lodash')
+
+var config = require('../config')
 
 exports.postNotifyImage = function(request, reply) {
   var username = request.payload.user
@@ -45,6 +49,28 @@ exports.postNotifyImage = function(request, reply) {
     }
   })
 
+  // Set ports on image document
+  var registryImage = RegistryService.getOneImage(config.REGISTRY_FULLURL, username + "/" + name)
+  var exposedPorts = registryImage.then(function(registryImage) {
+    return Promise.map(registryImage.tags, function (tag) {
+      return RegistryService.getOneTagImageManifest(config.REGISTRY_FULLURL, registryImage.name, tag)
+    })
+  }).then(function(imageManifests) {
+    if (imageManifests.length === 0) {
+      return []
+    }
+
+    // Overcomplicated code here but it has to extract a very nested value with the key 'ExposedPorts'
+    var imageManifest = imageManifests[0]
+    return _.uniq(_.flatten(_.without(_.map(imageManifest.history, function(history) {
+      if (history.v1Compatibility.config.ExposedPorts) {
+        return _.map(Object.keys(history.v1Compatibility.config.ExposedPorts), function (port) {
+          return port.split("/")[0]
+        })
+      }
+    }), undefined)))
+  })
+
   var status = checkImage.then(function (image) {
     // If image does not have a id defined and therefore
     // have no way to determine if it has been updated.
@@ -69,13 +95,14 @@ exports.postNotifyImage = function(request, reply) {
     }
   })
 
-  Promise.all([checkImage, status, sendToWorker]).spread(function (image, status) {
+  Promise.all([checkImage, status, exposedPorts, sendToWorker]).spread(function (image, status, exposedPorts) {
     image.logs.push({
       timestamp: timestamp,
       dockerContentDigest: dockerContentDigest,
       status: status
     })
     image.modifiedAt = timestamp
+    image.exposedPorts = exposedPorts
     return image.save()
   }).then(function() {
     reply("ok")
