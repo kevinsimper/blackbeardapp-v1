@@ -85,6 +85,8 @@ var AppEdit = React.createClass({
     return (
       <div className='AppEdit'>
         <h2>Edit app</h2>
+        <h3>Environment Variables</h3>
+        <div style={{marginBottom: "0.5em"}}>These will be available inside the container as environment variables.</div>
         <Table>
           <thead>
             <tr>
