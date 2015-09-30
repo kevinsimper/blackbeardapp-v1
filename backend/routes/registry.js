@@ -33,19 +33,6 @@ exports.getRegistryAllImages = {
       var combined = images.map(function(image, index) {
         image.tags = imageDetails[index]
 
-        // Overcomplicated code here but it has to extract a very nested value with the key 'ExposedPorts'
-        var exposedPorts = _.uniq(_.flattenDeep(_.map(image.tags, function(tag) {
-          return _.without(_.map(tag.history, function(history) {
-            if (history.v1Compatibility.config.ExposedPorts) {
-              return _.map(Object.keys(history.v1Compatibility.config.ExposedPorts), function (port) {
-                return port.split("/")[0]
-              })
-            }
-          }), undefined)
-        })))
-
-        image.exposedPorts = exposedPorts
-
         return image
       })
       reply(combined)
@@ -108,6 +95,8 @@ exports.getSynchronise = {
           var registryImageName = registryImage[0].name.split('/')
           var name = registryImageName[1]
 
+          var exposedPorts = RegistryService.extractPortsFromTagImageManifest(registryImage)
+
           var timestamp = Math.round(Date.now() / 1000)
 
           // Create image
@@ -115,6 +104,7 @@ exports.getSynchronise = {
             user: user._id,
             name: name,
             createdAt: timestamp,
+            exposedPorts: exposedPorts,
             dockerContentDigest: dockerContentDigest,
             logs: [
               {

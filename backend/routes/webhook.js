@@ -60,15 +60,7 @@ exports.postNotifyImage = function(request, reply) {
       return []
     }
 
-    // Overcomplicated code here but it has to extract a very nested value with the key 'ExposedPorts'
-    var imageManifest = imageManifests[0]
-    return _.uniq(_.flatten(_.without(_.map(imageManifest.history, function(history) {
-      if (history.v1Compatibility.config.ExposedPorts) {
-        return _.map(Object.keys(history.v1Compatibility.config.ExposedPorts), function (port) {
-          return port.split("/")[0]
-        })
-      }
-    }), undefined)))
+    return RegistryService.extractPortsFromTagImageManifest(imageManifests)
   })
 
   var status = checkImage.then(function (image) {
