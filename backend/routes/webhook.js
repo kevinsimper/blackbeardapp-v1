@@ -58,6 +58,8 @@ exports.postNotifyImage = function(request, reply) {
   }).then(function(imageManifests) {
     return RegistryService.extractPortsFromTagImageManifest(imageManifests)
   }).catch(function(err) {
+    // In the situation we cannot retrieve the TagImageManifest from the RegistryService we will just return an
+    // empty list. It will basically mean the image does not have ports exposed or is corrupt in some way.
     return []
   })
 
