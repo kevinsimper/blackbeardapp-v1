@@ -32,6 +32,7 @@ exports.getRegistryAllImages = {
     Promise.all([allImages, images, imageDetails]).spread(function (allImages, images, imageDetails) {
       var combined = images.map(function(image, index) {
         image.tags = imageDetails[index]
+
         return image
       })
       reply(combined)
@@ -94,6 +95,8 @@ exports.getSynchronise = {
           var registryImageName = registryImage[0].name.split('/')
           var name = registryImageName[1]
 
+          var exposedPorts = RegistryService.extractPortsFromTagImageManifest(registryImage)
+
           var timestamp = Math.round(Date.now() / 1000)
 
           // Create image
@@ -101,6 +104,7 @@ exports.getSynchronise = {
             user: user._id,
             name: name,
             createdAt: timestamp,
+            exposedPorts: exposedPorts,
             dockerContentDigest: dockerContentDigest,
             logs: [
               {

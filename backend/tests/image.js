@@ -37,7 +37,8 @@ lab.experiment('/users', function () {
       json: true,
       body: {
         user: 'blackbeard',
-        name: 'busybox'
+        name: 'busybox',
+        dockerContentDigest: 'sha4878978946456456'
       }
     }).spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)
@@ -52,7 +53,8 @@ lab.experiment('/users', function () {
       json: true,
       body: {
         user: 'unknown',
-        name: 'busybox'
+        name: 'busybox',
+        dockerContentDigest: 'sha4878978946456456'
       }
     }).spread(function(response, body) {
       expect(response.statusCode, 'to be', 200)

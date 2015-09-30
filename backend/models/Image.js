@@ -5,6 +5,7 @@ var schema = new mongoose.Schema({
   name: String,
   createdAt: String,
   modifiedAt: String,
+  exposedPorts: [Number],
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
   logs: [{
     timestamp: String,

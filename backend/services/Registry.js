@@ -1,5 +1,6 @@
 var Promise = require('bluebird')
 var request = Promise.promisify(require('request'))
+var _ = require('lodash')
 
 exports.getAllImages = function (registryUrl) {
   var url = registryUrl + '/v2/_catalog'
@@ -37,4 +38,19 @@ exports.getOneTagImageManifest = function (registryUrl, image, tag) {
     })
     return body
   })
+}
+
+exports.extractPortsFromTagImageManifest = function(manifest) {
+  if (!manifest.length) {
+    return []
+  }
+  // Overcomplicated code here but it has to extract a very nested value with the key 'ExposedPorts'
+  var imageManifest = manifest[0]
+  return _.uniq(_.flatten(_.without(_.map(imageManifest.history, function(history) {
+    if (history.v1Compatibility.config.ExposedPorts) {
+      return _.map(Object.keys(history.v1Compatibility.config.ExposedPorts), function (port) {
+        return port.split("/")[0]
+      })
+    }
+  }), undefined)))
 }
