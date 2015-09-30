@@ -160,6 +160,10 @@ exports.claimVoucher = {
         throw new Promise.OperationalError("Voucher is invalid")
       }
 
+      if (voucher.code === "WELCOMETOBLACKBEARD") {
+        throw new Promise.OperationalError("Voucher is invalid")
+      }
+
       // Check if voucher is in unlimited mode
       // or has not been claimed too many times
       if ((voucher.limit === null) || (voucher.used < voucher.limit)) {
