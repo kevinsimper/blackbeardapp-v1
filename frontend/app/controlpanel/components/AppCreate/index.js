@@ -10,6 +10,7 @@ var Label= require('../Label/')
 var Button = require('../Button/')
 var ImagesSelect = require('../ImagesSelect/index')
 var ErrorMessage = require('../ErrorMessage/')
+var Select = require('../Select')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
@@ -23,6 +24,7 @@ var AppCreate = React.createClass({
       loaded: false,
       name: '',
       image: '',
+      exposedPorts: [],
       status: '',
       port: ''
     })
@@ -46,8 +48,22 @@ var AppCreate = React.createClass({
     })
   },
   onChangeImage: function(image) {
+    // Get ports from image.
+    // Sort them and set the default selected port to the first one.
+    var imageObject = ImageStore.getOne(image)
+    var port = null
+    var exposedPorts = []
+    if (imageObject.exposedPorts && (imageObject.exposedPorts instanceof Array)) {
+      exposedPorts =imageObject.exposedPorts.sort(function(a, b){
+        return parseInt(a) > parseInt(b)
+      })
+      port = exposedPorts[0].toString()
+    }
+
     this.setState({
-      image: image
+      image: image,
+      exposedPorts: exposedPorts,
+      port: port
     })
   },
   onChangePort: function(e) {
@@ -67,6 +83,12 @@ var AppCreate = React.createClass({
     if(!this.state.image) {
       this.setState({
         status: 'You have to choose a image'
+      })
+      return false
+    }
+    if(this.state.image && (this.state.exposedPorts.length == 0)) {
+      this.setState({
+        status: 'There are no ports to expose'
       })
       return false
     }
@@ -90,15 +112,23 @@ var AppCreate = React.createClass({
       })
   },
   render: function() {
+    var self = this
     return (
       <form className="App" onSubmit={this.onSubmit}>
         <h1>Create app</h1>
         <Label>Name</Label>
         <Input type="text" value={this.state.name} onChange={this.onChangeName} />
-        <Label>Port</Label>
-        <Input style={{width: "5em"}} type="text" value={this.state.port} onChange={this.onChangePort} />
         <Label>Image</Label>
         <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
+        <Label>Port</Label>
+        {(this.state.exposedPorts.length > 0) &&
+        <Select value={this.state.port} onChange={this.onChangePort}>
+          {this.state.exposedPorts.map(function(port) {
+            return <option value={port} selected={self.state.port == port}>{port}</option>
+          })}
+        </Select>}
+        {!this.state.image && <span>Please select an image</span>}
+        {this.state.image && (this.state.exposedPorts.length == 0) && <span>There are no ports to expose.</span>}
         <ErrorMessage>{this.state.status}</ErrorMessage>
         <div>
           <Button>Create app</Button>
