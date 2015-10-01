@@ -92,7 +92,7 @@ var AppShow = React.createClass({
           </div>
           <div>
             <span>Port:&nbsp;</span>
-            <span> {this.state.app.port}</span>
+            <span> {this.state.app.ports.join(", ")}</span>
           </div>
           <div>
             <span>Created:&nbsp;</span>

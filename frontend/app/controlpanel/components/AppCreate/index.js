@@ -131,9 +131,9 @@ var AppCreate = React.createClass({
         <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
         <Label>Port</Label>
         {(this.state.exposedPorts.length > 0) &&
-        <Select multiple={true} value={this.state.ports} onChange={this.onChangePort}>
+        <Select value={this.state.ports} onChange={this.onChangePort}>
           {this.state.exposedPorts.map(function(port) {
-            return <option value={port} selected={self.state.ports == port}>{port}</option>
+            return <option value={port}>{port}</option>
           })}
         </Select>}
         {!this.state.image && <span>Please select an image</span>}
