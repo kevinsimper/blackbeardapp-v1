@@ -90,7 +90,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
 
     var clusterContainerId = Promise.all([cluster, user, image, pullImage, app]).spread(function (cluster, user, image, pullImage, app) {
       var imagePath = registry + '/' + user.username + '/' + image.name + ':latest'
-      console.log('image to start', image)
+      console.log('image to start', imagePath)
       return ClusterService.createContainer(cluster, imagePath, app).then(function (clusterContainerId) {
         console.log('clusterContainerId', clusterContainerId)
         return clusterContainerId
@@ -118,19 +118,24 @@ Promise.all([mongo, rabbitmq]).then(function () {
         throw new Promise.OperationalError('no-connection-details')
       }
 
-      var appPorts = _.flatten(_.filter(containerInfo.NetworkSettings.Ports, function (details, port) {
-        var port = port.split("/")[0]
+      // Just getting first App port at this stage
+      var appPort = app.ports.pop()
 
-        return port == app.port
-      }), true)
+      var portBinding = _.find(containerInfo.NetworkSettings.Ports, function (details, port) {
+        return (parseInt(port.split("/")[0]) == appPort)
+      })
 
-      if (!appPorts.length) {
+      if (!portBinding || !portBinding.length || !portBinding[0].HostPort) {
+        throw new Promise.OperationalError('port-404')
+      }
+
+      if (!appPort) {
         throw new Promise.OperationalError('no-port')
       }
 
       container.status = Container.status.UP
       container.ip = cluster.ip
-      container.port = appPorts[0].HostPort
+      container.port = portBinding[0].HostPort
       container.cluster = cluster._id
       container.containerHash = clusterContainerId
       container.dockerContentDigest = image.dockerContentDigest
@@ -151,6 +156,7 @@ Promise.all([mongo, rabbitmq]).then(function () {
         case 'no-app':
         case 'no-user':
         case 'no-port':
+        case 'port-404':
         case 'no-connection-details':
         case 'no-image':
           container.then(function (container) {
