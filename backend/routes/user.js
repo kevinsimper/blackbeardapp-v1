@@ -2,10 +2,13 @@ var Promise = require('bluebird')
 var passwordHash = require('password-hash')
 var Boom = require('boom')
 var User = require('../models/User')
+var Voucher = require('../models/Voucher')
+var VoucherClaimant = require('../models/VoucherClaimant')
 var roles = require('../models/roles/')
 var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 var _ = require('lodash')
+var moment = require('moment')
 var Mail = require('../services/Mail')
 var Payment = require('../models/Payment')
 var Log = require('../models/Log')
@@ -136,7 +139,31 @@ exports.postUser = {
       return newUser.save()
     })
 
-    var sendResult = user.then(function(user) {
+    // Put $3 on new users account
+    // This logic should be moved to something like VoucherService.claimVoucher(user, voucher)
+    var welcomeVoucher = user.then(function(user) {
+      return Voucher.findOne({code: "WELCOMETOBLACKBEARD"})
+    })
+
+    var welcomeVoucherClaimed = Promise.all([user, welcomeVoucher]).spread(function(user, welcomeVoucher) {
+      var voucherClaimant = new VoucherClaimant({
+        voucher: welcomeVoucher._id,
+        user: user._id,
+        claimedAt: moment().unix()
+      })
+
+      return voucherClaimant.save()
+    })
+
+    // Increasing user's credit, however because this is a welcome voucher we are not adding them to the voucher.claimants
+    // because everyone will be there.
+    var userUpdatedCredit = Promise.all([user, welcomeVoucher, welcomeVoucherClaimed]).spread(function(user, welcomeVoucher, welcomeVoucherClaimed) {
+      user.credit += welcomeVoucher.amount
+
+      return user.save()
+    })
+
+    var sendResult = Promise.all([user, userUpdatedCredit]).spread(function(user, userUpdatedCredit) {
       return Mail.sendVerificationEmail(user)
     }).then(function(sendResult) {
       if (sendResult !== Mail.result.SEND_SUCCESSFUL) {
