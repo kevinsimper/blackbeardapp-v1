@@ -23,9 +23,13 @@ Because the actual IP of our container will not be known we can set the allowed 
 
 Create a new App on Blackbeard.
 
+
+
 Interface stuff to set env variables. In my case because I am hugely security-conscious I set them to:
 
 Interface stuff to deploy
+
+And voilà WordPress is running online: ![It's alive!](/images/blog/wordpress-running.png)
 
 Sources:
 https://hub.docker.com/_/wordpress/
