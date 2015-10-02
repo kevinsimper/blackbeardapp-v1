@@ -112,7 +112,7 @@ var VoucherCreate = React.createClass({
 
     VoucherActions.new(this.state)
       .then(function(voucher) {
-        self.transitionTo('/vouchers/' + voucher._id)
+        self.transitionTo('/controlpanel/vouchers/' + voucher._id)
       })
   },
   render: function() {

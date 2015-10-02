@@ -3,7 +3,6 @@ var Router = require('react-router')
 var Store = require('./Store')
 
 var getState = function() {
-  console.log(PreUsersShow.getParams().id)
   return {
     preUser: {}
   };
@@ -15,7 +14,7 @@ var PreUsersShow = React.createClass({
     return getState()
   },
   componentDidMount: function() {
-      this.unsubscribe = PreUsersStore.listen(this.onChange);
+      this.unsubscribe = Store.listen(this.onChange);
       Actions.load()
   },
   componentWillUnmount: function() {

@@ -27,10 +27,10 @@ var Vouchers = React.createClass({
     this.setState(this.getState())
   },
   onClickView: function(voucher) {
-    this.transitionTo('/vouchers/' + voucher._id)
+    this.transitionTo('/controlpanel/vouchers/' + voucher._id)
   },
   onClickNew: function(voucher) {
-    this.transitionTo('/vouchers/create')
+    this.transitionTo('/controlpanel/vouchers/create')
   },
   render: function () {
     var self = this

@@ -64,14 +64,14 @@ var AppShow = React.createClass({
     }
     AppsActions.del(this.state.app._id)
       .then(function() {
-        self.replaceWith('/')
+        self.replaceWith('/controlpanel')
       })
   },
   onClickStart: function() {
-    this.transitionTo('/apps/' + this.props.params.id + '/containers')
+    this.transitionTo('/controlpanel/apps/' + this.props.params.id + '/containers')
   },
   onClickEdit: function () {
-    this.transitionTo('/apps/' + this.props.params.id + '/edit')
+    this.transitionTo('/controlpanel/apps/' + this.props.params.id + '/edit')
   },
   render: function() {
     var self = this

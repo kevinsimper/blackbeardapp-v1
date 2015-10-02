@@ -26,41 +26,39 @@ var Registry = require('./components/Registry/')
 var CreditLogs = require('./components/CreditLogs/')
 var Usage = require('./components/Usage/')
 var AppEdit = require('./components/AppEdit/')
+var Verify = require('./components/Verify')
 
 var routes = (
-  <Route handler={ControlpanelApp}>
+  <Route path='/controlpanel' handler={ControlpanelApp}>
     <DefaultRoute handler={Dashboard}/>
-    <Route name='login' handler={Login}/>
-    <Route name='forgot' handler={ForgotPassword}/>
-    <Route path='/forgot/:id' handler={ForgotPassword}/>
-    <Route name='dashboard' handler={Dashboard}/>
-    <Route name='app' path='/apps'>
-      <Route path='create' handler={AppCreate}/>
-      <Route name="AppShow" path=':id' handler={AppShow}/>
-      <Route path=':id/containers' handler={ContainerFormular}/>
-    </Route>
-    <Route path='/apps/:id/edit' handler={AppEdit}/>
-    <Route path='/images' handler={Images}/>
-    <Route path='/billing' handler={Billing}/>
-    <Route path='/preusers' handler={PreUsersList}/>
-    <Route name='preuser' path='/preusers/:id' handler={PreUsersShow}/>
+    <Route path='login' handler={Login}/>
+    <Route path='forgot' handler={ForgotPassword}/>
+    <Route path='forgot/:id' handler={ForgotPassword}/>
+    <Route path='dashboard' handler={Dashboard}/>
+    <Route path='apps/create' handler={AppCreate}/>
+    <Route path='apps/:id' handler={AppShow}/>
+    <Route path='apps/:id/containers' handler={ContainerFormular}/>
+    <Route path='apps/:id/edit' handler={AppEdit}/>
+    <Route path='images' handler={Images}/>
+    <Route path='billing' handler={Billing}/>
+    <Route path='preusers' handler={PreUsersList}/>
+    <Route path='preusers/:id' handler={PreUsersShow}/>
     <Route path='profile' handler={Profile}/>
-    <Route name='user' path='/users'>
-      <Route path='/users' handler={Users}/>
-      <Route name="UserShow" path=':id' handler={UserShow}/>
-    </Route>
-    <Route path='/logs' handler={Logs}/>
-    <Route path='/clusters' handler={Clusters}/>
-    <Route path='/clusters/:id' handler={ClusterShow}/>
-    <Route path='/vouchers' handler={Vouchers}/>
-    <Route path='/vouchers/create' handler={VoucherCreate}/>
-    <Route path='/vouchers/:id' handler={VoucherShow}/>
-    <Route path='/registry' handler={Registry}/>
-    <Route path='/creditlogs' handler={CreditLogs}/>
-    <Route path='/usage' handler={Usage}/>
+    <Route path='users' handler={Users}/>
+    <Route path='users/:id' handler={UserShow}/>
+    <Route path='logs' handler={Logs}/>
+    <Route path='clusters' handler={Clusters}/>
+    <Route path='clusters/:id' handler={ClusterShow}/>
+    <Route path='vouchers' handler={Vouchers}/>
+    <Route path='vouchers/create' handler={VoucherCreate}/>
+    <Route path='vouchers/:id' handler={VoucherShow}/>
+    <Route path='registry' handler={Registry}/>
+    <Route path='creditlogs' handler={CreditLogs}/>
+    <Route path='usage' handler={Usage}/>
+    <Route path='verify/:id' handler={Verify}/>
   </Route>
 )
 
-Router.run(routes, Router.HashLocation, function(Root) {
+Router.run(routes, Router.HistoryLocation, function(Root) {
   React.render(<Root/>, document.querySelector('#adminapp'))
 })

@@ -19,8 +19,13 @@ exports.postForgot = function(request, reply) {
       from: 'Blackbeard <info@blackbeard.io>',
       to: user.email,
       subject: 'Blackbeard - Password Reset',
-      text: "Please click on the following link to reset your passsword. http://blackbeard.io/forgot/"+user.resetToken+
-        "\n\nRegards,\nThe team at Blackbeard"
+      text: [
+        'Please click on the following link to reset your passsword.',
+        '<a href="https://blackbeard.io/controlpanel/forgot/' + user.resetToken + '">',
+        'https://blackbeard.io/controlpanel/forgot/' + user.resetToken,
+        '</a>',
+        '\n\nRegards,\nThe team at Blackbeard'
+      ].join('')
     }
 
     Mail.send(data, function (error, body) {

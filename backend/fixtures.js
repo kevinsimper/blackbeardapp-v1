@@ -30,7 +30,7 @@ db.users.insert({
   "role": "ADMIN",
   "creditCards": [],
   "verified": false,
-  "verifyCode": "wq9y8XnWjnbJAGPavwmXpVNq9Y2BAwWpaytJKDB6erMdQx38y7Z5kRgKzgJRQYGV",
+  "verifyCode": "PredictableVerifyCode",
   "containerLimit": 20,
   "deleted": false,
   "__v": 0

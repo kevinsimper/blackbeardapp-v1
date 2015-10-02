@@ -9,6 +9,7 @@ var VoucherStore = require('../Vouchers/store')
 var Table = require('../Table')
 var Button = require('../Button')
 var Navigation = require('react-router').Navigation
+var Link = require('react-router').Link
 
 var VoucherShow = React.createClass({
   mixins: [Reflux.ListenerMixin, Navigation],
@@ -42,7 +43,7 @@ var VoucherShow = React.createClass({
 
     return (
       <div className='VoucherShow'>
-        <a href="#/vouchers">&lt; Back to Voucher List</a>
+        <Link to="/controlpanel/vouchers">&lt; Back to Voucher List</Link>
         <h1>Vouchers</h1>
         <Table variant='striped'>
           <thead>
@@ -54,7 +55,7 @@ var VoucherShow = React.createClass({
           <tbody>
             <tr>
               <td>Amount</td>
-              <td>${this.state.voucher.amount/100}</td>
+              <td>${this.state.voucher.amount / 100}</td>
             </tr>
             <tr>
               <td>Code</td>

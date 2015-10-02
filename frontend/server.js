@@ -27,11 +27,13 @@ app.get('/signup', function (req, res) {
   })
 })
 
-app.get('/controlpanel', function(req, res) {
+var controlpanel = function(req, res) {
   res.render('controlpanel/index', {
     NODE_ENV: process.env.NODE_ENV
   })
-})
+}
+app.get('/controlpanel', controlpanel)
+app.get('/controlpanel/*', controlpanel)
 
 app.get('/blog/', function (req, res) {
   var blogSlug = req.params.post

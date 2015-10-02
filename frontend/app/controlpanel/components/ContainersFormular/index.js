@@ -23,7 +23,7 @@ var ContainerFormular = React.createClass({
     e.preventDefault()
     AppActions.newContainer(this.props.params.id, this.state)
       .then(function() {
-        self.transitionTo('/apps/' + self.props.params.id)
+        self.transitionTo('/controlpanel/apps/' + self.props.params.id)
       })
       .catch(function(err) {
         if (err.status == 400) {
