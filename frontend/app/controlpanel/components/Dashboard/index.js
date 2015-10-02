@@ -40,10 +40,10 @@ var Dashboard = React.createClass({
     this.setState(this.getState())
   },
   onClickCreate: function () {
-    this.transitionTo('/apps/create')
+    this.transitionTo('/controlpanel/apps/create')
   },
   onClickCreditCard: function () {
-    this.transitionTo('/profile')
+    this.transitionTo('/controlpanel/profile')
   },
   onClickVerify: function () {
     var self = this

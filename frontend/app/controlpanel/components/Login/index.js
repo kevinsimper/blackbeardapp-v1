@@ -24,7 +24,7 @@ var Login = React.createClass({
           message: err.message
         })
       } else {
-        self.replaceWith('/')
+        self.replaceWith('/controlpanel')
       }
     })
   },
@@ -49,7 +49,7 @@ var Login = React.createClass({
           <Input type="password" value={this.state.password} onChange={this.onPasswordChange} required/>
           <div>
             <Button type="submit">Log in</Button>
-            <Link to='/forgot' className='Login__Forgot'>Forgot password?</Link>
+            <Link to='/controlpanel/forgot' className='Login__Forgot'>Forgot password?</Link>
           </div>
           <div>{this.state.message}</div>
         </form>

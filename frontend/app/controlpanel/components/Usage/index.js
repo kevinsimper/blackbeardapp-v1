@@ -60,11 +60,11 @@ var Usage = React.createClass({
           {Object.keys(this.state.billing.monthTotals).map(function(key) {
             var rows = []
             self.state.billing.results.map(function (billing) {
-              if (billing.month == key) {
+              if (billing.month === key) {
                 rows.push(<tr>
                   <td>{billing.month}</td>
                   <td>
-                    <Link to='AppShow' params={{id: billing.app._id}}>
+                    <Link to={'/controlpanel/apps/' + billing.app._id}>
                       {billing.app.name}
                     </Link>
                   </td>

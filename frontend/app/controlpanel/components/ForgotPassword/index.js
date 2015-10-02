@@ -65,7 +65,7 @@ var ForgotPassword = React.createClass({
       })
       auth.setToken(res.body.token)
       auth.onChange(true)
-      self.replaceWith('/')
+      self.replaceWith('/controlpanel')
     })
   },
   render: function() {

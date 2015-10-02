@@ -39,7 +39,7 @@ var ClusterShow = React.createClass({
   onClickDelete: function() {
     var self = this
     ClusterActions.del(this.props.params.id).then(function () {
-      self.transitionTo('/clusters')
+      self.transitionTo('/controlpanel/clusters')
     })
   },
   onClickStartContainer: function () {

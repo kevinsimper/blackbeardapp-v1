@@ -112,7 +112,7 @@ var AppCreate = React.createClass({
     })
     AppActions.new(this.state)
       .then(function(newApp) {
-        self.replaceWith('/apps/' + newApp._id)
+        self.replaceWith('/controlpanel/apps/' + newApp._id)
       })
       .catch(function(error) {
         self.setState({

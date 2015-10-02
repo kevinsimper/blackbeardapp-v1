@@ -34,7 +34,7 @@ var UserShow = React.createClass({
     if(confirm('Do you want to deactivate this user?')) {
       actions.del(this.props.params.id)
       .then(function() {
-        self.transitionTo('/users')
+        self.transitionTo('/controlpanel/users')
       })
     }
   },

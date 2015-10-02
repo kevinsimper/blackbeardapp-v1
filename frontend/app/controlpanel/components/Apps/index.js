@@ -6,6 +6,7 @@ var ContainersStore = require('../Containers/store')
 var ContainersAction = require('../Containers/actions')
 var StatusIcon = require('../StatusIcon/')
 var filter = require('lodash/collection/filter')
+var Navigation = require('react-router').Navigation
 
 var getState = function() {
   return {
@@ -15,7 +16,7 @@ var getState = function() {
 }
 
 var Apps = React.createClass({
-  mixins: [Reflux.ListenerMixin],
+  mixins: [Reflux.ListenerMixin, Navigation],
   getInitialState: function() {
     return getState()
   },
@@ -31,6 +32,9 @@ var Apps = React.createClass({
   onChange: function() {
     this.setState(getState())
   },
+  onClickApp: function (app) {
+    this.transitionTo('/controlpanel/apps/' + app._id)
+  },
   render: function() {
     var self = this
     var activeApps = filter(this.state.apps, {deleted: false}) || []
@@ -41,7 +45,7 @@ var Apps = React.createClass({
           {activeApps.map(function(app){
             return (
               <div className='Apps__Item'>
-                <a href={'#/apps/' + app._id} className='Apps__Link'>
+                <a href={'/controlpanel/apps/' + app._id} className='Apps__Link' onClick={self.onClickApp.bind(null, app)}>
                   <div className='Apps__StatusIcon'>
                     <StatusIcon/>
                   </div>
@@ -65,7 +69,7 @@ var Apps = React.createClass({
               {deletedApps.map(function (app) {
                 return (
                   <div className='Apps__Item'>
-                    <a href={'#/apps/' + app._id} className='Apps__Link'>
+                    <a href={'/controlpanel/apps/' + app._id} className='Apps__Link' onClick={self.onClickApp.bind(null, app)}>
                       {app.name}
                     </a>
                   </div>

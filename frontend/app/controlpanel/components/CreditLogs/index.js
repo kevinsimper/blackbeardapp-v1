@@ -46,11 +46,11 @@ var CreditLogs = React.createClass({
           return <tr>
               <td>{moment.unix(object.timestamp).format()}</td>
               <td>
-                <Link className='Users__Link' to='UserShow' params={{id: object.user._id}}>
+                <Link className='Users__Link' to={'/controlpanel/users/' + object.user._id}>
                   {object.user.email}
                 </Link>
               </td>
-              <td>${(object.amount/100).toFixed(2)}</td>
+              <td>${(object.amount / 100).toFixed(2)}</td>
               <td>{object.status}</td>
               <td>{object.source}</td>
             </tr>;

@@ -24,7 +24,7 @@ var Clusters = React.createClass({
     this.setState(this.getState())
   },
   onClickView: function(item) {
-    this.transitionTo('/clusters/' + item._id)
+    this.transitionTo('/controlpanel/clusters/' + item._id)
   },
   render: function () {
     var self = this

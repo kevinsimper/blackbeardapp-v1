@@ -17,7 +17,7 @@ var ControlpanelApp = React.createClass({
       loggedIn: loggedIn
     });
     if(!loggedIn) {
-      this.replaceWith('/login')
+      this.replaceWith('/controlpanel/login')
     }
   },
   componentWillMount: function() {

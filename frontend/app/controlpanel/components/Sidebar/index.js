@@ -2,8 +2,10 @@ var React = require('react');
 var auth = require('../../auth')
 var Button = require('../Button/')
 var ProfileActions = require('../Profile/actions')
+var Navigation = require('react-router').Navigation
 
 var Sidebar = React.createClass({
+  mixins: [Navigation],
   getInitialState: function () {
     return {
       profile: {}
@@ -17,6 +19,10 @@ var Sidebar = React.createClass({
       })
     })
   },
+  onClickLink: function (e) {
+    e.preventDefault()
+    this.transitionTo(e.target.pathname)
+  },
   render: function() {
     return (
       <div className='Sidebar'>
@@ -25,43 +31,43 @@ var Sidebar = React.createClass({
         </div>
         <div className='Sidebar__List'>
           <div className='Sidebar__Item'>
-            <a className='Sidebar__Link' href="#/">Dashboard</a>
+            <a className='Sidebar__Link' href="/controlpanel" onClick={this.onClickLink}>Dashboard</a>
           </div>
           <div className='Sidebar__Item'>
-            <a className='Sidebar__Link' href="#/profile">My Profile</a>
+            <a className='Sidebar__Link' href="/controlpanel/profile" onClick={this.onClickLink}>My Profile</a>
           </div>
           <div className='Sidebar__Item'>
-            <a className='Sidebar__Link' href="#/images">Images</a>
+            <a className='Sidebar__Link' href="/controlpanel/images" onClick={this.onClickLink}>Images</a>
           </div>
           <div className='Sidebar__Item'>
-            <a className='Sidebar__Link' href="#/usage">Usage</a>
+            <a className='Sidebar__Link' href="/controlpanel/usage" onClick={this.onClickLink}>Usage</a>
           </div>
           {this.state.profile.role && (this.state.profile.role === 'ADMIN') &&
             <div>
               <h3 className='Sidebar__DividerTitel'>Admin</h3>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/registry">Registry</a>
+                <a className='Sidebar__Link' href="/controlpanel/registry" onClick={this.onClickLink}>Registry</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/preusers">PreUsers</a>
+                <a className='Sidebar__Link' href="/controlpanel/preusers" onClick={this.onClickLink}>PreUsers</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/users">Users</a>
+                <a className='Sidebar__Link' href="/controlpanel/users" onClick={this.onClickLink}>Users</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/billing">Billing</a>
+                <a className='Sidebar__Link' href="/controlpanel/billing" onClick={this.onClickLink}>Billing</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/creditlogs">Credit Logs</a>
+                <a className='Sidebar__Link' href="/controlpanel/creditlogs" onClick={this.onClickLink}>Credit Logs</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/logs">Logs</a>
+                <a className='Sidebar__Link' href="/controlpanel/logs" onClick={this.onClickLink}>Logs</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/clusters">Clusters</a>
+                <a className='Sidebar__Link' href="/controlpanel/clusters" onClick={this.onClickLink}>Clusters</a>
               </div>
               <div className='Sidebar__Item'>
-                <a className='Sidebar__Link' href="#/vouchers">Vouchers</a>
+                <a className='Sidebar__Link' href="/controlpanel/vouchers" onClick={this.onClickLink}>Vouchers</a>
               </div>
             </div>
           }

@@ -15,7 +15,7 @@ var Users = React.createClass({
   },
   getInitialState: function() {
     return this.getState()
-    
+
   },
   componentDidMount: function() {
     Actions.load()
@@ -25,7 +25,7 @@ var Users = React.createClass({
     this.setState(this.getState())
   },
   onClickView: function(item) {
-    this.transitionTo('/users/' + item._id)
+    this.transitionTo('/controlpanel/users/' + item._id)
   },
   render: function() {
     var self = this

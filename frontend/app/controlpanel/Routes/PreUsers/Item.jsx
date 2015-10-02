@@ -12,7 +12,7 @@ var PreUsersItem = React.createClass({
     return (
       <tr>
         <td>
-          <Link to='preuser' params={{id: preUser._id}}>{preUser.email}</Link>
+          <Link to={'/controlpanel/preusers/' + preUser._id}>{preUser.email}</Link>
         </td>
         <td>{preUser.ip}</td>
         <td>{preUser.active}</td>

@@ -21,6 +21,10 @@
 
 $layoutWidth: 1100px;
 
+html {
+  overflow-y: scroll;
+}
+
 html, body, #adminapp {
   height: 100%
 }
