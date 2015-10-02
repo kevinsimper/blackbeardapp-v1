@@ -26,6 +26,7 @@ var Registry = require('./components/Registry/')
 var CreditLogs = require('./components/CreditLogs/')
 var Usage = require('./components/Usage/')
 var AppEdit = require('./components/AppEdit/')
+var Verify = require('./components/Verify')
 
 var routes = (
   <Route path='/controlpanel' handler={ControlpanelApp}>
@@ -54,6 +55,7 @@ var routes = (
     <Route path='registry' handler={Registry}/>
     <Route path='creditlogs' handler={CreditLogs}/>
     <Route path='usage' handler={Usage}/>
+    <Route path='verify/:id' handler={Verify}/>
   </Route>
 )
 
