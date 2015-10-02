@@ -24,9 +24,13 @@ exports.inviteUser = function(request, reply) {
         from: 'Blackbeard <info@blackbeard.io>',
         to: user.email,
         subject: 'Blackbeard Credit Applied!',
-        text: "Your new account at Blackbeard has been credited for $"+credit+". To use this credit and take "+
-          "advantage of the hosting services provided by Blackbeard please login at http://blackbeard.io."+
-          "\n\nRegards,\nThe team at Blackbeard"
+        text: [
+          'Your new account at Blackbeard has been credited for $' + credit,
+          'To use this credit and take advantage of the hosting services ',
+          'provided by Blackbeard please login at ',
+          '<a href="https://blackbeard.io">https://blackbeard.io</a>.',
+          '\n\nRegards,\nThe team at Blackbeard'
+        ].join('')
     }
 
     Mail.send(data, function (error, body) {
@@ -50,4 +54,3 @@ exports.inviteUser = function(request, reply) {
     }
   })
 }
-
