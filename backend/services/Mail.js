@@ -40,13 +40,13 @@ exports.sendVerificationEmail = function(user) {
     return self.result.ALREADY_VERIFIED
   }
 
-  var token = new Hashids('sweetySWEET', 64, 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789')
+  var token = new Hashids('sweetySWEET', 32, 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ23456789')
   user.verifyCode = token.encode([Math.floor(Date.now() / 1000), Math.floor(Math.random()*100)])
 
   var user = user.save()
   return user.then(function(user) {
     return Promise.fromNode(function (cb) {
-      var href = 'https://blackbeard.io/controlpanel/verify/' + user._id + '?code=' + user.verifyCode
+      var href = 'https://blackbeard.io/controlpanel/verify/' + user.verifyCode
       self.send({
         from: 'Blackbeard <info@blackbeard.io>',
         to: user.email,

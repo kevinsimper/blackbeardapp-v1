@@ -249,14 +249,11 @@ lab.experiment('/users', function() {
       done()
     })
   })
-  var ADMIN_ID = '559396be05974b0c00b6b281'
   lab.test('Verify account', function(done) {
+    var code = 'PredictableVerifyCode'
     request({
       method: 'GET',
-      uri: appUrl + '/verify/' + ADMIN_ID,
-      qs: {
-        code: 'wq9y8XnWjnbJAGPavwmXpVNq9Y2BAwWpaytJKDB6erMdQx38y7Z5kRgKzgJRQYGJ'
-      },
+      uri: appUrl + '/verify/' + code,
       json: true
     }).spread(function(response, body) {
       expect(body.message, 'to be', 'Account verified.')

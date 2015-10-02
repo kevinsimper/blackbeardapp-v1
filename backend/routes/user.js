@@ -501,16 +501,13 @@ exports.getVerify = {
   auth: false,
   validate: {
     params: {
-      user: Joi.string().required()
-    },
-    query: {
       code: Joi.string().required()
     }
   },
   handler: function(request, reply) {
-    var userId = request.params.user
+    var code = request.params.code
 
-    User.findOne({_id: userId})
+    User.findOne({verifyCode: code})
     .then(function(user) {
       if (user === null) {
         throw new Promise.OperationalError(Mail.result.USER_NOT_FOUND)
@@ -519,8 +516,12 @@ exports.getVerify = {
       if (user.verified) {
         throw new Promise.OperationalError(Mail.result.ALREADY_VERIFIED)
       }
+      if (user.verifyCode !== code) {
+        throw new Error('Verify code is not correct')
+      }
 
       user.verified = true
+      user.verifyCode = ''
       return user.save()
     }).then(function(user) {
       reply({

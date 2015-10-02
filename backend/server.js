@@ -251,7 +251,7 @@ server.register(require('hapi-auth-jwt2'), function(err) {
   })
   server.route({
     method: 'GET',
-    path: '/verify/{user}',
+    path: '/verify/{code}',
     config: userRoutes.getVerify
   })
 
