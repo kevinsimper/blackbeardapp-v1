@@ -79,18 +79,25 @@ exports.getSynchronise = {
         }))
 
         if (matchCount === 0) {
-          var user = User.findOne({username: username})
-          return user
+          return User.findOne({
+            username: username
+          }).then(function (user) {
+            if(user === null) {
+              return false
+            } else {
+              return user
+            }
+          })
         }
 
-        return 'matched'
+        return false
       })
     })
 
     comparedUsers.then(function(comparedUsers) {
       return Promise.map(registryImages, function (registryImage, i) {
         var user = comparedUsers[i]
-        if (user !== 'matched') {
+        if (user !== false) {
           var dockerContentDigest = registryImage[0].dockerContentDigest
           var registryImageName = registryImage[0].name.split('/')
           var name = registryImageName[1]
