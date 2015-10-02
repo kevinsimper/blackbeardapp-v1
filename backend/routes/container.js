@@ -20,7 +20,7 @@ exports.postContainer = function(request, reply) {
       throw new Promise.OperationalError('panic')
     }
 
-    return system 
+    return system
   })
 
   var user = system.then(function(system) {
@@ -37,7 +37,7 @@ exports.postContainer = function(request, reply) {
   }).then(function(userApps) {
     return _.sum(_.flatten(_.map(userApps, function(userApp) {
       return _.map(userApp.containers, function(container) {
-        return (container.status === Container.status.UP)
+        return (container.deleted === false)
       })
     })))
   })
@@ -138,12 +138,22 @@ exports.getContainers = function(request, reply) {
 
 exports.deleteContainer = function(request, reply) {
   var containerId = request.params.container
-  var role = request.auth.credentials.role
 
-  Container.findOneByRole(containerId, role).then(function (container) {
-    return Promise.fromNode(function (callback) {
-      container.delete(callback)
-    })
+  var container = Container.findOne({
+    _id: containerId
+  }).then(function (container) {
+    if(container) {
+      return container
+    } else {
+      throw new Promise.OperationalError('Did not found')
+    }
+  })
+
+  container.then(function (container) {
+    container.status = Container.status.DOWN
+    container.deleted = true
+    container.deletedAt = new Date()
+    return container.saveAsync()
   }).spread(function (container) {
     return Queue.send('container-kill', {
       containerId: container._id
