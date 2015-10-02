@@ -37,7 +37,7 @@ var store = Reflux.createStore({
       .send({
         name: app.name,
         image: app.image,
-        port: app.port
+        ports: app.ports
       })
       .end(function(err, res) {
         if (err) {
