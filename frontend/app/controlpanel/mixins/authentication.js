@@ -4,7 +4,6 @@ var Authentication = {
   statics: {
     willTransitionTo: function (transition) {
       if (!auth.loggedIn()) {
-        transition.redirect('/login', {}, {'nextPath' : transition.path});
       }
     }
   }
