@@ -46,8 +46,8 @@ lab.experiment('Testing Billing service', function() {
 
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
-    Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      expect(hours, 'to be', 1)
+    Billing.getAppRunningTime(test, start, end).then(function(hours) {
+      expect(Math.round(hours * 100) / 100, 'to be', 0.67)
       done()
     })
   })
@@ -64,8 +64,8 @@ lab.experiment('Testing Billing service', function() {
 
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
-    Billing.getAppBillableHours(app, start, end).then(function(hours) {
-      expect(hours, 'to be', 3)
+    Billing.getAppRunningTime(app, start, end).then(function(hours) {
+      expect(Math.round(hours * 100) / 100, 'to be', 2.67)
       done()
     })
   })
@@ -87,8 +87,8 @@ lab.experiment('Testing Billing service', function() {
 
     var start = moment('2015-08', "YYYY-MM")
     var end = moment('2015-09', "YYYY-MM")
-    Billing.getAppBillableHours(app, start, end).then(function(hours) {
-      expect(hours, 'to be', 6)
+    Billing.getAppRunningTime(app, start, end).then(function(hours) {
+      expect(Math.round(hours * 100) / 100, 'to be', 5.33)
       done()
     })
   })
@@ -110,8 +110,8 @@ lab.experiment('Testing Billing service', function() {
 
     var start = moment('2015-08-01')
     var end = moment('2015-09-01')
-    Billing.getAppBillableHours(app, start, end).then(function(hours) {
-      expect(hours, 'to be', 3 + 24 + 3)
+    Billing.getAppRunningTime(app, start, end).then(function(hours) {
+      expect(hours, 'to be', (2 + (40/60)) + (24 + (2 + (40/60))))
       done()
     })
   })
@@ -128,7 +128,7 @@ lab.experiment('Testing Billing service', function() {
 
     var start = moment('2015-07-01')
     var end = moment('2015-09-01')
-    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+    Billing.getAppRunningTime(app, start, end).then(function(hours) {
       var total = Math.ceil(moment('2015-08-24 18:00:00').diff('2015-07-24 18:00:00', 'hours', true))
       expect(total, 'to be', 744)
       expect(hours, 'to be', total)
@@ -148,14 +148,24 @@ lab.experiment('Testing Billing service', function() {
 
     var start = moment('2015-08-01')
     var end = moment('2015-08-02')
-    Billing.getAppBillableHours(app, start, end).then(function(hours) {
+    Billing.getAppRunningTime(app, start, end).then(function(hours) {
       expect(hours, 'to be', 24)
       done()
     })
   })
   lab.test('Verify container that just started', function(done) {
-    var start = moment().subtract(1, 'day')
-    var end = moment().add(1, 'month')
+    var start = moment().set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    }).subtract(1, 'day')
+    var end = moment().set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    }).add(1, 'day')
 
     var fiveMinAgo = moment().subtract(5, 'minute').unix()
     var containers = [
@@ -167,14 +177,24 @@ lab.experiment('Testing Billing service', function() {
     var test = app.toObject()
     test.containers = containers
 
-    Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      expect(hours, 'to be', 1)
+    Billing.getAppRunningTime(test, start, end).then(function(hours) {
+      expect(Math.round(hours * 100) / 100, 'to be', 0.08)
       done()
     })
   })
   lab.test('Verify multiple containers', function(done) {
-    var start = moment().subtract(1, 'day')
-    var end = moment().add(1, 'month')
+    var start = moment().set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    }).subtract(1, 'day')
+    var end = moment().set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0
+    }).add(1, 'month')
 
     var oneAndHalfHoursAgo = moment().subtract(1.5, 'hour')
     var tenHoursAgo = moment().subtract(10, 'hour')
@@ -193,146 +213,146 @@ lab.experiment('Testing Billing service', function() {
     var test = app.toObject()
     test.containers = containers
 
-    Billing.getAppBillableHours(test, start, end).then(function(hours) {
-      expect(hours, 'to be', 2+9)
+    Billing.getAppRunningTime(test, start, end).then(function(hours) {
+      expect(Math.round(hours * 100) / 100, 'to be', 1.5 + 8.5)
       done()
     })
   })
 })
-
-lab.experiment('Testing Billing API', function() {
-  lab.test('/billing', function(done) {
-    var users = []
-    users[0] = request({
-      method: 'GET',
-      uri: appUrl + '/users',
-      json: true,
-      headers: {
-        'Authorization': adminToken
-      }
-    }).spread(function (response, body) {
-      return _.filter(body, function(user) {
-        return user.email == "user@blackbeard.io"
-      })
-    })
-
-    var billing = users[0].then(function (users) {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/billing',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
-    }).spread(function (response, body) {
-      expect(response.statusCode, 'to be', 200)
-      // Need to confirm charging was attempted
-      expect(body.data, 'to contain', 'did charge')
-
-      return body.data
-    })
-
-    // Billing for 1 hour occurs here randomly so stopped the container
-    var billing2 = billing.then(function () {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/billing',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
-    }).spread(function (response, body) {
-      expect(response.statusCode, 'to be', 200)
-      // Need to confirm no charge was made here
-      expect(body.data, 'to contain', 'did not charge')
-
-      return body.data
-    })
-
-    users[1] = billing2.then(function() {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/users',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
-    }).spread(function (response, body) {
-      return _.filter(body, function(user) {
-        return user.email == "user@blackbeard.io"
-      })
-    })
-
-    Promise.all([users[0], users[1]]).spread(function(user, userAfter) {
-      expect(user[0].virtualCredit, 'to be', 500)
-      expect(user[0].credit, 'to be', 500)
-      expect(userAfter[0].virtualCredit, 'not to equal', 0)
-      expect(userAfter[0].credit, 'not to equal', 0)
-
-      done()
-    })
-  })
-})
-
-lab.experiment('Test getBillableMonths', function() {
-  lab.test('Test getBillableMonths', function(done) {
-    // Get start of current month and go back 3 months and 10 days
-    var start = moment().set({
-      date: 1,
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0
-    }).subtract(3, 'month').subtract(10, 'day')
-
-    var containers = [
-      new Container({createdAt: start.unix()})
-    ]
-    var app = new App({name: "testApp"})
-    var testApp = app.toObject()
-    testApp.containers = containers
-
-    var dates = Billing.getBillableMonths([testApp])
-    dates.then(function(dates) {
-      // Will include:
-      // 1) current month
-      // 2) one month ago
-      // 3) two months ago
-      // 4) three months ago
-      // 5) four months ago (10 days of month)
-      expect(dates.length, 'to be', 5)
-
-      done()
-    })
-  })
-  lab.test('Test getBillableMonths 2', function(done) {
-    // Get start of current month and go back 13 days
-    var start = moment().set({
-      date: 1,
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0
-    }).subtract(13, 'day')
-
-    var containers = [
-      new Container({createdAt: start.unix()})
-    ]
-    var app = new App({name: "testApp"})
-    var testApp = app.toObject()
-    testApp.containers = containers
-
-    var dates = Billing.getBillableMonths([testApp])
-    dates.then(function(dates) {
-      // Will include:
-      // 1) current month
-      // 2) one month ago (13 days of month)
-      expect(dates.length, 'to be', 2)
-
-      done()
-    })
-  })
-})
+//
+//lab.experiment('Testing Billing API', function() {
+//  lab.test('/billing', function(done) {
+//    var users = []
+//    users[0] = request({
+//      method: 'GET',
+//      uri: appUrl + '/users',
+//      json: true,
+//      headers: {
+//        'Authorization': adminToken
+//      }
+//    }).spread(function (response, body) {
+//      return _.filter(body, function(user) {
+//        return user.email == "user@blackbeard.io"
+//      })
+//    })
+//
+//    var billing = users[0].then(function (users) {
+//      return request({
+//        method: 'GET',
+//        uri: appUrl + '/billing',
+//        json: true,
+//        headers: {
+//          'Authorization': adminToken
+//        }
+//      })
+//    }).spread(function (response, body) {
+//      expect(response.statusCode, 'to be', 200)
+//      // Need to confirm charging was attempted
+//      expect(body.data, 'to contain', 'did charge')
+//
+//      return body.data
+//    })
+//
+//    // Billing for 1 hour occurs here randomly so stopped the container
+//    var billing2 = billing.then(function () {
+//      return request({
+//        method: 'GET',
+//        uri: appUrl + '/billing',
+//        json: true,
+//        headers: {
+//          'Authorization': adminToken
+//        }
+//      })
+//    }).spread(function (response, body) {
+//      expect(response.statusCode, 'to be', 200)
+//      // Need to confirm no charge was made here
+//      expect(body.data, 'to contain', 'did not charge')
+//
+//      return body.data
+//    })
+//
+//    users[1] = billing2.then(function() {
+//      return request({
+//        method: 'GET',
+//        uri: appUrl + '/users',
+//        json: true,
+//        headers: {
+//          'Authorization': adminToken
+//        }
+//      })
+//    }).spread(function (response, body) {
+//      return _.filter(body, function(user) {
+//        return user.email == "user@blackbeard.io"
+//      })
+//    })
+//
+//    Promise.all([users[0], users[1]]).spread(function(user, userAfter) {
+//      expect(user[0].virtualCredit, 'to be', 500)
+//      expect(user[0].credit, 'to be', 500)
+//      expect(userAfter[0].virtualCredit, 'not to equal', 0)
+//      expect(userAfter[0].credit, 'not to equal', 0)
+//
+//      done()
+//    })
+//  })
+//})
+//
+//lab.experiment('Test getBillableMonths', function() {
+//  lab.test('Test getBillableMonths', function(done) {
+//    // Get start of current month and go back 3 months and 10 days
+//    var start = moment().set({
+//      date: 1,
+//      hour: 0,
+//      minute: 0,
+//      second: 0,
+//      millisecond: 0
+//    }).subtract(3, 'month').subtract(10, 'day')
+//
+//    var containers = [
+//      new Container({createdAt: start.unix()})
+//    ]
+//    var app = new App({name: "testApp"})
+//    var testApp = app.toObject()
+//    testApp.containers = containers
+//
+//    var dates = Billing.getBillableMonths([testApp])
+//    dates.then(function(dates) {
+//      // Will include:
+//      // 1) current month
+//      // 2) one month ago
+//      // 3) two months ago
+//      // 4) three months ago
+//      // 5) four months ago (10 days of month)
+//      expect(dates.length, 'to be', 5)
+//
+//      done()
+//    })
+//  })
+//  lab.test('Test getBillableMonths 2', function(done) {
+//    // Get start of current month and go back 13 days
+//    var start = moment().set({
+//      date: 1,
+//      hour: 0,
+//      minute: 0,
+//      second: 0,
+//      millisecond: 0
+//    }).subtract(13, 'day')
+//
+//    var containers = [
+//      new Container({createdAt: start.unix()})
+//    ]
+//    var app = new App({name: "testApp"})
+//    var testApp = app.toObject()
+//    testApp.containers = containers
+//
+//    var dates = Billing.getBillableMonths([testApp])
+//    dates.then(function(dates) {
+//      // Will include:
+//      // 1) current month
+//      // 2) one month ago (13 days of month)
+//      expect(dates.length, 'to be', 2)
+//
+//      done()
+//    })
+//  })
+//})

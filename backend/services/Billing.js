@@ -9,16 +9,16 @@ var debug = require('debug')('billing')
 module.exports = {
   topUpInterval: 1000,
   diffHours: function (start, stop) {
-    return Math.ceil(Math.abs(start.diff(stop, 'hours', true)))
+    return Math.abs(start.diff(stop, 'hours', true))
   },
   /**
   * Takes app and date range. From this all containers are retrieved and the
-  * amount of hours the containers are online are summed up.
+  * time the app's containers are online. This is the raw, unrounded figure, e.g. 1.2 hours.
   *
   * @param {moment} start
   * @param {moment} end
   */
-  getAppBillableHours: function (app, start, end) {
+  getAppRunningTime: function (app, start, end) {
     var self = this
     var now = moment()
     return new Promise(function (resolve) {
@@ -144,7 +144,7 @@ module.exports = {
         return Promise.all(monthsToGet.map(function(month) {
           var monthEnd = month.clone().add(1, 'month')
           return Promise.all(apps.map(function(app, index) {
-            return self.getAppBillableHours(app, month, monthEnd)
+            return self.getAppRunningTime(app, month, monthEnd)
           }))
         }))
       })
@@ -194,7 +194,7 @@ module.exports = {
 
     return Promise.all(days.map(function (day) {
       return new Promise(function (resolve, reject) {
-        var appBillableHours = self.getAppBillableHours(app, day, day.clone().add(1, 'day'))
+        var appBillableHours = self.getAppRunningTime(app, day, day.clone().add(1, 'day'))
 
         appBillableHours.then(function(appBillableHours) {
           resolve({

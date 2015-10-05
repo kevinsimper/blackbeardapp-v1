@@ -40,7 +40,7 @@ exports.getAllBilling = function(request, reply) {
       // Loops over each of the user's apps
       return Promise.all(apps.map(function(app) {
         // For each app get usage
-        return Billing.getAppBillableHours(app, moment.unix(timespans[index]), today)
+        return Billing.getAppRunningTime(app, moment.unix(timespans[index]), today)
       }))
     }))
   })
