@@ -5,6 +5,7 @@ var store = require('./store')
 var Table = require('../Table/')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
+var ClusterUsage = require('../ClusterUsage')
 
 var Clusters = React.createClass({
   mixins: [Reflux.ListenerMixin, Navigation],
@@ -30,7 +31,7 @@ var Clusters = React.createClass({
     var self = this
     return (
       <div className='Clusters'>
-        <h1>Clusters</h1>
+        <h1>Clusters  <ClusterUsage/></h1>
         <Table variant='striped'>
           <thead>
             <tr>
