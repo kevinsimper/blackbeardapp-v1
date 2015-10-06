@@ -183,6 +183,7 @@ exports.getAllClusterUsage = {
           var usage = usages[i]
           return {
             cluster: cluster._id,
+            limit: cluster.memory,
             memoryUsed: usage.memoryUsed,
             count: usage.count
           }
@@ -195,10 +196,14 @@ exports.getAllClusterUsage = {
       var countTotal = _.sum(_.map(result, function(cluster) {
         return cluster.count
       }))
+      var limitTotal = _.sum(_.map(result, function(cluster) {
+        return cluster.limit
+      }))
       reply({
         results: result,
         memoryUsed: memoryTotal,
-        count: countTotal
+        count: countTotal,
+        limit: limitTotal
       })
     }).error(function (err) {
       request.log(['error'], err)

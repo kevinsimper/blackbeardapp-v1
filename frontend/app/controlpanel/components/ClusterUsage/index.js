@@ -21,11 +21,12 @@ var ClusterUsage = React.createClass({
       })
   },
   render: function () {
-    var percentageUsed = this.state.usage.count ? (this.state.usage.memoryUsed / this.state.usage.count) : 0
+    // if you have used 1024mb and you are running 2 clusters
+    var percentageUsed = Math.round((this.state.usage.limit ? (this.state.usage.memoryUsed / this.state.usage.limit) : 0)*100)
 
     return (
       <div className='ClusterUsage'>
-        Total Memory Used: {this.state.usage.memoryUsed}, Total Clusters: {this.state.usage.count}, Percentage Used: {percentageUsed}
+        Total Memory Used: {this.state.usage.memoryUsed}, Total Containers: {this.state.usage.count}, Percentage Used: {percentageUsed}
       </div>
     )
   }
