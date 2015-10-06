@@ -71,7 +71,7 @@ var Sidebar = React.createClass({
               </div>
             </div>
           }
-          <div className='Sidebar__Item' style={{padding: 10}}>
+          <div className='Sidebar__Logout' style={{padding: 10}}>
             <Button onClick={auth.logout}>Log out</Button>
           </div>
         </div>
