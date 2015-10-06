@@ -1,8 +1,7 @@
 #! /usr/bin/env node
 
-// Fill out accessToken (from existing login) and ip below with your local configuration
-var accessToken = ''
-var ip = ''
+var accessToken = process.argv[2]
+var ip = process.argv[3]
 if(!accessToken) {
   throw new Error('You have to define accessToken!')
 }
