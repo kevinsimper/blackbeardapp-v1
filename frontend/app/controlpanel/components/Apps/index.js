@@ -32,7 +32,8 @@ var Apps = React.createClass({
   onChange: function() {
     this.setState(getState())
   },
-  onClickApp: function (app) {
+  onClickApp: function (app, e) {
+    e.preventDefault()
     this.transitionTo('/controlpanel/apps/' + app._id)
   },
   render: function() {

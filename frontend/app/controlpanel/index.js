@@ -2,6 +2,7 @@ var React = require('react');
 var Router = require('react-router')
 var Route = Router.Route
 var DefaultRoute = Router.DefaultRoute
+var config = require('./config')
 var ControlpanelApp = require('./components/ControlpanelApp/')
 var Dashboard = require('./components/Dashboard/')
 var Profile = require('./components/Profile/')
@@ -58,6 +59,12 @@ var routes = (
     <Route path='verify/:id' handler={Verify}/>
   </Route>
 )
+
+if(config.BACKEND_HOST === 'https://api.blackbeard.io') {
+  if (window.location.protocol != "https:") {
+    window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+  }
+}
 
 Router.run(routes, Router.HistoryLocation, function(Root) {
   React.render(<Root/>, document.querySelector('#adminapp'))
