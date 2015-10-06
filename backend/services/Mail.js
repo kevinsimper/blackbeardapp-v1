@@ -10,7 +10,7 @@ var User = require('../models/User')
 * @param {string} data.from
 * @param {string} data.to
 * @param {string} data.subject
-* @param {string} data.text
+* @param {string} data.html
 * @param {function} callback
 */
 exports.send = function (data, callback) {
@@ -51,7 +51,7 @@ exports.sendVerificationEmail = function(user) {
         from: 'Blackbeard <info@blackbeard.io>',
         to: user.email,
         subject: 'Blackbeard - Verify Email Account',
-        text: [
+        html: [
           'Please click on the following link to verify your account. \n\n',
           '<a href="' + href + '">',
           href,
