@@ -297,25 +297,7 @@ lab.experiment('Testing Billing API', function() {
       return body.data
     })
 
-    // Billing for 1 hour occurs here randomly so stopped the container
-    var billing2 = billing.then(function () {
-      return request({
-        method: 'GET',
-        uri: appUrl + '/billing',
-        json: true,
-        headers: {
-          'Authorization': adminToken
-        }
-      })
-    }).spread(function (response, body) {
-      expect(response.statusCode, 'to be', 200)
-      // Need to confirm no charge was made here
-      expect(body.data, 'to contain', 'did not charge')
-
-      return body.data
-    })
-
-    users[1] = billing2.then(function() {
+    users[1] = billing.then(function() {
       return request({
         method: 'GET',
         uri: appUrl + '/users',
