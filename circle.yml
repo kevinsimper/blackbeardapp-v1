@@ -17,6 +17,7 @@ dependencies:
     - curl -L https://github.com/docker/compose/releases/download/1.2.0/docker-compose-`uname -s`-`uname -m` > ./docker-compose
     - chmod +x ./docker-compose
     - mv config/development.yml.sample config/development.yml
+    - mv registry/config.yml.sample registry/config.yml
     - docker pull mongo:latest
     - docker pull node:4.0
     - docker pull registry:2
