@@ -5,7 +5,7 @@ var AppsActions = require('../Apps/actions')
 var AppsStore = require('../Apps/store')
 var store = require('./store')
 var actions = require('./actions')
-var Table = require('../table')
+var Table = require('../Table')
 var findWhere = require('lodash/collection/findWhere')
 
 var UsageDaily = React.createClass({
