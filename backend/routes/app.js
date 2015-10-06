@@ -202,7 +202,7 @@ exports.getUserBilling = function(request, reply) {
   var apps = App.find({user: user}).populate('containers')
 
   apps.then(function(apps) {
-    var userBilling = Billing.getBillableHoursPerApps(apps)
+    var userBilling = Billing.getUsagePerApps(apps)
     userBilling.then(function(userBilling) {
       reply(userBilling)
     })
@@ -220,8 +220,8 @@ exports.getUserBillingPerDay = {
       app: Joi.string().required()
     },
     query: {
-      from: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required(),
-      to: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/).required()
+      from: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/),
+      to: Joi.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/)
     }
   },
   handler: function(request, reply) {
@@ -231,10 +231,20 @@ exports.getUserBillingPerDay = {
     var app = App.findOne({_id: appId, user: user}).populate('containers')
 
     app.then(function(app) {
-      var from = moment(request.query.from)
-      var to = moment(request.query.to)
+      var from
+      var to
+      if(request.query.from) {
+        from = moment(request.query.from)
+      } else {
+        from = moment().startOf('month')
+      }
+      if(request.query.to) {
+        to = moment(request.query.to)
+      } else {
+        to = moment(from).endOf('month')
+      }
 
-      var userBilling = Billing.getBillableHoursPerAppWithDays(app, from, to)
+      var userBilling = Billing.getUsagePerAppWithDays(app, from, to)
       return userBilling.then(function(userBilling) {
         reply(userBilling)
       })

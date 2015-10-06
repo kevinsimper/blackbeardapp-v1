@@ -1,85 +1,128 @@
 var _ = require('lodash')
 var moment = require('moment')
 var Promise = require('bluebird')
-var App = Promise.promisifyAll(require('../models/App'))
-var User = Promise.promisifyAll(require('../models/User'))
-var UserRoles = require('../models/roles/')
-var Container = require('../models/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
-var stripe = require('stripe')(process.env.STRIPE_SECRET)
-var CreditCard = Promise.promisifyAll(require('../models/CreditCard'))
 var CreditCardService = require('../services/CreditCard')
-var ContainerService = require('../services/Container')
 var Payment = Promise.promisifyAll(require('../models/Payment'))
-var Boom = require('boom')
+var debug = require('debug')('billing')
 
 module.exports = {
   topUpInterval: 1000,
-  diffHours: function (a, b) {
-    return Math.ceil(a.diff(b)/1000/60/60)
+  diffHours: function (start, stop) {
+    return Math.abs(start.diff(stop, 'hours', true))
   },
   /**
   * Takes app and date range. From this all containers are retrieved and the
-  * amount of hours the containers are online are summed up.
+  * time the app's containers are online. This is the raw, unrounded figure, e.g. 1.2 hours.
   *
   * @param {moment} start
   * @param {moment} end
   */
-  getAppBillableHours: function (app, start, end) {
+  getAppRunningTime: function (app, start, end) {
     var self = this
-    return new Promise(function (resolve, reject) {
-      var hours = 0
-
-      app.containers.forEach(function (container, i) {
-        var current = 0
+    var now = moment()
+    return new Promise(function (resolve) {
+      var hours = app.containers.map(function (container) {
         var createdDate = moment.unix(container.createdAt)
+        var deletedDate = moment(Date.parse(container.deletedAt))
 
-        var deletedAt = null
-
-        if (!ContainerService.isCurrentlyRunning(container) || (Math.abs(createdDate.diff(moment())) >= 60*1000)) {
-          if (container.deletedAt) {
-            deletedAt = moment(Date.parse(container.deletedAt))
-          } else {
-            deletedAt = moment()
-          }
-
-          if (deletedAt === null || ((deletedAt.isSame(createdDate)) || (deletedAt.isBefore(createdDate)))) {
-            throw new Promise.OperationalError("Seems to be deleted and created at same exact time.")
-          }
-
-          if (deletedAt.isBefore(end)) {
-            // Stopped before end of month
-            // Stopped within month
-            if (createdDate.isBefore(start)) {
-              // Started before start of period
-              current = self.diffHours(deletedAt, start)
-
-            } else {
-              // Started at start of period
-              current = self.diffHours(deletedAt, createdDate)
-            }
-          } else {
-            // Stopped after end of month
-            if (createdDate.isBefore(start)) {
-              // Created before start so full month
-              current = self.diffHours(end, start)
-
-            } else {
-              // from midway through to end of month
-              current = self.diffHours(end, createdDate)
-            }
-          }
-
-          if (ContainerService.isCurrentlyRunning(container)) {
-            // App is currently running so we shouldn't count current hour
-            current -= 1
-          }
-
-          hours += current
+        if(start.isAfter(now)) {
+          debug('start.isAfter(now)')
+          return 0
         }
-      })
+        if(createdDate.isAfter(start) && createdDate.isAfter(end)) {
+          debug('createdDate.isAfter(start)')
+          return 0
+        }
+        if(deletedDate.isBefore(start) && deletedDate.isBefore(end)) {
+          debug('deletedDate.isBefore(start) ')
+          return 0
+        }
 
-      resolve(hours)
+        debug('deleted', container.deleted)
+        if(container.deleted) {
+          debug('createdDate.isAfter(start)', createdDate.isAfter(start))
+          if(createdDate.isAfter(start)) {
+            if(deletedDate.isBefore(end)) {
+              return self.diffHours(createdDate, deletedDate)
+            } else {
+              return self.diffHours(createdDate, end)
+            }
+          }
+          if(createdDate.isBefore(start)) {
+            if(deletedDate.isBefore(end)) {
+              return self.diffHours(start, deletedDate)
+            } else {
+              return self.diffHours(start, end)
+            }
+          }
+        }
+
+        debug('createdDate.isBefore(start)', createdDate.isBefore(start))
+        // if created before start and not deleted
+        if(createdDate.isBefore(start)) {
+          if(now.isBefore(end)) {
+            return self.diffHours(start, now)
+          } else {
+            return self.diffHours(start, end)
+          }
+        }
+        debug('isBetween', createdDate.isBetween(start, end))
+        if(createdDate.isBetween(start, end)) {
+          if(now.isBetween(start, end)) {
+            return self.diffHours(createdDate, now)
+          } else {
+            return self.diffHours(createdDate, end)
+          }
+        }
+        throw new Error('Billing has an error!')
+      })
+      debug('hours', hours)
+      var containerHours = []
+      _.each(app.containers, function(container, i) {
+        containerHours.push({
+          container: container._id,
+          hours: hours[i]
+        })
+      })
+      resolve(containerHours)
+    })
+  },
+  /**
+   * Takes app and start and end times. Returns amount of hours for reporting purposes.
+   * This is rounded up so may not reflect how the user is charged if billing is run at the same
+   * time.
+   */
+  getAppUsage: function (app, start, end) {
+    return this.getAppRunningTime(app, start, end).then(function(runningTime) {
+      return _.sum(_.map(runningTime, function (containerTime) {
+        return Math.ceil(containerTime.hours) // Container must be running over in full hour blocks
+      }))
+    })
+  },
+  /**
+   * Takes app and start and end times. Returns amount of hours for billing purposes.
+   * This will round up or down depending on the current state of the container, i.e.
+   * If the container is deleted (stopped) then the hours will be rounded up
+   * otherwise if the container is still running then it will be rounded down.
+   */
+  getAppBilling: function (app, start, end) {
+    return this.getAppRunningTime(app, start, end).then(function(runningTime) {
+      return _.sum(_.map(runningTime, function (containerTime) {
+        var hours = null
+
+        var container = _.find(app.containers, function(container) {
+          return containerTime.container == container._id
+        })
+
+        if (container.deleted) {
+          hours = Math.ceil(containerTime.hours)
+        } else {
+          hours = Math.floor(containerTime.hours)
+        }
+
+        return hours
+      }))
     })
   },
   /**
@@ -136,7 +179,7 @@ module.exports = {
   /**
   * Per month get apps (id and name) and the amount of hours they were run.
   */
-  getBillableHoursPerApps: function (apps) {
+  getUsagePerApps: function (apps) {
     var self = this
     return new Promise(function (resolve, reject) {
       var monthsToGet = self.getBillableMonths(apps)
@@ -145,7 +188,7 @@ module.exports = {
         return Promise.all(monthsToGet.map(function(month) {
           var monthEnd = month.clone().add(1, 'month')
           return Promise.all(apps.map(function(app, index) {
-            return self.getAppBillableHours(app, month, monthEnd)
+            return self.getAppBilling(app, month, monthEnd)
           }))
         }))
       })
@@ -183,7 +226,7 @@ module.exports = {
   /**
   * Per day get app (id and name) and the amount of hours they were run.
   */
-  getBillableHoursPerAppWithDays: function (app, from, to) {
+  getUsagePerAppWithDays: function (app, from, to) {
     var self = this
     var current = from.clone()
     var days = []
@@ -195,7 +238,7 @@ module.exports = {
 
     return Promise.all(days.map(function (day) {
       return new Promise(function (resolve, reject) {
-        var appBillableHours = self.getAppBillableHours(app, day, day.clone().add(1, 'day'))
+        var appBillableHours = self.getAppUsage(app, day, day.clone().add(1, 'day'))
 
         appBillableHours.then(function(appBillableHours) {
           resolve({
