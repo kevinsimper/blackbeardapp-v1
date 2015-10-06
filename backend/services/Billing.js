@@ -78,7 +78,51 @@ module.exports = {
         throw new Error('Billing has an error!')
       })
       debug('hours', hours)
-      resolve(_.sum(hours))
+      var containerHours = []
+      _.each(app.containers, function(container, i) {
+        containerHours.push({
+          container: container._id,
+          hours: hours[i]
+        })
+      })
+      resolve(containerHours)
+    })
+  },
+  /**
+   * Takes app and start and end times. Returns amount of hours for reporting purposes.
+   * This is rounded up so may not reflect how the user is charged if billing is run at the same
+   * time.
+   */
+  getAppUsage: function (app, start, end) {
+    return this.getAppRunningTime(app, start, end).then(function(runningTime) {
+      return _.sum(_.map(runningTime, function (containerTime) {
+        return Math.ceil(containerTime.hours) // Container must be running over in full hour blocks
+      }))
+    })
+  },
+  /**
+   * Takes app and start and end times. Returns amount of hours for billing purposes.
+   * This will round up or down depending on the current state of the container, i.e.
+   * If the container is deleted (stopped) then the hours will be rounded up
+   * otherwise if the container is still running then it will be rounded down.
+   */
+  getAppBilling: function (app, start, end) {
+    return this.getAppRunningTime(app, start, end).then(function(runningTime) {
+      return _.sum(_.map(runningTime, function (containerTime) {
+        var hours = null
+
+        var container = _.find(app.containers, function(container) {
+          return containerTime.container == container._id
+        })
+
+        if (container.deleted) {
+          hours = Math.ceil(containerTime.hours)
+        } else {
+          hours = Math.floor(containerTime.hours)
+        }
+
+        return hours
+      }))
     })
   },
   /**
@@ -144,7 +188,7 @@ module.exports = {
         return Promise.all(monthsToGet.map(function(month) {
           var monthEnd = month.clone().add(1, 'month')
           return Promise.all(apps.map(function(app, index) {
-            return self.getAppRunningTime(app, month, monthEnd)
+            return self.getAppBilling(app, month, monthEnd)
           }))
         }))
       })
