@@ -202,7 +202,7 @@ exports.getUserBilling = function(request, reply) {
   var apps = App.find({user: user}).populate('containers')
 
   apps.then(function(apps) {
-    var userBilling = Billing.getBillableHoursPerApps(apps)
+    var userBilling = Billing.getUsagePerApps(apps)
     userBilling.then(function(userBilling) {
       reply(userBilling)
     })
@@ -244,7 +244,7 @@ exports.getUserBillingPerDay = {
         to = moment(from).endOf('month')
       }
 
-      var userBilling = Billing.getBillableHoursPerAppWithDays(app, from, to)
+      var userBilling = Billing.getUsagePerAppWithDays(app, from, to)
       return userBilling.then(function(userBilling) {
         reply(userBilling)
       })

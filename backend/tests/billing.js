@@ -262,6 +262,59 @@ lab.experiment('Testing Billing service', function() {
       done()
     })
   })
+
+  lab.test('getUsagePerAppWithDays', function(done) {
+    var start = moment('2015-08', "YYYY-MM")
+    var end = moment('2015-09', "YYYY-MM")
+
+    var containers = [
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 18:40:00',
+        deleted: true
+      })
+    ]
+    var app = new App({name: "testApp"})
+    var test = app.toObject()
+    test.containers = containers
+
+    Billing.getUsagePerAppWithDays(test, start, end).then(function(result) {
+      var usage6th = _.find(result, function(item) {
+        return (item.day == '2015-08-06')
+      })
+      var usage7th = _.find(result, function(item) {
+        return (item.day == '2015-08-07')
+      })
+
+      expect(usage6th.hours, 'to be', 1)
+      expect(usage7th.hours, 'to be', 0)
+
+      done()
+    })
+  })
+
+  lab.test('getUsagePerApps', function(done) {
+    var start = moment('2015-08', "YYYY-MM")
+    var end = moment('2015-09', "YYYY-MM")
+
+    var containers = [
+      new Container({
+        createdAt: moment('2015-08-06 18:00:00').unix(),
+        deletedAt: '2015-08-06 18:40:00',
+        deleted: true
+      })
+    ]
+    var app = new App({name: "testApp"})
+    var test = app.toObject()
+    test.containers = containers
+
+    Billing.getUsagePerApps([test], start, end).then(function(result) {
+      expect(result.results.length, 'to be', 3)
+      expect(result.monthTotals['2015-08'], 'to be', 1)
+
+      done()
+    })
+  })
 })
 
 lab.experiment('Testing Billing API', function() {

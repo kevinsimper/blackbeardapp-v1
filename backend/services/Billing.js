@@ -179,7 +179,7 @@ module.exports = {
   /**
   * Per month get apps (id and name) and the amount of hours they were run.
   */
-  getBillableHoursPerApps: function (apps) {
+  getUsagePerApps: function (apps) {
     var self = this
     return new Promise(function (resolve, reject) {
       var monthsToGet = self.getBillableMonths(apps)
@@ -226,7 +226,7 @@ module.exports = {
   /**
   * Per day get app (id and name) and the amount of hours they were run.
   */
-  getBillableHoursPerAppWithDays: function (app, from, to) {
+  getUsagePerAppWithDays: function (app, from, to) {
     var self = this
     var current = from.clone()
     var days = []
@@ -238,7 +238,7 @@ module.exports = {
 
     return Promise.all(days.map(function (day) {
       return new Promise(function (resolve, reject) {
-        var appBillableHours = self.getAppRunningTime(app, day, day.clone().add(1, 'day'))
+        var appBillableHours = self.getAppUsage(app, day, day.clone().add(1, 'day'))
 
         appBillableHours.then(function(appBillableHours) {
           resolve({
