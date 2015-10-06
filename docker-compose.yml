@@ -40,7 +40,7 @@ db:
    - "27017:27017"
 
 registry:
-  image: registry:2
+  build: ./registry/
   ports:
    - "5000:5000"
   environment:

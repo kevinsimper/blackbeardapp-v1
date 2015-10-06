@@ -33,3 +33,5 @@ npm-debug.log
 backend/tests/server
 backend/fixtures/cluster.js
 backend/fixtures/mails
+
+registry/config.yml
