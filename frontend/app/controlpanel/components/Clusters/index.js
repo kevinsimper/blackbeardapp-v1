@@ -35,9 +35,9 @@ var Clusters = React.createClass({
       <div className='Clusters'>
         <Header>
           <h1>Clusters</h1>
+          <ClusterUsage/>
         </Header>
         <ContentBlock>
-          <ClusterUsage/>
           <Table variant='striped'>
             <thead>
               <tr>
