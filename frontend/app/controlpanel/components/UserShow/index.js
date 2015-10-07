@@ -7,6 +7,8 @@ var Input = require('../Input/')
 var moment = require('moment')
 var Navigation = require('react-router').Navigation
 var UserLogs = require('../UserLogs/')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var UserShow = React.createClass({
   mixins: [React.addons.LinkedStateMixin, Navigation],
@@ -41,59 +43,63 @@ var UserShow = React.createClass({
   render: function() {
     return (
       <div className="UserShow">
-        <h2>User</h2>
-        <Table variant='striped'>
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Id</td>
-              <td>{this.state._id}</td>
-            </tr>
-            <tr>
-              <td>Email</td>
-              <td><Input valueLink={this.linkState('email')}/></td>
-            </tr>
-            <tr>
-              <td>Credit</td>
-              <td>{this.state.credit}</td>
-            </tr>
-            <tr>
-              <td>Container Limit</td>
-              <td><Input valueLink={this.linkState('containerLimit')}/></td>
-            </tr>
-            <tr>
-              <td>Role</td>
-              <td>
-                <select valueLink={this.linkState('role')}>
-                  <option value='USER'>User</option>
-                  <option value='ADMIN'>Admin</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Created</td>
-              <td>{moment.unix(this.state.timestamp).format()} - {moment.unix(this.state.timestamp).fromNow()}</td>
-            </tr>
-            <tr>
-              <td>IP when signed up</td>
-              <td>{this.state.ip}</td>
-            </tr>
-            <tr>
-              <td>Deleted</td>
-              <td>{this.state.deleted && <span>Yes</span>}</td>
-            </tr>
-          </tbody>
-        </Table>
-        <div>
-          <Button variant='danger' onClick={this.onClickDeactivate}>Deactivate</Button>
-          <Button onClick={this.onClickSave}>Save</Button>
-        </div>
-        <UserLogs user={this.props.params.id}/>
+        <Header>
+          <h2>User</h2>
+        </Header>
+        <ContentBlock>
+          <Table variant='striped'>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Id</td>
+                <td>{this.state._id}</td>
+              </tr>
+              <tr>
+                <td>Email</td>
+                <td><Input valueLink={this.linkState('email')}/></td>
+              </tr>
+              <tr>
+                <td>Credit</td>
+                <td>{this.state.credit}</td>
+              </tr>
+              <tr>
+                <td>Container Limit</td>
+                <td><Input valueLink={this.linkState('containerLimit')}/></td>
+              </tr>
+              <tr>
+                <td>Role</td>
+                <td>
+                  <select valueLink={this.linkState('role')}>
+                    <option value='USER'>User</option>
+                    <option value='ADMIN'>Admin</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Created</td>
+                <td>{moment.unix(this.state.timestamp).format()} - {moment.unix(this.state.timestamp).fromNow()}</td>
+              </tr>
+              <tr>
+                <td>IP when signed up</td>
+                <td>{this.state.ip}</td>
+              </tr>
+              <tr>
+                <td>Deleted</td>
+                <td>{this.state.deleted && <span>Yes</span>}</td>
+              </tr>
+            </tbody>
+          </Table>
+          <div>
+            <Button variant='danger' onClick={this.onClickDeactivate}>Deactivate</Button>
+            <Button onClick={this.onClickSave}>Save</Button>
+          </div>
+          <UserLogs user={this.props.params.id}/>
+        </ContentBlock>
       </div>
     )
   }

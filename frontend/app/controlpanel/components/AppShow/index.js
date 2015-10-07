@@ -18,6 +18,8 @@ var TimeSince = require('../TimeSince/')
 var filter = require('lodash/collection/filter')
 var Reflux = require('reflux')
 var ButtonGroup = require('../ButtonGroup')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var AppShow = React.createClass({
   mixins: [Navigation, Reflux.ListenerMixin],
@@ -84,43 +86,47 @@ var AppShow = React.createClass({
 
     return (
       <div className='AppShow'>
-        <h1><StatusIcon/>{this.state.app.name}</h1>
-        <div>
+        <Header>
+          <h1><StatusIcon/>{this.state.app.name}</h1>
+        </Header>
+        <ContentBlock>
           <div>
-            <span>Image:&nbsp;</span>
-            <span> {this.state.image && this.state.image.name}</span>
+            <div>
+              <span>Image:&nbsp;</span>
+              <span> {this.state.image && this.state.image.name}</span>
+            </div>
+            <div>
+              <span>Port:&nbsp;</span>
+              <span> {this.state.app.ports.join(", ")}</span>
+            </div>
+            <div>
+              <span>Created:&nbsp;</span>
+              <TimeSince timestamp={this.state.app.timestamp}/>
+            </div>
+            <div>
+              <span>URL:&nbsp;</span>
+              {upContainers.length !== 0 &&
+              <a target='_BLANK' href={'http://' + this.state.app.name + '.blackbeardapps.com'}>
+                http://{this.state.app.name}.blackbeardapps.com
+              </a>
+              }
+              {upContainers.length === 0 &&
+              <span>-</span>
+              }
+            </div>
           </div>
           <div>
-            <span>Port:&nbsp;</span>
-            <span> {this.state.app.ports.join(", ")}</span>
+            <ButtonGroup>
+              <Button onClick={this.onClickStart}>Start Container</Button>
+              <Button onClick={this.onClickEdit}>Edit</Button>
+              {runningContainers.length === 0 &&
+                <Button variant='danger' onClick={this.onClickDelete}>Delete App</Button>
+              }
+            </ButtonGroup>
           </div>
-          <div>
-            <span>Created:&nbsp;</span>
-            <TimeSince timestamp={this.state.app.timestamp}/>
-          </div>
-          <div>
-            <span>URL:&nbsp;</span>
-            {upContainers.length !== 0 &&
-            <a target='_BLANK' href={'http://' + this.state.app.name + '.blackbeardapps.com'}>
-              http://{this.state.app.name}.blackbeardapps.com
-            </a>
-            }
-            {upContainers.length === 0 &&
-            <span>-</span>
-            }
-          </div>
-        </div>
-        <div>
-          <ButtonGroup>
-            <Button onClick={this.onClickStart}>Start Container</Button>
-            <Button onClick={this.onClickEdit}>Edit</Button>
-            {runningContainers.length === 0 &&
-              <Button variant='danger' onClick={this.onClickDelete}>Delete App</Button>
-            }
-          </ButtonGroup>
-        </div>
-        <Containers app={this.state.app._id} />
-        <AppLogs app={this.state.app._id} />
+          <Containers app={this.state.app._id} />
+          <AppLogs app={this.state.app._id} />
+        </ContentBlock>
       </div>
     );
   }

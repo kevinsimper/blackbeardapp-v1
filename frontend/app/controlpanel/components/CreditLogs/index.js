@@ -8,6 +8,8 @@ var Label = require('../Label')
 var CreditLogsActions = require('./actions')
 var CreditLogsStore = require('./store')
 var moment = require('moment')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var CreditLogs = React.createClass({
   getState: function() {
@@ -30,34 +32,38 @@ var CreditLogs = React.createClass({
   render: function() {
     return (
       <div>
-        <h2>Credit Logs</h2>
-        <Table variant='striped'>
-          <thead>
-          <tr>
-            <th>Created</th>
-            <th>User</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Source</th>
-            </tr>
-          </thead>
-          <tbody>
-        {this.state.creditLogs.map(function(object, i){
-          return <tr>
-              <td>{moment.unix(object.timestamp).format()}</td>
-              <td>
-                <Link className='Users__Link' to={'/controlpanel/users/' + object.user._id}>
-                  {object.user.email}
-                </Link>
-              </td>
-              <td>${(object.amount / 100).toFixed(2)}</td>
-              <td>{object.status}</td>
-              <td>{object.source}</td>
-            </tr>;
-        })}
-        </tbody>
-        </Table>
-        {this.state.loading && <div>Loading ...</div>}
+        <Header>
+          <h1>Credit Logs</h1>
+        </Header>
+        <ContentBlock>
+          <Table variant='striped'>
+            <thead>
+            <tr>
+              <th>Created</th>
+              <th>User</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+          {this.state.creditLogs.map(function(object, i){
+            return <tr>
+                <td>{moment.unix(object.timestamp).format()}</td>
+                <td>
+                  <Link className='Users__Link' to={'/controlpanel/users/' + object.user._id}>
+                    {object.user.email}
+                  </Link>
+                </td>
+                <td>${(object.amount / 100).toFixed(2)}</td>
+                <td>{object.status}</td>
+                <td>{object.source}</td>
+              </tr>;
+          })}
+          </tbody>
+          </Table>
+          {this.state.loading && <div>Loading ...</div>}
+        </ContentBlock>
       </div>
     )
   }

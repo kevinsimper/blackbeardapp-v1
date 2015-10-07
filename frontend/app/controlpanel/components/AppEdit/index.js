@@ -5,6 +5,8 @@ var Table = require('../Table')
 var Button = require('../Button')
 var request = require('superagent')
 var config = require('../../config')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var AppEdit = React.createClass({
   getInitialState: function () {
@@ -84,50 +86,54 @@ var AppEdit = React.createClass({
     var self = this
     return (
       <div className='AppEdit'>
-        <h2>Edit app</h2>
-        <h3>Environment Variables</h3>
-        <div style={{marginBottom: "0.5em"}}>These will be available inside the container as environment variables.</div>
-        <Table>
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>Value</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.environments.map(function (variable) {
-              return (
-                <tr className='AppEdit__Variable' key={variable.key}>
-                  <td className='AppEdit__Variable__Key'>
-                    {variable.key}
-                  </td>
-                  <td className='AppEdit__Variable__Value'>
-                    <Input type='text' value={variable.value} onChange={self.onExistingValueChange.bind(null, variable)} />
-                  </td>
-                  <td>
-                    <Button variant='danger' size='small' onClick={self.onClickDelete.bind(null, variable)}>Delete</Button>
-                  </td>
-                </tr>
-              )
-            })}
-            <tr>
-              <td>
-                <Input type='text' value={this.state.key} onChange={this.onKeyChange}/>
-              </td>
-              <td>
-                <Input type='text' value={this.state.value} onChange={this.onValueChange} />
-              </td>
-              <td>
-                <Button size='small' onClick={this.onClickAdd}>Add</Button>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-        <Button onClick={this.onClickSave}>Save</Button>
-        <div>
-          {this.state.status}
-        </div>
+        <Header>
+          <h2>Edit App settings</h2>
+        </Header>
+        <ContentBlock>
+          <h3>Environment Variables</h3>
+          <div style={{marginBottom: "0.5em"}}>These will be available inside the container as environment variables.</div>
+          <Table>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.environments.map(function (variable) {
+                return (
+                  <tr className='AppEdit__Variable' key={variable.key}>
+                    <td className='AppEdit__Variable__Key'>
+                      {variable.key}
+                    </td>
+                    <td className='AppEdit__Variable__Value'>
+                      <Input type='text' value={variable.value} onChange={self.onExistingValueChange.bind(null, variable)} />
+                    </td>
+                    <td>
+                      <Button variant='danger' size='small' onClick={self.onClickDelete.bind(null, variable)}>Delete</Button>
+                    </td>
+                  </tr>
+                )
+              })}
+              <tr>
+                <td>
+                  <Input type='text' value={this.state.key} onChange={this.onKeyChange}/>
+                </td>
+                <td>
+                  <Input type='text' value={this.state.value} onChange={this.onValueChange} />
+                </td>
+                <td>
+                  <Button size='small' onClick={this.onClickAdd}>Add</Button>
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+          <Button onClick={this.onClickSave}>Save</Button>
+          <div>
+            {this.state.status}
+          </div>
+        </ContentBlock>
       </div>
     )
   }

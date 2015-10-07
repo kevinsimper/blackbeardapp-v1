@@ -6,6 +6,8 @@ var Navigation = require('react-router').Navigation
 var StatusIcon = require('../StatusIcon/')
 var Table = require('../Table/')
 var ContainerItem = require('../ContainerItem/')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var store = require('./store')
 var actions = require('./actions')
@@ -46,28 +48,34 @@ module.exports = React.createClass({
 
     return (
       <div>
-      <h2>Billing for {this.props.params.month}</h2>
-      <Table>
-          <thead>
-          <tr>
-          <th>App</th>
-          <th>Hours</th>
-          </tr>
-          </thead>
-          <tbody>
-          {this.state.billing.apps.map(function(app) {
-            return <tr>
-              <td>{app.appName}</td>
-              <td>{app.hours}</td>
-            </tr>
-          })}
-          <tr />
-          <tr>
-            <th>Total</th>
-            <th>{this.state.billing.total}</th>
-          </tr>
-      </tbody>
-      </Table>
+        <Header>
+          <h2>Billing for {this.props.params.month}</h2>
+        </Header>
+        <ContentBlock>
+          <Table>
+            <thead>
+              <tr>
+                <th>App</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.billing.apps.map(function(app) {
+                return (
+                  <tr>
+                    <td>{app.appName}</td>
+                    <td>{app.hours}</td>
+                  </tr>
+                )
+              })}
+              <tr />
+              <tr>
+                <th>Total</th>
+                <th>{this.state.billing.total}</th>
+              </tr>
+            </tbody>
+          </Table>
+        </ContentBlock>
       </div>
     );
   }

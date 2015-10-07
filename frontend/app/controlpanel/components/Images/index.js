@@ -3,6 +3,8 @@ var actions = require('./actions')
 var store = require('./store')
 var moment = require('moment')
 var Table = require('../Table/')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var Images = React.createClass({
   getInitialState: function() {
@@ -26,29 +28,33 @@ var Images = React.createClass({
   render: function() {
     return (
       <div className='Images'>
-        <h2>Images</h2>
-        <Table variant='striped'>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.images.map(function(image) {
-              return (
-                <tr>
-                  <td>{image.name}</td>
-                  <td>
-                    <span title={moment.unix(image.createdAt).format()}>
-                      {moment.unix(image.createdAt).fromNow()}
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </Table>
+        <Header>
+          <h1>Images</h1>
+        </Header>
+        <ContentBlock>
+          <Table variant='striped'>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.images.map(function(image) {
+                return (
+                  <tr>
+                    <td>{image.name}</td>
+                    <td>
+                      <span title={moment.unix(image.createdAt).format()}>
+                        {moment.unix(image.createdAt).fromNow()}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </ContentBlock>
       </div>
     )
   }
