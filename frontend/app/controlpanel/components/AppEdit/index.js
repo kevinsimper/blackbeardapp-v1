@@ -31,18 +31,22 @@ var AppEdit = React.createClass({
       })
   },
   saveEnvironments: function () {
-    var self = this
-    request
-      .patch(config.BACKEND_HOST + '/users/me/apps/' + this.props.params.id)
-      .set('Authorization', localStorage.token)
-      .send({
-        environments: this.state.environments
-      })
-      .end(function(err, res) {
-        self.setState({
-          status: 'OK'
+    if (this.state.key != '') {
+      alert("You have an unsaved environment variable.")
+    } else {
+      var self = this
+      request
+        .patch(config.BACKEND_HOST + '/users/me/apps/' + this.props.params.id)
+        .set('Authorization', localStorage.token)
+        .send({
+          environments: this.state.environments
         })
-      })
+        .end(function (err, res) {
+          self.setState({
+            status: 'OK'
+          })
+        })
+    }
   },
   onKeyChange: function (e) {
     this.setState({
