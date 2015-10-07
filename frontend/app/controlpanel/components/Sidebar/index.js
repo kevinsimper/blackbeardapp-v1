@@ -3,6 +3,8 @@ var auth = require('../../auth')
 var Button = require('../Button/')
 var ProfileActions = require('../Profile/actions')
 var Navigation = require('react-router').Navigation
+var Link = require('react-router').Link
+var Logo = require('../Logo')
 
 var Sidebar = React.createClass({
   mixins: [Navigation],
@@ -27,7 +29,9 @@ var Sidebar = React.createClass({
     return (
       <div className='Sidebar'>
         <div className='Sidebar__Logo'>
-          <h2>Blackbeard</h2>
+          <Link to='/'>
+            <Logo/>
+          </Link>
         </div>
         <div className='Sidebar__List'>
           <div className='Sidebar__Item'>

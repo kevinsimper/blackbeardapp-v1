@@ -2,7 +2,16 @@
   color: #FFF;
   text-align: center;
 }
-.Sidebar__Logo {}
+.Sidebar__Logo {
+  width: 130px;
+  height: 130px;
+  line-height: 95px;
+  margin: 20px auto;
+  h2 {
+    margin: 0;
+    padding: 0;
+  }
+}
 .Sidebar__DividerTitel {
   font-size: 1.4rem;
 }
