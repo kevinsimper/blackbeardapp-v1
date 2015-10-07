@@ -16,5 +16,11 @@
     "file": "2015-09-03-uses",
     "title": "Use Cases of Blackbeard",
     "date": "2015-09-03 13:50"
+  },
+  {
+    "slug": "wordpress",
+    "file": "2015-09-30-wordpress",
+    "title": "Deploying a WordPress blog on Blackbeard",
+    "date": "2015-09-30 14:10"
   }]
 }
