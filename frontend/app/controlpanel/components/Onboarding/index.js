@@ -6,6 +6,8 @@ var Select = require('../Select')
 var request = require('superagent')
 var config = require('../../config')
 var classNames = require('classnames')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var Onboarding = React.createClass({
   getInitialState: function() {
@@ -72,42 +74,46 @@ var Onboarding = React.createClass({
     var self = this
     return (
       <div className="Onboarding">
-        <h1>Getting started using Blackbeard</h1>
-        <p>There is some things that you need to do before you can get started using Blackbeard.</p>
-        <p>You have to specify a username, that you are going to use when you log into the registry.</p>
-        <Label>What is your registry username?</Label>
-        <div className={this.inputClassesUsername()}>
-          <Input type='text' value={this.state.username} onChange={this.onChangeUsername}/>
-        </div>
-        {!this.state.success &&
-          <div>
-            <Button onClick={this.onClickSave}>Save</Button>
+        <Header>
+          <h1>Getting started using Blackbeard</h1>
+        </Header>
+        <ContentBlock>
+          <p>There is some things that you need to do before you can get started using Blackbeard.</p>
+          <p>You have to specify a username, that you are going to use when you log into the registry.</p>
+          <Label>What is your registry username?</Label>
+          <div className={this.inputClassesUsername()}>
+            <Input type='text' value={this.state.username} onChange={this.onChangeUsername}/>
           </div>
-        }
-        {this.state.status &&
-          <div className='Onboarding__Success'>
-            {this.state.status}
+          {!this.state.success &&
+            <div>
+              <Button onClick={this.onClickSave}>Save</Button>
+            </div>
+          }
+          {this.state.status &&
+            <div className='Onboarding__Success'>
+              {this.state.status}
+            </div>
+          }
+          {this.state.error &&
+            <div className='Onboarding__Error'>
+              {this.state.error}
+            </div>
+          }
+          <p>You are going to use your username like this:</p>
+          <div className='Onboarding__Terminal'>
+            <pre>
+              <code>$ docker login -u {this.state.username || '[username]'} registry.blackbeard.io</code>
+            </pre>
+            <pre>
+              <code>$ docker push registry.blackbeard.io/{this.state.username || '[username]'}/container</code>
+            </pre>
           </div>
-        }
-        {this.state.error &&
-          <div className='Onboarding__Error'>
-            {this.state.error}
-          </div>
-        }
-        <p>You are going to use your username like this:</p>
-        <div className='Onboarding__Terminal'>
-          <pre>
-            <code>$ docker login -u {this.state.username || '[username]'} registry.blackbeard.io</code>
-          </pre>
-          <pre>
-            <code>$ docker push registry.blackbeard.io/{this.state.username || '[username]'}/container</code>
-          </pre>
-        </div>
-        {this.state.success &&
-          <div style={{marginTop: 40}}>
-            <Button onClick={this.goToNext}>Go to dashboard!</Button>
-          </div>
-        }
+          {this.state.success &&
+            <div style={{marginTop: 40}}>
+              <Button onClick={this.goToNext}>Go to dashboard!</Button>
+            </div>
+          }
+        </ContentBlock>
       </div>
     )
   }

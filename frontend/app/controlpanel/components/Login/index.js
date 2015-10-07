@@ -5,6 +5,8 @@ var auth = require('../../auth')
 var Button = require('../Button/')
 var Input = require('../Input/')
 var Label = require('../Label/')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var Login = React.createClass({
   mixins: [Navigation],
@@ -41,18 +43,22 @@ var Login = React.createClass({
   render: function() {
     return (
       <div className='Login'>
-        <h1>Login</h1>
-        <form onSubmit={this.onSubmit}>
-          <Label>Email</Label>
-          <Input type="email" value={this.state.username} onChange={this.onUsernameChange} required/>
-          <Label>Password</Label>
-          <Input type="password" value={this.state.password} onChange={this.onPasswordChange} required/>
-          <div>
-            <Button type="submit">Log in</Button>
-            <Link to='/controlpanel/forgot' className='Login__Forgot'>Forgot password?</Link>
-          </div>
-          <div>{this.state.message}</div>
-        </form>
+        <Header>
+          <h1>Login</h1>
+        </Header>
+        <ContentBlock>
+          <form onSubmit={this.onSubmit}>
+            <Label>Email</Label>
+            <Input type="email" value={this.state.username} onChange={this.onUsernameChange} required/>
+            <Label>Password</Label>
+            <Input type="password" value={this.state.password} onChange={this.onPasswordChange} required/>
+            <div>
+              <Button type="submit">Log in</Button>
+              <Link to='/controlpanel/forgot' className='Login__Forgot'>Forgot password?</Link>
+            </div>
+            <div>{this.state.message}</div>
+          </form>
+        </ContentBlock>
       </div>
     );
   }

@@ -6,6 +6,8 @@ var request = require('superagent')
 var config = require('../../config')
 var auth = require('../../auth')
 var Navigation = require('react-router').Navigation
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var ForgotPassword = React.createClass({
   mixins: [Navigation],
@@ -72,7 +74,6 @@ var ForgotPassword = React.createClass({
 
     var requestForm = (
       <div>
-        <h1>Forgot Password</h1>
         <div>You will receive a email with a link you will have to click.</div>
         <Label>Email</Label>
         <Input type='email' placeholder='me@example.com' value={this.state.email} onChange={this.handleEmailChange}/>
@@ -84,8 +85,7 @@ var ForgotPassword = React.createClass({
 
     var changePasswordForm = (
       <div>
-        <h1>Change password</h1>
-        <Label>Password</Label>
+        <Label>Change password to:</Label>
         <Input type='password' value={this.props.password} onChange={this.handlePasswordChange} />
         <div>
           <Button onClick={this.onClickChange}>Change password</Button>
@@ -100,9 +100,14 @@ var ForgotPassword = React.createClass({
     }
     return (
       <div className="ForgotPassword">
-        {content}
-        {this.state.loading && <div>Loading</div>}
-        {this.state.message}
+        <Header>
+          <h1>Forgot Password</h1>
+        </Header>
+        <ContentBlock>
+          {content}
+          {this.state.loading && <div>Loading</div>}
+          {this.state.message}
+        </ContentBlock>
       </div>
     )
 
