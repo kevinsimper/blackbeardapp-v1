@@ -5,6 +5,8 @@ var Table = require('../Table')
 var Button = require('../Button')
 var Navigation = require('react-router').Navigation
 var moment = require('moment')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var Users = React.createClass({
   mixins: [Navigation],
@@ -15,7 +17,6 @@ var Users = React.createClass({
   },
   getInitialState: function() {
     return this.getState()
-
   },
   componentDidMount: function() {
     Actions.load()
@@ -31,38 +32,42 @@ var Users = React.createClass({
     var self = this
     return (
       <div className='Users'>
-        <h1>Users</h1>
-        <Table variant='striped'>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Credit</th>
-              <th>Timestamp</th>
-              <th>Deleted</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.users.map(function(item) {
-              var handler = self.onClickView.bind(null, item)
-              return (
-                <tr>
-                  <td>{item.email}</td>
-                  <td>{item.credit}</td>
-                  <td>
-                    <span title={moment.unix(item.timestamp).format()}>
-                      {moment.unix(item.timestamp).fromNow()}
-                    </span>
-                  </td>
-                  <td>{item.deleted && <span>Yes</span>}</td>
-                  <td>
-                    <Button size='small' onClick={handler}>View</Button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </Table>
+        <Header>
+          <h1>Users</h1>
+        </Header>
+        <ContentBlock>
+          <Table variant='striped'>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Credit</th>
+                <th>Timestamp</th>
+                <th>Deleted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.users.map(function(item) {
+                var handler = self.onClickView.bind(null, item)
+                return (
+                  <tr>
+                    <td>{item.email}</td>
+                    <td>{item.credit}</td>
+                    <td>
+                      <span title={moment.unix(item.timestamp).format()}>
+                        {moment.unix(item.timestamp).fromNow()}
+                      </span>
+                    </td>
+                    <td>{item.deleted && <span>Yes</span>}</td>
+                    <td>
+                      <Button size='small' onClick={handler}>View</Button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </ContentBlock>
       </div>
     )
   }

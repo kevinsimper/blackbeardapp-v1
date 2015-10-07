@@ -4,6 +4,8 @@ var PreUsersStore = require('./Store')
 var Authentication = require('../../mixins/authentication')
 var PreUsersItem = require('./Item.jsx')
 var Table = require('../../components/Table/')
+var Header = require('../../components/Header')
+var ContentBlock = require('../../components/ContentBlock')
 
 var getState = function() {
   return {
@@ -30,23 +32,27 @@ var ListPreUsers = React.createClass({
     var self = this
     return (
       <div>
-        <h1>PreUsers</h1>
-        <Table variant='striped'>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>IP</th>
-              <th>Active</th>
-              <th>Comment</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.preUsers.map(function(preUser, i) {
-              return <PreUsersItem preUser={preUser} key={i} />;
-            })}
-          </tbody>
-        </Table>
+        <Header>
+          <h1>PreUsers</h1>
+        </Header>
+        <ContentBlock>
+          <Table variant='striped'>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>IP</th>
+                <th>Active</th>
+                <th>Comment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.preUsers.map(function(preUser, i) {
+                return <PreUsersItem preUser={preUser} key={i} />;
+              })}
+            </tbody>
+          </Table>
+        </ContentBlock>
       </div>
     );
   }

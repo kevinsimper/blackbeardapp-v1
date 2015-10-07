@@ -6,6 +6,8 @@ var Table = require('../Table/')
 var Button = require('../Button/')
 var Navigation = require('react-router').Navigation
 var ClusterUsage = require('../ClusterUsage')
+var Header = require('../Header/')
+var ContentBlock = require('../ContentBlock/')
 
 var Clusters = React.createClass({
   mixins: [Reflux.ListenerMixin, Navigation],
@@ -31,37 +33,41 @@ var Clusters = React.createClass({
     var self = this
     return (
       <div className='Clusters'>
-        <ClusterUsage/>
-        <h1>Clusters</h1>
-        <Table variant='striped'>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Machines</th>
-              <th>Memory</th>
-              <th>Container Limit %</th>
-              <th>Deleted</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.clusters.map(function (item) {
-              var handler = self.onClickView.bind(null, item)
-              return (
-                <tr>
-                  <td>{item.type}</td>
-                  <td>{item.machines}</td>
-                  <td>{item.memory}</td>
-                  <td>{Math.round(item.pressure*100)}</td>
-                  <td>{item.deleted && 'Yes'}</td>
-                  <td>
-                    <Button size='small' onClick={handler}>View</Button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </Table>
+        <Header>
+          <h1>Clusters</h1>
+          <ClusterUsage/>
+        </Header>
+        <ContentBlock>
+          <Table variant='striped'>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Machines</th>
+                <th>Memory</th>
+                <th>Container Limit %</th>
+                <th>Deleted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.clusters.map(function (item) {
+                var handler = self.onClickView.bind(null, item)
+                return (
+                  <tr>
+                    <td>{item.type}</td>
+                    <td>{item.machines}</td>
+                    <td>{item.memory}</td>
+                    <td>{Math.round(item.pressure*100)}</td>
+                    <td>{item.deleted && 'Yes'}</td>
+                    <td>
+                      <Button size='small' onClick={handler}>View</Button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </ContentBlock>
       </div>
     )
   }

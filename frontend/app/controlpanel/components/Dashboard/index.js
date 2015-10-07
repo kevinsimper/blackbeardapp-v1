@@ -9,7 +9,9 @@ var ErrorMessage = require('../ErrorMessage/')
 var ProfileActions = require('../Profile/actions')
 var ProfileStore = require('../Profile/store')
 var AppsStore = require('../Apps/store')
-var Navigation = require('react-router').Navigation;
+var Navigation = require('react-router').Navigation
+var Header = require('../Header/')
+var ContentBlock = require('../ContentBlock/')
 
 var Dashboard = React.createClass({
   mixins: [Authentication, Navigation, Reflux.ListenerMixin],
@@ -77,52 +79,56 @@ var Dashboard = React.createClass({
     }
     return (
       <div>
-        <h1>Dashboard</h1>
-        {!this.state.profile.verified &&
-          (this.state.profile.verificationSendStatus === undefined ||
-          this.state.profile.verificationSendStatus === false) &&
-          <div>
-            <div>To use Blackbeard you need to verify your email address</div>
-            {this.state.loadingVerify &&
-              <span>Loading...</span>
-            }
-            {!this.state.loadingVerify &&
-              <Button onClick={this.onClickVerify}>Resend Verification Email</Button>
-            }
-            {this.state.profile.verificationSendStatus === false &&
-              <ErrorMessage>Verification email could not be sent</ErrorMessage>
-            }
-          </div>
-        }
-        {!this.state.profile.verified &&
-          this.state.profile.verificationSendStatus === true &&
-          <div style={{fontWeight: 'bold', marginBottom: '1em'}}>
-            Verification email sent.
-          </div>
-        }
-        {!this.isCreditcardDone() &&
-          <div style={{marginBottom: '1em'}}>
-            <div>To deploy containers on Blackbeard you need to supply a credit card!</div>
-            <Button onClick={this.onClickCreditCard}>Enter Card Details</Button>
-          </div>
-        }
-        {this.state.apps.length === 0 &&
-          <div>
-            <div>You have not created any apps, go and create your first app! It is easier than you think!</div>
-            <Button onClick={this.onClickCreate} style={{fontSize: '1.4em'}}>Create New App</Button>
+        <Header>
+          <h1>Dashboard</h1>
+        </Header>
+        <ContentBlock>
+          {!this.state.profile.verified &&
+            (this.state.profile.verificationSendStatus === undefined ||
+            this.state.profile.verificationSendStatus === false) &&
             <div>
-              <small>Button is larger than default, just so that you don't miss it! Serious, go check it out! ;-)</small>
+              <div>To use Blackbeard you need to verify your email address</div>
+              {this.state.loadingVerify &&
+                <span>Loading...</span>
+              }
+              {!this.state.loadingVerify &&
+                <Button onClick={this.onClickVerify}>Resend Verification Email</Button>
+              }
+              {this.state.profile.verificationSendStatus === false &&
+                <ErrorMessage>Verification email could not be sent</ErrorMessage>
+              }
             </div>
-          </div>
-        }
-        {this.state.apps.length > 0 &&
-          <div>
-            <div>Hi there! How are you doing?</div>
-            <Button onClick={this.onClickCreate}>Create New App</Button>
-            <h2>My Apps</h2>
-            <Apps/>
-          </div>
-        }
+          }
+          {!this.state.profile.verified &&
+            this.state.profile.verificationSendStatus === true &&
+            <div style={{fontWeight: 'bold', marginBottom: '1em'}}>
+              Verification email sent.
+            </div>
+          }
+          {!this.isCreditcardDone() &&
+            <div style={{marginBottom: '1em'}}>
+              <div>To deploy containers on Blackbeard you need to supply a credit card!</div>
+              <Button onClick={this.onClickCreditCard}>Enter Card Details</Button>
+            </div>
+          }
+          {this.state.apps.length === 0 &&
+            <div>
+              <div>You have not created any apps, go and create your first app! It is easier than you think!</div>
+              <Button onClick={this.onClickCreate} style={{fontSize: '1.4em'}}>Create New App</Button>
+              <div>
+                <small>Button is larger than default, just so that you don't miss it! Serious, go check it out! ;-)</small>
+              </div>
+            </div>
+          }
+          {this.state.apps.length > 0 &&
+            <div>
+              <div>Hi there! How are you doing?</div>
+              <Button onClick={this.onClickCreate}>Create New App</Button>
+              <h2>My Apps</h2>
+              <Apps/>
+            </div>
+          }
+        </ContentBlock>
       </div>
     );
   }

@@ -11,6 +11,8 @@ var Snippet = require('../Snippet')
 var Navigation = require('react-router').Navigation
 var ClusterStatus = require('../ClusterStatus')
 var ClusterContainers = require('../ClusterContainers')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var ClusterShow = React.createClass({
   mixins: [Reflux.ListenerMixin, Navigation],
@@ -57,89 +59,93 @@ var ClusterShow = React.createClass({
 
     return (
       <div className='ClusterShow'>
-        <Button onClick={this.onClickStartContainer}>Start container</Button>
-        <h1>Cluster</h1>
-        <Table variant='striped'>
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Type</td>
-              <td>{this.state.cluster.type}</td>
-            </tr>
-            <tr>
-              <td>Machines</td>
-              <td>{this.state.cluster.machines}</td>
-            </tr>
-            <tr>
-              <td>Machines</td>
-              <td>{this.state.cluster.memory}</td>
-            </tr>
-            <tr>
-              <td>IP</td>
-              <td>{this.state.cluster.ip}</td>
-            </tr>
-            {this.state.cluster.type === 'swarm' &&
-              <div>
-                <tr>
-                  <td>CA</td>
-                  <td>
-                    <Snippet>
-                      {this.state.cluster.certificates.ca}
-                    </Snippet>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Certificate</td>
-                  <td>
-                    <Snippet>
-                      {this.state.cluster.certificates.cert}
-                    </Snippet>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Key</td>
-                  <td>
-                    <Snippet>
-                      {this.state.cluster.certificates.key}
-                    </Snippet>
-                  </td>
-                </tr>
-                <tr>
-                  <td>SSH Public</td>
-                  <td>
-                    <Snippet>
-                      {this.state.cluster.certificates.sshPublic}
-                    </Snippet>
-                  </td>
-                </tr>
-                <tr>
-                  <td>SSH Private</td>
-                  <td>
-                    <Snippet>
-                      {this.state.cluster.certificates.sshPrivate}
-                    </Snippet>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Deleted</td>
-                  <td>{this.state.cluster.deletedAt}</td>
-                </tr>
-              </div>
-            }
-          </tbody>
-        </Table>
-        <div>
-          <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
-        </div>
-        <div>
-          <ClusterStatus cluster={this.props.params.id}/>
-          <ClusterContainers cluster={this.props.params.id}/>
-        </div>
+        <Header>
+          <h1>Cluster</h1>
+        </Header>
+        <ContentBlock>
+          <Button onClick={this.onClickStartContainer}>Start container</Button>
+          <Table variant='striped'>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Type</td>
+                <td>{this.state.cluster.type}</td>
+              </tr>
+              <tr>
+                <td>Machines</td>
+                <td>{this.state.cluster.machines}</td>
+              </tr>
+              <tr>
+                <td>Machines</td>
+                <td>{this.state.cluster.memory}</td>
+              </tr>
+              <tr>
+                <td>IP</td>
+                <td>{this.state.cluster.ip}</td>
+              </tr>
+              {this.state.cluster.type === 'swarm' &&
+                <div>
+                  <tr>
+                    <td>CA</td>
+                    <td>
+                      <Snippet>
+                        {this.state.cluster.certificates.ca}
+                      </Snippet>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Certificate</td>
+                    <td>
+                      <Snippet>
+                        {this.state.cluster.certificates.cert}
+                      </Snippet>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Key</td>
+                    <td>
+                      <Snippet>
+                        {this.state.cluster.certificates.key}
+                      </Snippet>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SSH Public</td>
+                    <td>
+                      <Snippet>
+                        {this.state.cluster.certificates.sshPublic}
+                      </Snippet>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SSH Private</td>
+                    <td>
+                      <Snippet>
+                        {this.state.cluster.certificates.sshPrivate}
+                      </Snippet>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Deleted</td>
+                    <td>{this.state.cluster.deletedAt}</td>
+                  </tr>
+                </div>
+              }
+            </tbody>
+          </Table>
+          <div>
+            <Button variant='danger' onClick={this.onClickDelete}>Delete</Button>
+          </div>
+          <div>
+            <ClusterStatus cluster={this.props.params.id}/>
+            <ClusterContainers cluster={this.props.params.id}/>
+          </div>
+        </ContentBlock>
       </div>
     )
   }

@@ -11,6 +11,8 @@ var VoucherClaim = require('../VoucherClaim/')
 var ProfileActions = require('./actions')
 var moment = require('moment')
 var classes = require('classnames')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var Profile = React.createClass({
   getState: function() {
@@ -71,41 +73,45 @@ var Profile = React.createClass({
     })
     return (
       <div>
-        <div className='Profile__block'>
-          <form onSubmit={this.onSubmit}>
-            <h1>Profile</h1>
-            <Label>Name</Label>
-            <Input type='text' value={this.state.name} className={nameClasses} onChange={this.handleNameChange}/>
-            <Label>E-mail</Label>
-            <Input type='text' value={this.state.email} className={emailClasses} onChange={this.handleEmailChange}/>
-            <Label>Docker Registry Username</Label>
-            <Input type='text' value={this.state.username} disabled='disabled'/>
-            <div>
-              <Button type='submit'>Update</Button>
-            </div>
-            {this.state.loading && <div>Loading...</div>}
-            {this.state.message}
-          </form>
-        </div>
-        <div className='Profile__block'>
-          <h2>Information</h2>
-            <div>Current Balance</div>
-            <div>${this.state.credit / 100}</div>
-            <div>Registration Date</div>
-            <div>{moment.unix(this.state.timestamp).format()}</div>
-        </div>
-        <div className='Profile__block'>
-          <VoucherClaim/>
-        </div>
-        <div className='Profile__block'>
-          <Creditcards/>
-        </div>
-        <div className='Profile__block'>
-          <CreditcardsFormular/>
-        </div>
-        <div className='Profile__block'>
-          <PreviousPayments/>
-        </div>
+        <Header>
+          <h1>Profile</h1>
+        </Header>
+        <ContentBlock>
+          <div className='Profile__block'>
+            <form onSubmit={this.onSubmit}>
+              <Label>Name</Label>
+              <Input type='text' value={this.state.name} className={nameClasses} onChange={this.handleNameChange}/>
+              <Label>E-mail</Label>
+              <Input type='text' value={this.state.email} className={emailClasses} onChange={this.handleEmailChange}/>
+              <Label>Docker Registry Username</Label>
+              <Input type='text' value={this.state.username} disabled='disabled'/>
+              <div>
+                <Button type='submit'>Update</Button>
+              </div>
+              {this.state.loading && <div>Loading...</div>}
+              {this.state.message}
+            </form>
+          </div>
+          <div className='Profile__block'>
+            <h2>Information</h2>
+              <div>Current Balance</div>
+              <div>${this.state.credit / 100}</div>
+              <div>Registration Date</div>
+              <div>{moment.unix(this.state.timestamp).format()}</div>
+          </div>
+          <div className='Profile__block'>
+            <VoucherClaim/>
+          </div>
+          <div className='Profile__block'>
+            <Creditcards/>
+          </div>
+          <div className='Profile__block'>
+            <CreditcardsFormular/>
+          </div>
+          <div className='Profile__block'>
+            <PreviousPayments/>
+          </div>
+        </ContentBlock>
       </div>
     );
   }

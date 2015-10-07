@@ -11,6 +11,8 @@ var Button = require('../Button/')
 var ImagesSelect = require('../ImagesSelect/index')
 var ErrorMessage = require('../ErrorMessage/')
 var Select = require('../Select')
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var AppCreate = React.createClass({
   mixins: [Navigation],
@@ -123,26 +125,32 @@ var AppCreate = React.createClass({
   render: function() {
     var self = this
     return (
-      <form className="App" onSubmit={this.onSubmit}>
-        <h1>Create app</h1>
-        <Label>Name</Label>
-        <Input type="text" value={this.state.name} onChange={this.onChangeName} />
-        <Label>Image</Label>
-        <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
-        <Label>Port</Label>
-        {(this.state.exposedPorts.length > 0) &&
-        <Select value={this.state.ports} onChange={this.onChangePort}>
-          {this.state.exposedPorts.map(function(port) {
-            return <option value={port}>{port}</option>
-          })}
-        </Select>}
-        {!this.state.image && <span>Please select an image</span>}
-        {this.state.image && (this.state.exposedPorts.length == 0) && <span>There are no ports to expose.</span>}
-        <ErrorMessage>{this.state.status}</ErrorMessage>
-        <div>
-          <Button>Create app</Button>
-        </div>
-      </form>
+      <div className="AppCreate">
+        <Header>
+          <h1>Create app</h1>
+        </Header>
+        <ContentBlock>
+          <form onSubmit={this.onSubmit}>
+            <Label>Name</Label>
+            <Input type="text" value={this.state.name} onChange={this.onChangeName} />
+            <Label>Image</Label>
+            <ImagesSelect images={this.state.images} value={this.state.image} onChange={this.onChangeImage}/>
+            <Label>Port</Label>
+            {(this.state.exposedPorts.length > 0) &&
+            <Select value={this.state.ports} onChange={this.onChangePort}>
+              {this.state.exposedPorts.map(function(port) {
+                return <option value={port}>{port}</option>
+              })}
+            </Select>}
+            {!this.state.image && <span>Please select an image</span>}
+            {this.state.image && (this.state.exposedPorts.length == 0) && <span>There are no ports to expose.</span>}
+            <ErrorMessage>{this.state.status}</ErrorMessage>
+            <div>
+              <Button>Create app</Button>
+            </div>
+          </form>
+        </ContentBlock>
+      </div>
     );
   }
 })

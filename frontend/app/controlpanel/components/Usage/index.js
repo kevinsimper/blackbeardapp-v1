@@ -5,6 +5,8 @@ var Table = require('../Table/')
 var UsageDaily = require('../UsageDaily/')
 var Router = require('react-router')
 var Link = Router.Link
+var Header = require('../Header')
+var ContentBlock = require('../ContentBlock')
 
 var store = require('./store')
 var actions = require('./actions')
@@ -42,43 +44,47 @@ var Usage = React.createClass({
 
     return (
       <div>
-        <h2>Usage</h2>
-        <Table>
-          <thead>
-            <tr>
-              <th>Month</th>
-              <th>Application</th>
-              <th>Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-          {Object.keys(this.state.billing.monthTotals).map(function(key) {
-            var rows = []
-            self.state.billing.results.map(function (billing) {
-              if (billing.month === key) {
-                rows.push(<tr>
-                  <td>{billing.month}</td>
-                  <td>
-                    <Link to={'/controlpanel/apps/' + billing.app._id}>
-                      {billing.app.name}
-                    </Link>
-                  </td>
-                  <td>{billing.hours}</td>
-                </tr>)
-              }
-            })
+        <Header>
+          <h1>Usage</h1>
+        </Header>
+        <ContentBlock>
+          <Table>
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Application</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+            {Object.keys(this.state.billing.monthTotals).map(function(key) {
+              var rows = []
+              self.state.billing.results.map(function (billing) {
+                if (billing.month === key) {
+                  rows.push(<tr>
+                    <td>{billing.month}</td>
+                    <td>
+                      <Link to={'/controlpanel/apps/' + billing.app._id}>
+                        {billing.app.name}
+                      </Link>
+                    </td>
+                    <td>{billing.hours}</td>
+                  </tr>)
+                }
+              })
 
-            rows.push(<tr>
-              <td></td>
-              <td></td>
-              <td style={{fontWeight: "bold"}}>{self.state.billing.monthTotals[key]}</td>
-            </tr>)
+              rows.push(<tr>
+                <td></td>
+                <td></td>
+                <td style={{fontWeight: "bold"}}>{self.state.billing.monthTotals[key]}</td>
+              </tr>)
 
-            return rows;
-          })}
-          </tbody>
-        </Table>
-        <UsageDaily/>
+              return rows;
+            })}
+            </tbody>
+          </Table>
+          <UsageDaily/>
+        </ContentBlock>
       </div>
     );
   }

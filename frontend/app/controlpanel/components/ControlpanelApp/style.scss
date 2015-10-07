@@ -1,5 +1,6 @@
 .ControlpanelApp {
   display: flex;
+  background-color: #f7f7f7;
   min-height: 100vh;
   @media(max-width: 500px) {
     flex-direction: column;
@@ -16,8 +17,4 @@
 }
 .ControlpanelApp__Content {
   flex: 7;
-  padding: 1rem;
-  @media(min-width: 500px) {
-    padding: 2rem;
-  }
 }
