@@ -7,6 +7,7 @@ var request = require('superagent')
 var config = require('../../config')
 var Header = require('../Header')
 var ContentBlock = require('../ContentBlock')
+var ErrorMessage = require('../ErrorMessage/')
 
 var AppEdit = React.createClass({
   getInitialState: function () {
@@ -43,7 +44,7 @@ var AppEdit = React.createClass({
         })
         .end(function (err, res) {
           self.setState({
-            status: 'OK'
+            status: 'Environment variables successfully saved.'
           })
         })
     }
@@ -95,6 +96,7 @@ var AppEdit = React.createClass({
         </Header>
         <ContentBlock>
           <h3>Environment Variables</h3>
+          <ErrorMessage>{this.state.status}</ErrorMessage>
           <div style={{marginBottom: "0.5em"}}>These will be available inside the container as environment variables.</div>
           <Table>
             <thead>
@@ -134,9 +136,6 @@ var AppEdit = React.createClass({
             </tbody>
           </Table>
           <Button onClick={this.onClickSave}>Save</Button>
-          <div>
-            {this.state.status}
-          </div>
         </ContentBlock>
       </div>
     )
