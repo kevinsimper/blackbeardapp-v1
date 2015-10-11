@@ -7,8 +7,11 @@ var request = require('superagent')
 var config = require('../../config')
 var Header = require('../Header')
 var ContentBlock = require('../ContentBlock')
+var ErrorMessage = require('../ErrorMessage/')
+var Navigation = require('react-router').Navigation
 
 var AppEdit = React.createClass({
+  mixins: [Navigation],
   getInitialState: function () {
     return {
       app: {},
@@ -43,7 +46,7 @@ var AppEdit = React.createClass({
         })
         .end(function (err, res) {
           self.setState({
-            status: 'OK'
+            status: 'Environment variables successfully saved.'
           })
         })
     }
@@ -75,6 +78,10 @@ var AppEdit = React.createClass({
   onClickSave: function () {
     this.saveEnvironments()
   },
+  onClickBack: function (e) {
+    e.preventDefault()
+    this.transitionTo("/controlpanel/apps/"+this.props.params.id)
+  },
   onExistingValueChange: function (variable, e) {
     var copy = this.state.environments.slice()
     copy.forEach(function (item) {
@@ -94,7 +101,9 @@ var AppEdit = React.createClass({
           <h2>Edit App settings</h2>
         </Header>
         <ContentBlock>
+          {this.state.app && <a href="" onClick={this.onClickBack}>&lt; Back to App</a>}
           <h3>Environment Variables</h3>
+          <div style={{color: "green", fontWeight: "bold", marginBottom: "0.5em"}}>{this.state.status}</div>
           <div style={{marginBottom: "0.5em"}}>These will be available inside the container as environment variables.</div>
           <Table>
             <thead>
@@ -134,9 +143,6 @@ var AppEdit = React.createClass({
             </tbody>
           </Table>
           <Button onClick={this.onClickSave}>Save</Button>
-          <div>
-            {this.state.status}
-          </div>
         </ContentBlock>
       </div>
     )

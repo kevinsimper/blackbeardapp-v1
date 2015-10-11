@@ -78,7 +78,7 @@ var AppShow = React.createClass({
   render: function() {
     var self = this
     if(!this.state.loaded) {
-      return <div>Loading ...</div>
+      return <ContentBlock><div>Loading ...</div></ContentBlock>
     }
 
     var runningContainers = filter(this.state.containers, {deleted: false}) || []
